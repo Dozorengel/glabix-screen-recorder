@@ -16,9 +16,9 @@ startBtn.addEventListener("click", () => {
   console.log("Btn clicked")
 
   // Web Camera
-  const media2 = navigator.mediaDevices.getUserMedia({ video: true })
+  // const media2 = navigator.mediaDevices.getUserMedia({ video: true })
 
-  console.log(media2)
+  // console.log(media2)
 
   const media = navigator.mediaDevices.getDisplayMedia({
     audio: false,

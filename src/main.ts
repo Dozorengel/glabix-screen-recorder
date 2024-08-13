@@ -23,9 +23,7 @@ function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     transparent: true,
-    title: "Glabix",
-    // frame: true,
-    // fullscreen: true,
+    frame: false,
     show: false,
     alwaysOnTop: true,
     width,
@@ -38,6 +36,7 @@ function createWindow() {
   })
 
   // and load the index.html of the app.
+  mainWindow.setWindowButtonVisibility(false)
   mainWindow.loadFile("index.html")
 
   // Open the DevTools.
