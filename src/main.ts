@@ -85,7 +85,7 @@ function createMenu() {
     {
       label: "Выйти",
       click: () => {
-        mainWindow.close()
+        app.quit()
       },
     },
   ])
