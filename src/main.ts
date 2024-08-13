@@ -22,7 +22,7 @@ function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    // transparent: true,
+    transparent: true,
     frame: false,
     roundedCorners: false, // macOS, not working on Windows
     thickFrame: false,
