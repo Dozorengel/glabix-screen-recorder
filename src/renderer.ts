@@ -1,10 +1,39 @@
-const startBtn = document.getElementById("startBtn")
-const stopBtn = document.getElementById("stopBtn")
+const startBtn = document.getElementById("startBtn") as HTMLButtonElement
+const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
+const recordTimer = document.getElementById("recordTimer") as HTMLButtonElement
 
 let mediaRecorder: MediaRecorder
 let recordedChunks: Blob[] = []
+let seconds: number = 0
+let minutes: number = 0
+let timerInterval // typescript
 // let width: number
 // let height: number
+
+function startRecordTimer() {
+  timerInterval = setInterval(() => {
+    seconds++
+
+    if (seconds >= 60) {
+      seconds = 0
+      minutes++
+    }
+
+    recordTimer.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+  }, 1000)
+
+  startBtn.disabled = true
+  stopBtn.disabled = false
+}
+
+function stopRecordTimer() {
+  clearInterval(timerInterval)
+  seconds = 0
+  minutes = 0
+  recordTimer.textContent = "00:00"
+  startBtn.disabled = false
+  stopBtn.disabled = true
+}
 
 startBtn.addEventListener("click", () => {
   // window.electronAPI.startRecording();
@@ -64,6 +93,7 @@ startBtn.addEventListener("click", () => {
 
       // Start recording
       mediaRecorder.start()
+      startRecordTimer()
     })
     .catch((e) => console.log(e))
 })
@@ -76,6 +106,7 @@ stopBtn.addEventListener("click", () => {
   // Stop recording
   if (mediaRecorder) {
     mediaRecorder.stop()
+    stopRecordTimer()
   }
 })
 
