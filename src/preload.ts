@@ -1,6 +1,14 @@
 import { contextBridge, ipcRenderer } from "electron"
 
+// rename "electronAPI" ? to more suitable
 contextBridge.exposeInMainWorld("electronAPI", {
+  toggleRecordButtons: (isRecording) => {
+    const startBtn = document.getElementById("startBtn") as HTMLButtonElement
+    const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
+
+    startBtn.disabled = isRecording
+    stopBtn.disabled = !isRecording
+  },
   startRecording: () => ipcRenderer.send("start-recording"),
   stopRecording: () => ipcRenderer.send("stop-recording"),
   onRecordingFinished: (callback) =>

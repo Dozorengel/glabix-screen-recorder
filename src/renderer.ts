@@ -21,9 +21,6 @@ function startRecordTimer() {
 
     recordTimer.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
   }, 1000)
-
-  startBtn.disabled = true
-  stopBtn.disabled = false
 }
 
 function stopRecordTimer() {
@@ -31,8 +28,6 @@ function stopRecordTimer() {
   seconds = 0
   minutes = 0
   recordTimer.textContent = "00:00"
-  startBtn.disabled = false
-  stopBtn.disabled = true
 }
 
 startBtn.addEventListener("click", () => {
@@ -94,6 +89,7 @@ startBtn.addEventListener("click", () => {
       // Start recording
       mediaRecorder.start()
       startRecordTimer()
+      window.electronAPI.toggleRecordButtons(true)
     })
     .catch((e) => console.log(e))
 })
@@ -107,6 +103,7 @@ stopBtn.addEventListener("click", () => {
   if (mediaRecorder) {
     mediaRecorder.stop()
     stopRecordTimer()
+    window.electronAPI.toggleRecordButtons(false)
   }
 })
 
