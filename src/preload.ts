@@ -1,7 +1,13 @@
 import { contextBridge, ipcRenderer } from "electron"
 
 // rename "electronAPI" ? to more suitable
-contextBridge.exposeInMainWorld("electronAPI", {
+export const electronAPI = {
+  startRecording: () => ipcRenderer.send("start-recording"),
+  stopRecording: () => ipcRenderer.send("stop-recording"),
+  onRecordingFinished: (callback) =>
+    ipcRenderer.on("recording-finished", callback),
+  onCanvasCreate: (callback) => ipcRenderer.on("create-canvas", callback),
+  onCanvasDestroy: (callback) => ipcRenderer.on("destroy-canvas", callback),
   toggleRecordButtons: (isRecording) => {
     const startBtn = document.getElementById("startBtn") as HTMLButtonElement
     const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
@@ -9,22 +15,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
     startBtn.disabled = isRecording
     stopBtn.disabled = !isRecording
   },
-  startRecording: () => ipcRenderer.send("start-recording"),
-  stopRecording: () => ipcRenderer.send("stop-recording"),
-  onRecordingFinished: (callback) =>
-    ipcRenderer.on("recording-finished", callback),
-})
+}
 
-window.addEventListener("DOMContentLoaded", () => {
-  const replaceText = (selector, text) => {
-    const element = document.getElementById(selector)
-    if (element) element.innerText = text
-  }
-
-  for (const type of ["chrome", "node", "electron"]) {
-    replaceText(`${type}-version`, process.versions[type])
-  }
-})
+contextBridge.exposeInMainWorld("electronAPI", electronAPI)
 
 let isMouseOverInteractiveElement = false
 

@@ -1,3 +1,24 @@
+import "./index.css"
+import { Canvas, Rect } from "fabric"
+
+let canvas: Canvas
+
+window.electronAPI.onCanvasCreate(() => {
+  canvas = new Canvas("canvas")
+  const rect = new Rect({
+    top: 0,
+    left: 0,
+    width: 60,
+    height: 70,
+    fill: "red",
+  })
+  canvas.add(rect)
+})
+
+window.electronAPI.onCanvasDestroy(() => {
+  canvas.dispose()
+})
+
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement
 const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
 const recordTimer = document.getElementById("recordTimer") as HTMLButtonElement

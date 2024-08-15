@@ -7,35 +7,18 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
     />
-    <link href="./styles.css" rel="stylesheet" />
     <title>Glabix Screen Recorder</title>
-    <style>
-      html,
-      body {
-        margin: 0;
-        width: 100%;
-        height: 100%;
-        background: transparent;
-      }
-
-      .controls {
-        width: 100px;
-        height: 100px;
-        background: rgb(128, 191, 255);
-      }
-
-      h1 {
-        margin: 0;
-      }
-    </style>
   </head>
 
   <body>
+    <h1>Glabix Screen Recorder!</h1>
     <div class="controls">
       <button id="startBtn" class="clickable">Start Recording</button>
       <button id="stopBtn" class="clickable" disabled>Stop Recording</button>
       <div id="recordTimer">00:00</div>
     </div>
+
+    <canvas id="canvas" width="300" height="300"></canvas>
     <!-- You can also require other files to run in this process -->
     <script type="module" src="/src/renderer.ts"></script>
   </body>

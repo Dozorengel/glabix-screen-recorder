@@ -1,6 +1,7 @@
 import type { ConfigEnv, UserConfig } from "vite"
 import { defineConfig } from "vite"
 import { pluginExposeRenderer } from "./vite.base.config"
+import postcssNesting from "postcss-nesting"
 
 // https://vitejs.dev/config
 export default defineConfig((env) => {
@@ -20,5 +21,10 @@ export default defineConfig((env) => {
       preserveSymlinks: true,
     },
     clearScreen: false,
+    css: {
+      postcss: {
+        plugins: [postcssNesting],
+      },
+    },
   } as UserConfig
 })
