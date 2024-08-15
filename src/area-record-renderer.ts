@@ -125,6 +125,13 @@ import Moveable, { MoveableRefTargetType } from "moveable"
 
   startScreenAreaBtn.addEventListener("click", () => {
     window.electronAPI.setIgnoreMouseEvents(true)
+    const screen = document.getElementById("__screen__")
+    screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
+    console.log("screen", screen)
+
+    const screenMove = moveable.getControlBoxElement()
+    screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
+
     setButtonsState("start")
     navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
       const canvas = document.getElementById("__screen_canvas__")
@@ -158,7 +165,7 @@ import Moveable, { MoveableRefTargetType } from "moveable"
     screen.id = "__screen__"
     screen.classList.add("clickable")
     screen.style.cssText =
-      "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 640px; height: 480px; box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 0px 9999px;"
+      "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 640px; height: 480px; outline: solid 2px #4af;"
     document.body.appendChild(screen)
 
     // Создание canvas для захвата области экрана
