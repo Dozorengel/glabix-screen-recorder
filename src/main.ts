@@ -34,17 +34,19 @@ function createWindow() {
     height,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      // nodeIntegration: true, // Enable Node.js integration
+      zoomFactor: 1.0,
+      nodeIntegration: true, // Enable Node.js integration
       // contextIsolation: false, // Disable context isolation (not recommended for production)
     },
   })
 
   // and load the index.html of the app.
+  // mainWindow.setSimpleFullScreen(false)
   mainWindow.setWindowButtonVisibility(false)
   mainWindow.loadFile("index.html")
   mainWindow.setAlwaysOnTop(true, "normal", 3000)
 
-  mainWindow.setIgnoreMouseEvents(true, { forward: true })
+  // mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()

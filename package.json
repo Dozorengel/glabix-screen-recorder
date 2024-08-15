@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
-    "konva": "^9.3.14"
+    "konva": "^9.3.14",
+    "moveable": "^0.53.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",

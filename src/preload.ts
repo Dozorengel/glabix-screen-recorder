@@ -1,7 +1,16 @@
 import { contextBridge, ipcRenderer } from "electron"
-
+let isIgnoreMouseEventsFreeze = false
 // rename "electronAPI" ? to more suitable
 export const electronAPI = {
+  setIgnoreMouseEvents: (flag: boolean) => {
+    if (!flag) {
+      isIgnoreMouseEventsFreeze = true
+      ipcRenderer.send("set-ignore-mouse-events", false)
+    } else {
+      isIgnoreMouseEventsFreeze = false
+      ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
+    }
+  },
   startRecording: () => ipcRenderer.send("start-recording"),
   stopRecording: () => ipcRenderer.send("stop-recording"),
   onRecordingFinished: (callback) =>
@@ -19,22 +28,59 @@ export const electronAPI = {
 
 contextBridge.exposeInMainWorld("electronAPI", electronAPI)
 
-let isMouseOverInteractiveElement = false
-
 window.addEventListener("DOMContentLoaded", () => {
-  const interactiveElements = document.querySelectorAll(".clickable")
+  const backdrop = document.querySelector(".page-backdrop")
 
-  interactiveElements.forEach((element) => {
-    element.addEventListener("mouseenter", () => {
-      console.log("Mouse enter")
-      isMouseOverInteractiveElement = true
-      ipcRenderer.send("set-ignore-mouse-events", false)
-    })
-
-    element.addEventListener("mouseleave", () => {
-      console.log("Mouse leave")
-      isMouseOverInteractiveElement = false
+  backdrop.addEventListener(
+    "mouseenter",
+    () => {
+      console.log("backdrop mouseenter")
       ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
-    })
-  })
+    },
+    false
+  )
+
+  backdrop.addEventListener(
+    "mouseleave",
+    () => {
+      console.log("backdrop mouseleave")
+      ipcRenderer.send("set-ignore-mouse-events", false)
+    },
+    false
+  )
+
+  // document.body.addEventListener('mouseover', (event) => {
+  //   const target = event.target as HTMLElement
+  //   const isClickable = target.classList.contains('clickable') || Boolean(target.closest('.clickable'))
+
+  //   console.log('isClickable', isClickable)
+
+  //   if (isClickable && !isIgnoreMouseEventsFreeze) {
+  //     ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
+  //   } else {
+  //     ipcRenderer.send("set-ignore-mouse-events", false)
+  //   }
+  // }, false)
+
+  // const interactiveElements = document.querySelectorAll(".clickable")
+
+  // console.log('interactiveElements', interactiveElements)
+
+  // interactiveElements.forEach((element) => {
+  //   element.addEventListener("mouseenter", () => {
+  //     if (!isIgnoreMouseEventsFreeze) {
+  //       console.log("Mouse enter")
+  //       isMouseOverInteractiveElement = true
+  //       ipcRenderer.send("set-ignore-mouse-events", false)
+  //     }
+  //   })
+
+  //   element.addEventListener("mouseleave", () => {
+  //     if (!isIgnoreMouseEventsFreeze) {
+  //       console.log("Mouse leave")
+  //       isMouseOverInteractiveElement = false
+  //       ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
+  //     }
+  //   })
+  // })
 })

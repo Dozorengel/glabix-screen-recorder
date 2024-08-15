@@ -11,7 +11,8 @@
   </head>
 
   <body>
-    <h1>Glabix Screen Recorder!</h1>
+    <div class="page-backdrop"></div>
+    <!-- <h1>Glabix Screen Recorder!</h1> -->
     <div class="controls">
       <button id="startBtn" class="clickable">Start Recording</button>
       <button id="stopBtn" class="clickable" disabled>Stop Recording</button>
@@ -19,7 +20,23 @@
     </div>
 
     <div id="container"></div>
+    <canvas id="canvas" width="300" height="300"></canvas>
+
+    <div class="screen-area-controls">
+      <button id="getScreenAreaBtn" class="clickable">
+        Выбрать часть экрана
+      </button>
+      <br />
+      <button id="startScreenAreaBtn" class="clickable" disabled>
+        Начать запись
+      </button>
+      <br />
+      <button id="stopScreenAreaBtn" class="clickable" disabled>
+        Остановить запись
+      </button>
+    </div>
     <!-- You can also require other files to run in this process -->
     <script type="module" src="/src/renderer.ts"></script>
+    <script type="module" src="/src/area-record-renderer.ts"></script>
   </body>
 </html>
