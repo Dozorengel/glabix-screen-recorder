@@ -11,10 +11,20 @@ import {
 } from "electron"
 import path from "path"
 
+import Store from "electron-store"
+import ElectronStore from "electron-store"
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 // if (require("electron-squirrel-startup")) {
 //   app.quit()
 // }
+
+// Create an instance of Store
+const store = new Store({
+  defaults: {
+    isRecording: false, // Set the default recording state to false
+  },
+})
 
 let mainWindow: BrowserWindow
 
@@ -185,4 +195,18 @@ app.on("activate", () => {
 ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   win.setIgnoreMouseEvents(ignore, options)
+})
+
+// Initialize is_recording from store
+let isRecording = store.get("is_recording") || false
+
+// Listen for IPC events to update is_recording
+ipcMain.on("set-recording", (event, recordingState) => {
+  isRecording = recordingState
+  store.set("is_recording", isRecording)
+})
+
+// Listen for IPC events to get current recording state
+ipcMain.handle("get-recording", () => {
+  return isRecording
 })

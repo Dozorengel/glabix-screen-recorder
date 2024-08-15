@@ -1,23 +1,24 @@
 import "./index.css"
-import { Canvas, Rect } from "fabric"
+// Uncomment when canvas ready
+// import { Canvas, Rect } from "fabric"
 
-let canvas: Canvas
+// let canvas: Canvas
 
-window.electronAPI.onCanvasCreate(() => {
-  canvas = new Canvas("canvas")
-  const rect = new Rect({
-    top: 0,
-    left: 0,
-    width: 60,
-    height: 70,
-    fill: "red",
-  })
-  canvas.add(rect)
-})
+// window.electronAPI.onCanvasCreate(() => {
+//   canvas = new Canvas("canvas")
+//   const rect = new Rect({
+//     top: 0,
+//     left: 0,
+//     width: 60,
+//     height: 70,
+//     fill: "red",
+//   })
+//   canvas.add(rect)
+// })
 
-window.electronAPI.onCanvasDestroy(() => {
-  canvas.dispose()
-})
+// window.electronAPI.onCanvasDestroy(() => {
+//   canvas.dispose()
+// })
 
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement
 const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
@@ -49,6 +50,25 @@ function stopRecordTimer() {
   seconds = 0
   minutes = 0
   recordTimer.textContent = "00:00"
+}
+
+function toggleRecordButtons(isRecording) {
+  startBtn.disabled = isRecording
+  stopBtn.disabled = !isRecording
+}
+
+async function toggleRecording() {
+  const currentState = await window.electronAPI.getRecordingState()
+  const newState = !currentState
+
+  console.log("CURRENT REC STATE: ", currentState)
+  console.log("NEW REC STATE: ", newState)
+
+  // Update the recording state in the main process
+  window.electronAPI.setRecordingState(newState)
+
+  // Update the button states
+  toggleRecordButtons(newState)
 }
 
 startBtn.addEventListener("click", () => {
@@ -110,7 +130,7 @@ startBtn.addEventListener("click", () => {
       // Start recording
       mediaRecorder.start()
       startRecordTimer()
-      window.electronAPI.toggleRecordButtons(true)
+      toggleRecording()
     })
     .catch((e) => console.log(e))
 })
@@ -124,7 +144,7 @@ stopBtn.addEventListener("click", () => {
   if (mediaRecorder) {
     mediaRecorder.stop()
     stopRecordTimer()
-    window.electronAPI.toggleRecordButtons(false)
+    toggleRecording()
   }
 })
 

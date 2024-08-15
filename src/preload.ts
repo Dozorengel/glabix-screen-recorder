@@ -8,13 +8,8 @@ export const electronAPI = {
     ipcRenderer.on("recording-finished", callback),
   onCanvasCreate: (callback) => ipcRenderer.on("create-canvas", callback),
   onCanvasDestroy: (callback) => ipcRenderer.on("destroy-canvas", callback),
-  toggleRecordButtons: (isRecording) => {
-    const startBtn = document.getElementById("startBtn") as HTMLButtonElement
-    const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
-
-    startBtn.disabled = isRecording
-    stopBtn.disabled = !isRecording
-  },
+  getRecordingState: () => ipcRenderer.invoke("get-recording"),
+  setRecordingState: (state) => ipcRenderer.send("set-recording", state),
 }
 
 contextBridge.exposeInMainWorld("electronAPI", electronAPI)
