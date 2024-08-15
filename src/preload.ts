@@ -1,11 +1,15 @@
 import { contextBridge, ipcRenderer } from "electron"
 
-contextBridge.exposeInMainWorld("electronAPI", {
+export const electronAPI = {
   startRecording: () => ipcRenderer.send("start-recording"),
   stopRecording: () => ipcRenderer.send("stop-recording"),
   onRecordingFinished: (callback) =>
     ipcRenderer.on("recording-finished", callback),
-})
+  onCanvasCreate: (callback) => ipcRenderer.on("create-canvas", callback),
+  onCanvasDestroy: (callback) => ipcRenderer.on("destroy-canvas", callback),
+}
+
+contextBridge.exposeInMainWorld("electronAPI", electronAPI)
 
 window.addEventListener("DOMContentLoaded", () => {
   const replaceText = (selector, text) => {

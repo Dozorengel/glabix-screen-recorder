@@ -19,7 +19,7 @@ import path from "path"
 let mainWindow: BrowserWindow
 
 function createWindow() {
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+  const { x, y, width, height } = screen.getPrimaryDisplay().bounds
   // Create the browser window.
   mainWindow = new BrowserWindow({
     transparent: true,
@@ -28,6 +28,8 @@ function createWindow() {
     thickFrame: false,
     show: false,
     alwaysOnTop: true,
+    x,
+    y,
     width,
     height,
     webPreferences: {
@@ -40,6 +42,9 @@ function createWindow() {
   // and load the index.html of the app.
   mainWindow.setWindowButtonVisibility(false)
   mainWindow.loadFile("index.html")
+  mainWindow.setAlwaysOnTop(true, "normal", 3000)
+
+  mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -74,6 +79,17 @@ function createMenu() {
         console.log("Crop screen")
       },
     },
+    {
+      label: "Нарисовать стрелку",
+      id: "createCanvas",
+      click: () => createCanvas(),
+    },
+    {
+      label: "Закончить рисование",
+      id: "destroyCanvas",
+      visible: false,
+      click: () => destroyCanvas(),
+    },
     // { label: 'Parent show', click: () => { mainWindow.show() } },
     // { label: 'Child show', click: () => { childWindow.show() } },
     {
@@ -93,6 +109,38 @@ function createMenu() {
 
   tray.setToolTip("Glabix video app.")
   tray.setContextMenu(contextMenu)
+
+  function createCanvas() {
+    mainWindow.webContents.send("create-canvas")
+
+    const createCanvasItemIndex = contextMenu.items.findIndex(
+      (i) => i.id === "createCanvas"
+    )
+    contextMenu.items[createCanvasItemIndex].visible = false
+
+    const destroyCanvasItemIndex = contextMenu.items.findIndex(
+      (i) => i.id === "destroyCanvas"
+    )
+    contextMenu.items[destroyCanvasItemIndex].visible = true
+
+    tray.setContextMenu(contextMenu)
+  }
+
+  function destroyCanvas() {
+    mainWindow.webContents.send("destroy-canvas")
+
+    const createCanvasItemIndex = contextMenu.items.findIndex(
+      (i) => i.id === "createCanvas"
+    )
+    contextMenu.items[createCanvasItemIndex].visible = true
+
+    const destroyCanvasItemIndex = contextMenu.items.findIndex(
+      (i) => i.id === "destroyCanvas"
+    )
+    contextMenu.items[destroyCanvasItemIndex].visible = false
+
+    tray.setContextMenu(contextMenu)
+  }
 }
 
 // This method will be called when Electron has finished

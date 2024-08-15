@@ -7,20 +7,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
     />
-    <link href="./styles.css" rel="stylesheet" />
     <title>Glabix Screen Recorder</title>
-    <style>
-      html,
-      body {
-        margin: 0;
-        width: 100%;
-        height: 100%;
-        background: transparent;
-      }
-      h1 {
-        margin: 0;
-      }
-    </style>
   </head>
 
   <body>
@@ -28,6 +15,8 @@
     We are using Node.js <span id="node-version"></span>, Chromium
     <span id="chrome-version"></span>, and Electron
     <span id="electron-version"></span>.
+
+    <canvas id="canvas" width="300" height="300"></canvas>
 
     <div></div>
     <br />
