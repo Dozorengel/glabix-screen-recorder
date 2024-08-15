@@ -1,22 +1,48 @@
 import "./index.css"
-import { Canvas, Rect } from "fabric"
+import Konva from "konva"
+import { Stage } from "konva/lib/Stage"
 
-let canvas: Canvas
+let stage: Stage
 
 window.electronAPI.onCanvasCreate(() => {
-  canvas = new Canvas("canvas")
-  const rect = new Rect({
-    top: 0,
-    left: 0,
-    width: 60,
-    height: 70,
-    fill: "red",
+  stage = new Konva.Stage({
+    container: "container", // id of container <div>
+    width: 500,
+    height: 500,
   })
-  canvas.add(rect)
+
+  // then create layer
+  const layer = new Konva.Layer()
+
+  // create our shape
+  const circle = new Konva.Circle({
+    x: stage.width() / 2,
+    y: stage.height() / 2,
+    radius: 70,
+    fill: "red",
+    stroke: "black",
+    strokeWidth: 4,
+  })
+
+  // add the shape to the layer
+  layer.add(circle)
+
+  // add the layer to the stage
+  stage.add(layer)
+
+  // draw the image
+  layer.draw()
+
+  circle.on("mouseover", function () {
+    document.body.style.cursor = "pointer"
+  })
+  circle.on("mouseout", function () {
+    document.body.style.cursor = "default"
+  })
 })
 
 window.electronAPI.onCanvasDestroy(() => {
-  canvas.dispose()
+  stage.destroy()
 })
 
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement

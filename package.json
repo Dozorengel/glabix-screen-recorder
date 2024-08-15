@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
-    "fabric": "^6.2.0"
+    "konva": "^9.3.14"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
