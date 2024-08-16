@@ -10,6 +10,7 @@ import {
   nativeImage,
 } from "electron"
 import path from "path"
+import os from "os"
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 // if (require("electron-squirrel-startup")) {
@@ -42,7 +43,9 @@ function createWindow() {
 
   // and load the index.html of the app.
   // mainWindow.setSimpleFullScreen(false)
-  mainWindow.setWindowButtonVisibility(false)
+  if (os.platform() == "darwin") {
+    mainWindow.setWindowButtonVisibility(false)
+  }
   mainWindow.loadFile("index.html")
   mainWindow.setAlwaysOnTop(true, "normal", 3000)
 
