@@ -11,11 +11,15 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: "favicon-24.png",
+    osxSign: {},
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
-    new MakerZIP({}, ["darwin"]),
+    new MakerSquirrel({
+      certificateFile: "./cert.pfx",
+      certificatePassword: process.env.CERTIFICATE_PASSWORD,
+    }),
+    new MakerZIP({}, ["darwin", "mas", "win32", "linux"]),
     new MakerRpm({}),
     new MakerDeb({}),
   ],
