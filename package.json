@@ -2,6 +2,7 @@
   "name": "glabix-video-recorder",
   "productName": "glabix-video-recorder",
   "version": "0.0.1",
+  "author": "Glabix co",
   "description": "Glabix video recorder",
   "main": ".vite/build/main.js",
   "scripts": {
