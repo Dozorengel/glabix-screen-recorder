@@ -168,7 +168,7 @@ import { destroyCanvas } from "./renderer"
     screen.id = "__screen__"
     screen.classList.add("clickable")
     screen.style.cssText =
-      "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 640px; height: 480px; outline: solid 2px #4af;"
+      "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 640px; height: 480px; outline: solid 2px #4af; outline-offset: 2px;"
     document.body.appendChild(screen)
 
     // Создание canvas для захвата области экрана
