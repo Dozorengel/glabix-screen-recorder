@@ -50,8 +50,10 @@ createCanvasBtn.addEventListener("click", () => {
 })
 
 export function destroyCanvas() {
-  stage.clear()
-  stage.destroy()
+  if (stage) {
+    stage.clear()
+    stage.destroy()
+  }
 }
 
 destroyCanvasBtn.addEventListener("click", () => {
