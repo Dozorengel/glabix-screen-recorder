@@ -1,4 +1,5 @@
 import Moveable, { MoveableRefTargetType } from "moveable"
+import { destroyCanvas } from "./renderer"
 ;(function () {
   const getScreenAreaBtn = document.getElementById(
     "getScreenAreaBtn"
@@ -121,6 +122,8 @@ import Moveable, { MoveableRefTargetType } from "moveable"
       mediaRecorder.stop()
       mediaRecorder = undefined
     }
+
+    destroyCanvas()
   })
 
   startScreenAreaBtn.addEventListener("click", () => {

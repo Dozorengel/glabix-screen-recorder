@@ -49,7 +49,7 @@ createCanvasBtn.addEventListener("click", () => {
   layer.draw()
 })
 
-function destroyCanvas() {
+export function destroyCanvas() {
   stage.clear()
   stage.destroy()
 }
