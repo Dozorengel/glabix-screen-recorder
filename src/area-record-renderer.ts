@@ -124,7 +124,7 @@ import Moveable, { MoveableRefTargetType } from "moveable"
   })
 
   startScreenAreaBtn.addEventListener("click", () => {
-    window.electronAPI.setIgnoreMouseEvents(true)
+    // window.electronAPI.setIgnoreMouseEvents(true)
     const screen = document.getElementById("__screen__")
     screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
     console.log("screen", screen)

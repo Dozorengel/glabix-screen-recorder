@@ -1,48 +1,61 @@
 import "./index.css"
 import Konva from "konva"
-import { Stage } from "konva/lib/Stage"
 
-let stage: Stage
+let stage: Konva.Stage
 
-window.electronAPI.onCanvasCreate(() => {
+const createCanvasBtn = document.getElementById(
+  "createCanvas"
+) as HTMLButtonElement
+const destroyCanvasBtn = document.getElementById(
+  "destroyCanvas"
+) as HTMLButtonElement
+
+createCanvasBtn.addEventListener("click", () => {
   stage = new Konva.Stage({
-    container: "container", // id of container <div>
-    width: 500,
-    height: 500,
+    container: "draw-container",
+    width: window.innerWidth,
+    height: window.innerHeight,
   })
 
-  // then create layer
   const layer = new Konva.Layer()
-
-  // create our shape
-  const circle = new Konva.Circle({
-    x: stage.width() / 2,
-    y: stage.height() / 2,
-    radius: 70,
-    fill: "red",
-    stroke: "black",
-    strokeWidth: 4,
-  })
-
-  // add the shape to the layer
-  layer.add(circle)
-
-  // add the layer to the stage
   stage.add(layer)
 
-  // draw the image
-  layer.draw()
+  let arrow: Konva.Arrow
+  const startPoints: number[] = []
+  stage.on("mousedown", () => {
+    const { x, y } = stage.getPointerPosition()
+    startPoints.push(x, y)
+    arrow = new Konva.Arrow({
+      points: [],
+      stroke: "red",
+      fill: "red",
+    })
+    layer.add(arrow)
+  })
 
-  circle.on("mouseover", function () {
-    document.body.style.cursor = "pointer"
+  stage.on("mousemove", () => {
+    if (arrow) {
+      const { x, y } = stage.getPointerPosition()
+      const points = [...startPoints, x, y]
+      arrow.points(points)
+    }
   })
-  circle.on("mouseout", function () {
-    document.body.style.cursor = "default"
+
+  stage.on("mouseup", () => {
+    arrow = null
+    startPoints.length = 0
   })
+
+  layer.draw()
 })
 
-window.electronAPI.onCanvasDestroy(() => {
+function destroyCanvas() {
+  stage.clear()
   stage.destroy()
+}
+
+destroyCanvasBtn.addEventListener("click", () => {
+  destroyCanvas()
 })
 
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement
@@ -145,6 +158,8 @@ stopBtn.addEventListener("click", () => {
   // window.electronAPI.stopRecording();
 
   console.log("Stopped")
+
+  destroyCanvas()
 
   // Stop recording
   if (mediaRecorder) {
