@@ -18,10 +18,17 @@ export const electronAPI = {
   onCanvasCreate: (callback) => ipcRenderer.on("create-canvas", callback),
   onCanvasDestroy: (callback) => ipcRenderer.on("destroy-canvas", callback),
   toggleRecordButtons: (isRecording) => {
+    // Move to state managment, exclude handling buttons in preload
     const startBtn = document.getElementById("startBtn") as HTMLButtonElement
     const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
 
     startBtn.disabled = isRecording
+    stopBtn.disabled = !isRecording
+  },
+  toggleWebcamButtons: (isRecording, startBtn, stopBtn, select) => {
+    // Move to state managment, exclude handling buttons in preload
+    startBtn.disabled = isRecording
+    select.disabled = isRecording
     stopBtn.disabled = !isRecording
   },
 }
