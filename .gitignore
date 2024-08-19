@@ -92,4 +92,5 @@ typings/
 out/
 
 # VSCode
-.vscode
+.vscode/easycode.ignore
+.vscode/settings.json
