@@ -18,6 +18,7 @@ import os from "os"
 // }
 
 let mainWindow: BrowserWindow
+let modalWindow: BrowserWindow
 
 function createWindow() {
   const { x, y, width, height } = screen.getPrimaryDisplay().bounds
@@ -63,8 +64,34 @@ function createWindow() {
   }
 
   createMenu()
+  createModal()
 }
 
+function createModal() {
+  modalWindow = new BrowserWindow({
+    // frame: false,
+    // thickFrame: false,
+    titleBarStyle: "hiddenInset",
+    // fullscreenable: false,
+    resizable: false,
+    width: 300,
+    show: false,
+    alwaysOnTop: true,
+    parent: mainWindow,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      zoomFactor: 1.0,
+      nodeIntegration: true, // Enable Node.js integration
+      // contextIsolation: false, // Disable context isolation (not recommended for production)
+    },
+  })
+
+  modalWindow.on("close", () => {
+    app.quit()
+  })
+
+  modalWindow.loadFile("modal.html")
+}
 function createMenu() {
   const image = nativeImage
     .createFromPath(path.join(__dirname, "favicon-24.png"))
@@ -82,12 +109,14 @@ function createMenu() {
       label: "Начать",
       click: () => {
         mainWindow.show()
+        modalWindow.show()
       },
     },
     {
       label: "Скрыть",
       click: () => {
         mainWindow.hide()
+        modalWindow.hide()
       },
     },
     {

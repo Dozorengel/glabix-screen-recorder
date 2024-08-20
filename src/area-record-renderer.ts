@@ -10,8 +10,28 @@ import { destroyCanvas } from "./renderer"
   const stopScreenAreaBtn = document.getElementById(
     "stopScreenAreaBtn"
   ) as HTMLButtonElement
-  let mediaRecorder: MediaRecorder
+  let videoRecorder: MediaRecorder
+  let audioRecorder: MediaRecorder
+  let audioDevicesList: MediaDeviceInfo[] = []
+  let activeAudioDevice: MediaDeviceInfo
+  let videoDevicesList: MediaDeviceInfo[] = []
   let moveable: Moveable
+
+  const devices = navigator.mediaDevices.enumerateDevices()
+  devices.then((devicesInfo) => {
+    audioDevicesList = devicesInfo.filter((d) => d.kind == "audioinput")
+    activeAudioDevice = audioDevicesList.length
+      ? audioDevicesList[0]
+      : undefined
+    videoDevicesList = devicesInfo.filter((d) => d.kind == "videoinput")
+    console.log(
+      "devicesInfo",
+      devicesInfo,
+      audioDevicesList,
+      videoDevicesList,
+      activeAudioDevice
+    )
+  })
 
   const setButtonsState = (activeState) => {
     const buttons = [getScreenAreaBtn, startScreenAreaBtn, stopScreenAreaBtn]
@@ -118,15 +138,15 @@ import { destroyCanvas } from "./renderer"
       moveable.destroy()
     }
 
-    if (mediaRecorder) {
-      mediaRecorder.stop()
-      mediaRecorder = undefined
+    if (videoRecorder) {
+      videoRecorder.stop()
+      videoRecorder = undefined
     }
 
     destroyCanvas()
   })
 
-  startScreenAreaBtn.addEventListener("click", () => {
+  startScreenAreaBtn.addEventListener("click", async () => {
     // window.electronAPI.setIgnoreMouseEvents(true)
     const screen = document.getElementById("__screen__")
     screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
@@ -136,10 +156,30 @@ import { destroyCanvas } from "./renderer"
     screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
 
     setButtonsState("start")
-    navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
-      const canvas = document.getElementById("__screen_canvas__")
-      createVideo(stream, canvas)
+
+    const videoStream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
     })
+    const audioStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        deviceId: activeAudioDevice.deviceId,
+        echoCancellation: true,
+        noiseSuppression: true,
+        sampleRate: 44100,
+      },
+      video: false,
+    })
+
+    const combinedStream = new MediaStream([
+      ...videoStream.getVideoTracks(),
+      ...audioStream.getAudioTracks(),
+    ])
+
+    const canvas = document.getElementById("__screen_canvas__")
+    createVideo(combinedStream, canvas)
+
+    // navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
+    // })
   })
 
   const fetchBlob = async (url) => {
@@ -195,9 +235,13 @@ import { destroyCanvas } from "./renderer"
   }
 
   const createVideo = (_stream, _canvas) => {
-    const stream = _canvas ? _canvas.captureStream() : _stream
-    console.log("_canvas", _canvas)
-    mediaRecorder = new MediaRecorder(stream)
+    const stream = _canvas
+      ? new MediaStream([
+          ..._canvas.captureStream().getVideoTracks(),
+          ..._stream.getAudioTracks(),
+        ])
+      : _stream
+    videoRecorder = new MediaRecorder(stream)
     let chunks = []
 
     if (_canvas) {
@@ -206,7 +250,7 @@ import { destroyCanvas } from "./renderer"
         .getBoundingClientRect()
       const canvasVideo = document.createElement("video")
       canvasVideo.id = "__canvas_video_stream__"
-      canvasVideo.srcObject = _stream
+      canvasVideo.srcObject = new MediaStream([..._stream.getVideoTracks()])
       canvasVideo.play()
 
       // Координаты области экрана для захвата
@@ -235,19 +279,19 @@ import { destroyCanvas } from "./renderer"
       updateCanvas()
     }
 
-    mediaRecorder.onpause = function (e) {
+    videoRecorder.onpause = function (e) {
       console.log("stream pause")
     }
 
-    mediaRecorder.onstart = function (e) {
+    videoRecorder.onstart = function (e) {
       // chrome.storage.local.set({ streamState: 'STARTED' })
     }
 
-    mediaRecorder.ondataavailable = function (e) {
+    videoRecorder.ondataavailable = function (e) {
       chunks.push(e.data)
     }
 
-    mediaRecorder.onstop = async function (e) {
+    videoRecorder.onstop = async function (e) {
       const blob = new Blob(chunks, { type: "video/webm" })
       chunks = [] // Reset the chunks for the next recording
 
@@ -260,50 +304,6 @@ import { destroyCanvas } from "./renderer"
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
-
-      // chrome.storage.local.set({ streamState: 'STOPPED' })
-      // const blobFile = new Blob(chunks, { type: 'video/webm' })
-      // const base64 = await fetchBlob(URL.createObjectURL(blobFile))
-      // const downloadLink = document.createElement('a')
-      // downloadLink.innerText = 'Скачать'
-      // downloadLink.style.cssText = 'display: inline-block; color: #fff; background-color: #009966;height: 2rem; text-transform: uppercase; border-radius: .25rem; padding: .5rem; font-size: 12px; line-height: 16px;'
-      // downloadLink.href = `${base64}`
-      // downloadLink.download = 'Без названия.webm'
-
-      // const video = document.createElement('video')
-      // video.src = `${base64}`
-      // video.controls = true
-      // video.autoplay = true
-      // video.style.cssText = 'width: 100%; height: 100%; max-width: 600px; max-height: 600px;'
-
-      // const overlay = document.createElement('div')
-      // overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(5px); z-index: 9999999; display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 20px;box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 0px 9999px;'
-      // overlay.id = '__overlay__'
-      // overlay.appendChild(video)
-      // overlay.appendChild(downloadLink)
-
-      // overlay.addEventListener('click', (event) => {
-      //   const target = event.target as HTMLElement
-      //   if (target.id == '__overlay__') {
-      //     overlay.remove()
-      //   }
-      // }, false)
-
-      // document.body.appendChild(overlay)
-
-      // const stopBtn = document.getElementById('stopVideoButton')
-      // const screen = document.getElementById('__screen__')
-      // const screenCanvas = document.getElementById('__screen_canvas__')
-
-      // if (stopBtn) {
-      //   stopBtn.remove()
-      // }
-      // if (screenCanvas) {
-      //   screenCanvas.remove()
-      // }
-      // if (screen) {
-      //   screen.remove()
-      // }
 
       stream.getTracks().forEach((track) => track.stop())
       if (_canvas) {
@@ -324,41 +324,12 @@ import { destroyCanvas } from "./renderer"
 
     if (_canvas) {
       _stream.oninactive = () => {
-        if (mediaRecorder) {
-          mediaRecorder.stop()
+        if (videoRecorder) {
+          videoRecorder.stop()
         }
       }
     }
 
-    mediaRecorder.start()
+    videoRecorder.start()
   }
-
-  // chrome.runtime.onMessage.addListener((request) => {
-  //   if (request.name === 'streamCanvasRecording') {
-  //   }
-
-  // if (request.name === 'streamRecording') {
-  //   navigator.mediaDevices.getUserMedia({
-  //     audio: false,
-  //     video: {
-  //       mandatory: {
-  //         chromeMediaSource: 'desktop',
-  //         chromeMediaSourceId: request.streamId,
-  //       },
-  //     },
-  //   })
-  //   .then((stream) => {
-  //     createVideo(stream)
-  //   })
-  //   .finally(() => {
-  //   })
-  // }
-
-  // if (request.name == 'endedRecording') {
-  //   console.log('endedRecording', request.body.base64)
-  //   // Create a new video element and show it in an overlay div (a lot of styles just for fun)
-
-  // }
-
-  // })
 })()

@@ -31,56 +31,23 @@ contextBridge.exposeInMainWorld("electronAPI", electronAPI)
 window.addEventListener("DOMContentLoaded", () => {
   const backdrop = document.querySelector(".page-backdrop")
 
-  backdrop.addEventListener(
-    "mouseenter",
-    () => {
-      console.log("backdrop mouseenter")
-      ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
-    },
-    false
-  )
+  if (backdrop) {
+    backdrop.addEventListener(
+      "mouseenter",
+      () => {
+        console.log("backdrop mouseenter")
+        ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
+      },
+      false
+    )
 
-  backdrop.addEventListener(
-    "mouseleave",
-    () => {
-      console.log("backdrop mouseleave")
-      ipcRenderer.send("set-ignore-mouse-events", false)
-    },
-    false
-  )
-
-  // document.body.addEventListener('mouseover', (event) => {
-  //   const target = event.target as HTMLElement
-  //   const isClickable = target.classList.contains('clickable') || Boolean(target.closest('.clickable'))
-
-  //   console.log('isClickable', isClickable)
-
-  //   if (isClickable && !isIgnoreMouseEventsFreeze) {
-  //     ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
-  //   } else {
-  //     ipcRenderer.send("set-ignore-mouse-events", false)
-  //   }
-  // }, false)
-
-  // const interactiveElements = document.querySelectorAll(".clickable")
-
-  // console.log('interactiveElements', interactiveElements)
-
-  // interactiveElements.forEach((element) => {
-  //   element.addEventListener("mouseenter", () => {
-  //     if (!isIgnoreMouseEventsFreeze) {
-  //       console.log("Mouse enter")
-  //       isMouseOverInteractiveElement = true
-  //       ipcRenderer.send("set-ignore-mouse-events", false)
-  //     }
-  //   })
-
-  //   element.addEventListener("mouseleave", () => {
-  //     if (!isIgnoreMouseEventsFreeze) {
-  //       console.log("Mouse leave")
-  //       isMouseOverInteractiveElement = false
-  //       ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
-  //     }
-  //   })
-  // })
+    backdrop.addEventListener(
+      "mouseleave",
+      () => {
+        console.log("backdrop mouseleave")
+        ipcRenderer.send("set-ignore-mouse-events", false)
+      },
+      false
+    )
+  }
 })
