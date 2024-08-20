@@ -59,12 +59,26 @@ h1 {
   object-fit: cover;
 }
 
+.hidden {
+  display: none;
+}
+
+.webcamera-only-frame {
+  width: 500px;
+  height: 500px;
+  object-fit: cover;
+}
+
 .webcamera-view {
   position: fixed;
-  top: 450px;
+  top: 600px;
   left: 20px;
-  width: 120px;
-  height: 120px;
+}
+
+.webcamera-only-view {
+  position: fixed;
+  top: 450px;
+  left: 500px;
 }
 
 .draw-container {

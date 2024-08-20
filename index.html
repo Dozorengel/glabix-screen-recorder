@@ -46,6 +46,12 @@
       <select id="cameraSelect" class="clickable">
         <option value="">Нет камеры</option>
       </select>
+      <button id="cameraOnlyBtn" class="clickable">
+        Включить режим только камера
+      </button>
+      <button id="stopCameraOnlyBtn" class="clickable">
+        Выключить режим только камера
+      </button>
       <button id="startWebcameraRecordBtn" class="clickable" disabled>
         Начать запись вебкамеры
       </button>
@@ -56,8 +62,18 @@
 
     <div class="webcamera-view">
       <video
-        id="video"
-        class="webcamera-frame"
+        id="webcam-round"
+        class="webcamera-frame hidden"
+        width="640"
+        height="480"
+        autoplay
+      ></video>
+    </div>
+
+    <div class="webcamera-only-view">
+      <video
+        id="webcam-square"
+        class="webcamera-only-frame hidden"
         width="640"
         height="480"
         autoplay
