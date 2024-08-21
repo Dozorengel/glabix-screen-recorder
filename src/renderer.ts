@@ -1,4 +1,4 @@
-import "./index.css"
+import "./styles/index-page.css"
 import Konva from "konva"
 
 let stage: Konva.Stage
@@ -93,7 +93,6 @@ function stopRecordTimer() {
 }
 
 startBtn.addEventListener("click", () => {
-  // window.electronAPI.startRecording();
   // const resolution = await window.electronAPI.resolution()
   // width = resolution.width
   // height = resolution.height

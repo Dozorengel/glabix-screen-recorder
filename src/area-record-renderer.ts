@@ -1,9 +1,11 @@
 import Moveable, { MoveableRefTargetType } from "moveable"
 import { destroyCanvas } from "./renderer"
+import { getMediaPermission } from "./helpers/media-permissions"
+import { ScreenAction, StreamSettings } from "./helpers/types"
 ;(function () {
-  const getScreenAreaBtn = document.getElementById(
-    "getScreenAreaBtn"
-  ) as HTMLButtonElement
+  // const getScreenAreaBtn = document.getElementById(
+  //   "getScreenAreaBtn"
+  // ) as HTMLButtonElement
   const startScreenAreaBtn = document.getElementById(
     "startScreenAreaBtn"
   ) as HTMLButtonElement
@@ -33,109 +35,110 @@ import { destroyCanvas } from "./renderer"
     )
   })
 
-  const setButtonsState = (activeState) => {
-    const buttons = [getScreenAreaBtn, startScreenAreaBtn, stopScreenAreaBtn]
-    buttons.forEach((button) => {
-      if (activeState == "cropScreen") {
-        button.disabled = button.id == "startScreenAreaBtn" ? false : true
-      }
-      if (activeState == "start") {
-        button.disabled = button.id == "stopScreenAreaBtn" ? false : true
-      }
-      if (activeState == "stop") {
-        button.disabled = button.id == "getScreenAreaBtn" ? false : true
-      }
-    })
-  }
+  // const setButtonsState = (activeState) => {
+  //   const buttons = [getScreenAreaBtn, startScreenAreaBtn]
+  //   buttons.forEach((button) => {
+  //     if (activeState == "cropScreen") {
+  //       button.disabled = button.id == "startScreenAreaBtn" ? false : true
+  //     }
+  //     // if (activeState == "start") {
+  //     //   button.disabled = button.id == "stopScreenAreaBtn" ? false : true
+  //     // }
+  //     if (activeState == "stop") {
+  //       button.disabled = button.id == "getScreenAreaBtn" ? false : true
+  //     }
+  //   })
+  // }
 
-  getScreenAreaBtn.addEventListener("click", () => {
-    window.electronAPI.setIgnoreMouseEvents(false)
-    setButtonsState("cropScreen")
-    createCanvas()
-    const screen = document.getElementById("__screen__")
-    moveable = new Moveable(document.body, {
-      target: screen as MoveableRefTargetType,
-      // If the container is null, the position is fixed. (default: parentElement(document.body))
-      container: document.body,
-      className: "clickable",
-      preventClickDefault: true,
-      draggable: true,
-      resizable: true,
-      scalable: false,
-      rotatable: false,
-      warpable: false,
-      // Enabling pinchable lets you use events that
-      // can be used in draggable, resizable, scalable, and rotateable.
-      pinchable: false, // ["resizable", "scalable", "rotatable"]
-      origin: true,
-      keepRatio: true,
-      // Resize, Scale Events at edges.
-      edge: false,
-      throttleDrag: 0,
-      throttleResize: 0,
-      throttleScale: 0,
-      throttleRotate: 0,
-    })
+  // getScreenAreaBtn.addEventListener("click", () => {
+  //   window.electronAPI.setIgnoreMouseEvents(false)
+  //   setButtonsState("cropScreen")
+  //   createCanvas()
+  //   const screen = document.getElementById("__screen__")
+  //   moveable = new Moveable(document.body, {
+  //     target: screen as MoveableRefTargetType,
+  //     // If the container is null, the position is fixed. (default: parentElement(document.body))
+  //     container: document.body,
+  //     className: "clickable",
+  //     preventClickDefault: true,
+  //     draggable: true,
+  //     resizable: true,
+  //     scalable: false,
+  //     rotatable: false,
+  //     warpable: false,
+  //     // Enabling pinchable lets you use events that
+  //     // can be used in draggable, resizable, scalable, and rotateable.
+  //     pinchable: false, // ["resizable", "scalable", "rotatable"]
+  //     origin: true,
+  //     keepRatio: true,
+  //     // Resize, Scale Events at edges.
+  //     edge: false,
+  //     throttleDrag: 0,
+  //     throttleResize: 0,
+  //     throttleScale: 0,
+  //     throttleRotate: 0,
+  //   })
 
-    moveable
-      .on("dragStart", ({ target, clientX, clientY }) => {
-        console.log("onDragStart", target)
-      })
-      .on(
-        "drag",
-        ({
-          target,
-          transform,
-          left,
-          top,
-          right,
-          bottom,
-          beforeDelta,
-          beforeDist,
-          delta,
-          dist,
-          clientX,
-          clientY,
-        }) => {
-          console.log("onDrag left, top", left, top)
-          target!.style.left = `${left}px`
-          target!.style.top = `${top}px`
-          // console.log("onDrag translate", dist);
-          // target!.style.transform = transform;
-        }
-      )
-      .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
-        console.log("onDragEnd", target, isDrag)
-      })
+  //   moveable
+  //     .on("dragStart", ({ target, clientX, clientY }) => {
+  //       console.log("onDragStart", target)
+  //     })
+  //     .on(
+  //       "drag",
+  //       ({
+  //         target,
+  //         transform,
+  //         left,
+  //         top,
+  //         right,
+  //         bottom,
+  //         beforeDelta,
+  //         beforeDist,
+  //         delta,
+  //         dist,
+  //         clientX,
+  //         clientY,
+  //       }) => {
+  //         console.log("onDrag left, top", left, top)
+  //         target!.style.left = `${left}px`
+  //         target!.style.top = `${top}px`
+  //         // console.log("onDrag translate", dist);
+  //         // target!.style.transform = transform;
+  //       }
+  //     )
+  //     .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
+  //       console.log("onDragEnd", target, isDrag)
+  //     })
 
-    /* resizable */
-    moveable
-      .on("resizeStart", ({ target, clientX, clientY }) => {
-        console.log("onResizeStart", target)
-      })
-      .on(
-        "resize",
-        ({ target, width, height, dist, delta, clientX, clientY }) => {
-          console.log("onResize", target)
-          delta[0] && (target!.style.width = `${width}px`)
-          delta[1] && (target!.style.height = `${height}px`)
-          const canvasVideo = document.getElementById(
-            "__screen_canvas__"
-          ) as HTMLCanvasElement
-          canvasVideo.width = width
-          canvasVideo.height = height
-        }
-      )
-      .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
-        console.log("onResizeEnd", target, isDrag)
-      })
-  })
+  //   /* resizable */
+  //   moveable
+  //     .on("resizeStart", ({ target, clientX, clientY }) => {
+  //       console.log("onResizeStart", target)
+  //     })
+  //     .on(
+  //       "resize",
+  //       ({ target, width, height, dist, delta, clientX, clientY }) => {
+  //         console.log("onResize", target)
+  //         delta[0] && (target!.style.width = `${width}px`)
+  //         delta[1] && (target!.style.height = `${height}px`)
+  //         const canvasVideo = document.getElementById(
+  //           "__screen_canvas__"
+  //         ) as HTMLCanvasElement
+  //         canvasVideo.width = width
+  //         canvasVideo.height = height
+  //       }
+  //     )
+  //     .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
+  //       console.log("onResizeEnd", target, isDrag)
+  //     })
+  // })
 
   stopScreenAreaBtn.addEventListener("click", () => {
-    setButtonsState("stop")
+    // setButtonsState("stop")
 
     if (moveable) {
       moveable.destroy()
+      moveable = undefined
     }
 
     if (videoRecorder) {
@@ -146,60 +149,84 @@ import { destroyCanvas } from "./renderer"
     destroyCanvas()
   })
 
-  startScreenAreaBtn.addEventListener("click", async () => {
-    // window.electronAPI.setIgnoreMouseEvents(true)
-    const screen = document.getElementById("__screen__")
-    screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
-    console.log("screen", screen)
+  // startScreenAreaBtn.addEventListener("click", async () => {
+  //   // window.electronAPI.setIgnoreMouseEvents(true)
+  //   const screen = document.getElementById("__screen__")
+  //   screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
+  //   console.log("screen", screen)
 
-    const screenMove = moveable.getControlBoxElement()
-    screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
+  //   const screenMove = moveable.getControlBoxElement()
+  //   screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
 
-    setButtonsState("start")
+  //   setButtonsState("start")
 
-    const videoStream = await navigator.mediaDevices.getDisplayMedia({
-      video: true,
-    })
-    const audioStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        deviceId: activeAudioDevice.deviceId,
-        echoCancellation: true,
-        noiseSuppression: true,
-        sampleRate: 44100,
-      },
-      video: false,
-    })
+  //   const videoStream = await navigator.mediaDevices.getDisplayMedia({
+  //     video: true,
+  //   })
+  //   const audioStream = await navigator.mediaDevices.getUserMedia({
+  //     audio: {
+  //       deviceId: activeAudioDevice.deviceId,
+  //       echoCancellation: true,
+  //       noiseSuppression: true,
+  //       sampleRate: 44100,
+  //     },
+  //     video: false,
+  //   })
+
+  //   const combinedStream = new MediaStream([
+  //     ...videoStream.getVideoTracks(),
+  //     ...audioStream.getAudioTracks(),
+  //   ])
+
+  //   const canvas = document.getElementById("__screen_canvas__")
+  //   createVideo(combinedStream, canvas)
+
+  //   // navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
+  //   // })
+  // })
+
+  const initStream = async (settings: StreamSettings): Promise<MediaStream> => {
+    let videoStream: MediaStream
+    let audioStream: MediaStream
+
+    if (settings.action == "fullScreenVideo") {
+      videoStream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+      })
+
+      audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: settings.audioDeviseId,
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
+        },
+        video: false,
+      })
+    }
+
+    if (settings.action == "cropVideo") {
+      videoStream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+      })
+
+      audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: settings.audioDeviseId,
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
+        },
+        video: false,
+      })
+    }
 
     const combinedStream = new MediaStream([
       ...videoStream.getVideoTracks(),
       ...audioStream.getAudioTracks(),
     ])
 
-    const canvas = document.getElementById("__screen_canvas__")
-    createVideo(combinedStream, canvas)
-
-    // navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
-    // })
-  })
-
-  const fetchBlob = async (url) => {
-    const response = await fetch(url)
-    const blob = await response.blob()
-    const base64 = await convertBlobToBase64(blob)
-
-    return base64
-  }
-
-  const convertBlobToBase64 = (blob) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(blob)
-      reader.onloadend = () => {
-        const base64data = reader.result
-
-        resolve(base64data)
-      }
-    })
+    return combinedStream
   }
 
   const createCanvas = () => {
@@ -216,15 +243,15 @@ import { destroyCanvas } from "./renderer"
     const canvas = document.createElement("canvas")
     canvas.id = "__screen_canvas__"
     canvas.style.cssText = `
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    opacity: 0; 
-    z-index: 99999;
-    outline: solid 2px red;
-  `
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      opacity: 0; 
+      z-index: 99999;
+      outline: solid 2px red;
+    `
 
     // Установка размеров canvas
     canvas.width = canvasPosition.width // ширина захваченной области
@@ -332,4 +359,115 @@ import { destroyCanvas } from "./renderer"
 
     videoRecorder.start()
   }
+
+  window.electronAPI.ipcRenderer.on(
+    "start-recording",
+    (event, data: StreamSettings) => {
+      if (data.action == "fullScreenVideo") {
+        initStream(data).then((stream) => {
+          createVideo(stream, undefined)
+        })
+      }
+
+      if (data.action == "cropVideo") {
+        createCanvas()
+        const screen = document.getElementById("__screen__")
+        moveable = new Moveable(document.body, {
+          target: screen as MoveableRefTargetType,
+          // If the container is null, the position is fixed. (default: parentElement(document.body))
+          container: document.body,
+          className: "clickable",
+          preventClickDefault: true,
+          draggable: true,
+          resizable: true,
+          scalable: false,
+          rotatable: false,
+          warpable: false,
+          // Enabling pinchable lets you use events that
+          // can be used in draggable, resizable, scalable, and rotateable.
+          pinchable: false, // ["resizable", "scalable", "rotatable"]
+          origin: true,
+          keepRatio: true,
+          // Resize, Scale Events at edges.
+          edge: false,
+          throttleDrag: 0,
+          throttleResize: 0,
+          throttleScale: 0,
+          throttleRotate: 0,
+        })
+
+        moveable
+          .on("dragStart", ({ target, clientX, clientY }) => {
+            console.log("onDragStart", target)
+          })
+          .on(
+            "drag",
+            ({
+              target,
+              transform,
+              left,
+              top,
+              right,
+              bottom,
+              beforeDelta,
+              beforeDist,
+              delta,
+              dist,
+              clientX,
+              clientY,
+            }) => {
+              console.log("onDrag left, top", left, top)
+              target!.style.left = `${left}px`
+              target!.style.top = `${top}px`
+              // console.log("onDrag translate", dist);
+              // target!.style.transform = transform;
+            }
+          )
+          .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
+            console.log("onDragEnd", target, isDrag)
+          })
+
+        /* resizable */
+        moveable
+          .on("resizeStart", ({ target, clientX, clientY }) => {
+            console.log("onResizeStart", target)
+          })
+          .on(
+            "resize",
+            ({ target, width, height, dist, delta, clientX, clientY }) => {
+              console.log("onResize", target)
+              delta[0] && (target!.style.width = `${width}px`)
+              delta[1] && (target!.style.height = `${height}px`)
+              const canvasVideo = document.getElementById(
+                "__screen_canvas__"
+              ) as HTMLCanvasElement
+              canvasVideo.width = width
+              canvasVideo.height = height
+            }
+          )
+          .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
+            console.log("onResizeEnd", target, isDrag)
+          })
+        const startScreenAreaBtn = document.getElementById(
+          "startScreenAreaBtn"
+        ) as HTMLButtonElement
+        startScreenAreaBtn.addEventListener(
+          "click",
+          () => {
+            const screen = document.getElementById("__screen__")
+            screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
+            const screenMove = moveable.getControlBoxElement()
+            screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
+            initStream(data).then((stream) => {
+              const canvas = document.getElementById("__screen_canvas__")
+              createVideo(stream, canvas)
+            })
+          },
+          false
+        )
+      }
+
+      console.log("Index Page start-recording", data.audioDeviseId)
+    }
+  )
 })()

@@ -2,6 +2,12 @@ import { contextBridge, ipcRenderer } from "electron"
 let isIgnoreMouseEventsFreeze = false
 // rename "electronAPI" ? to more suitable
 export const electronAPI = {
+  ipcRenderer: {
+    send: (channel, data) => ipcRenderer.send(channel, data),
+    on: (channel, func) =>
+      ipcRenderer.on(channel, (event, ...args) => func(event, ...args)),
+  },
+
   setIgnoreMouseEvents: (flag: boolean) => {
     if (!flag) {
       isIgnoreMouseEventsFreeze = true
@@ -11,7 +17,8 @@ export const electronAPI = {
       ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
     }
   },
-  startRecording: () => ipcRenderer.send("start-recording"),
+  startFullScreenRecording: () =>
+    ipcRenderer.send("start-fullscreen-recording"),
   stopRecording: () => ipcRenderer.send("stop-recording"),
   onRecordingFinished: (callback) =>
     ipcRenderer.on("recording-finished", callback),

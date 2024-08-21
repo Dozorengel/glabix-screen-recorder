@@ -47,8 +47,8 @@ function createWindow() {
   if (os.platform() == "darwin") {
     mainWindow.setWindowButtonVisibility(false)
   }
-  mainWindow.loadFile("index.html")
-  mainWindow.setAlwaysOnTop(true, "normal", 3000)
+  // mainWindow.loadFile("index.html")
+  mainWindow.setAlwaysOnTop(true, "normal", 999999)
 
   // mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
@@ -56,7 +56,7 @@ function createWindow() {
   // mainWindow.webContents.openDevTools()
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
+    mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/index.html`)
   } else {
     mainWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
@@ -90,7 +90,15 @@ function createModal() {
     app.quit()
   })
 
-  modalWindow.loadFile("modal.html")
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    modalWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/modal.html`)
+  } else {
+    modalWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/modal.html`)
+    )
+  }
+
+  // modalWindow.webContents.openDevTools()
 }
 function createMenu() {
   const image = nativeImage
@@ -173,4 +181,10 @@ app.on("activate", () => {
 ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   win.setIgnoreMouseEvents(ignore, options)
+})
+
+ipcMain.on("start-recording", (event, data) => {
+  mainWindow.webContents.send("start-recording", data)
+  modalWindow.hide()
+  // modalWindow.webContents.send('start-recording', data);
 })

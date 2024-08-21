@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+    />
+    <title></title>
+  </head>
+
+  <body>
+    <div class="mb-20">
+      <div class="mb-5">
+        <button
+          type="button"
+          class="btn hover js-btn-action-type"
+          data-action="fullScreenVideo"
+        >
+          Запись всего экрана
+        </button>
+      </div>
+      <div class="mb-5">
+        <button
+          type="button"
+          class="btn js-btn-action-type"
+          data-action="cropVideo"
+        >
+          Произвольная область
+        </button>
+      </div>
+      <div class="mb-5">
+        <button
+          type="button"
+          class="btn js-btn-action-type"
+          data-action="camera"
+        >
+          Только камера
+        </button>
+      </div>
+    </div>
+    <div id="media_device_container"></div>
+    <div>
+      <button type="button" id="startBtn" class="btn btn--primary">
+        Начать запись
+      </button>
+    </div>
+
+    <template id="media_device_tpl">
+      <div class="mb-20">
+        <button class="btn"></button>
+      </div>
+    </template>
+    <script type="module" src="/src/modal-renderer.ts"></script>
+  </body>
+</html>
