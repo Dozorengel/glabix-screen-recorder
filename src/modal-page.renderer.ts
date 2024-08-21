@@ -47,6 +47,39 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
     return clone
   }
 
+  function setupStreamSettings(): StreamSettings {
+    console.log("activeAudioDevice", activeAudioDevice, audioDevicesList)
+    let streamSettings: StreamSettings = {
+      action: activeScreenAction,
+    }
+
+    if (activeScreenAction == "fullScreenVideo") {
+      streamSettings = {
+        ...streamSettings,
+        video: true,
+        audioDeviseId: activeAudioDevice.deviceId,
+      }
+    }
+
+    if (activeScreenAction == "cropVideo") {
+      streamSettings = {
+        ...streamSettings,
+        video: true,
+        audioDeviseId: activeAudioDevice.deviceId,
+      }
+    }
+
+    if (activeScreenAction == "cameraOnly") {
+      streamSettings = {
+        ...streamSettings,
+        cameraDeviceId: activeVideoDevice.deviceId,
+        audioDeviseId: activeAudioDevice.deviceId,
+      }
+    }
+
+    return streamSettings
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     const actionButtons = document.querySelectorAll(
       ".js-btn-action-type"
@@ -59,7 +92,16 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
             btn.classList.remove("hover")
           })
           button.classList.add("hover")
-          activeScreenAction = button.dataset.action as ScreenAction
+          const action = button.dataset.action as ScreenAction
+
+          if (action != activeScreenAction) {
+            activeScreenAction = button.dataset.action as ScreenAction
+            const settings = setupStreamSettings()
+            window.electronAPI.ipcRenderer.send(
+              "record-settings-change",
+              settings
+            )
+          }
         },
         false
       )
@@ -91,36 +133,19 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
   startBtn.addEventListener(
     "click",
     () => {
-      console.log("activeAudioDevice", activeAudioDevice, audioDevicesList)
-      let streamSettings: StreamSettings = {
-        action: activeScreenAction,
+      const activeSettings = setupStreamSettings()
+
+      if (activeSettings.action == "fullScreenVideo") {
+        window.electronAPI.ipcRenderer.send(
+          "record-settings-change",
+          setupStreamSettings()
+        )
       }
 
-      if (activeScreenAction == "fullScreenVideo") {
-        streamSettings = {
-          ...streamSettings,
-          video: true,
-          audioDeviseId: activeAudioDevice.deviceId,
-        }
-      }
-
-      if (activeScreenAction == "cropVideo") {
-        streamSettings = {
-          ...streamSettings,
-          video: true,
-          audioDeviseId: activeAudioDevice.deviceId,
-        }
-      }
-
-      if (activeScreenAction == "cameraOnly") {
-        streamSettings = {
-          ...streamSettings,
-          cameraDeviceId: activeVideoDevice.deviceId,
-          audioDeviseId: activeAudioDevice.deviceId,
-        }
-      }
-
-      window.electronAPI.ipcRenderer.send("start-recording", streamSettings)
+      window.electronAPI.ipcRenderer.send(
+        "start-recording",
+        setupStreamSettings()
+      )
     },
     false
   )

@@ -12,6 +12,7 @@
 
   <body>
     <div class="page-backdrop"></div>
+    <div class="page-backdrop-locker" hidden></div>
 
     <div id="draw-container"></div>
 
@@ -29,9 +30,11 @@
     <canvas id="canvas" width="300" height="300"></canvas>
 
     <div class="screen-area-controls">
-      <button id="startScreenAreaBtn">Начать запись части экрана</button>
-      <br />
-      <button id="stopScreenAreaBtn">Остановить запись части экрана</button>
+      <!-- <button id="startScreenAreaBtn">Начать запись части экрана</button>
+      <br /> -->
+      <button id="stopScreenAreaBtn" class="clickable">
+        Остановить запись
+      </button>
     </div>
 
     <div class="webcamera-controls">

@@ -53,7 +53,7 @@ function createWindow() {
   // mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/index.html`)
@@ -64,10 +64,10 @@ function createWindow() {
   }
 
   createMenu()
-  createModal()
+  createModal(mainWindow)
 }
 
-function createModal() {
+function createModal(parentWindow) {
   modalWindow = new BrowserWindow({
     // frame: false,
     // thickFrame: false,
@@ -77,7 +77,7 @@ function createModal() {
     width: 300,
     show: false,
     alwaysOnTop: true,
-    parent: mainWindow,
+    parent: parentWindow,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       zoomFactor: 1.0,
@@ -183,8 +183,14 @@ ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
   win.setIgnoreMouseEvents(ignore, options)
 })
 
+ipcMain.on("record-settings-change", (event, data) => {
+  mainWindow.webContents.send("record-settings-change", data)
+  if (["fullScreenVideo"].includes(data.action)) {
+    modalWindow.hide()
+  }
+})
+
 ipcMain.on("start-recording", (event, data) => {
   mainWindow.webContents.send("start-recording", data)
   modalWindow.hide()
-  modalWindow.webContents.send("start-recording", data)
 })

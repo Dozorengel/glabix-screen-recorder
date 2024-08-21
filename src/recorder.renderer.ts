@@ -25,13 +25,13 @@ import { destroyCanvas } from "./draw.renderer"
       ? audioDevicesList[0]
       : undefined
     videoDevicesList = devicesInfo.filter((d) => d.kind == "videoinput")
-    console.log(
-      "devicesInfo",
-      devicesInfo,
-      audioDevicesList,
-      videoDevicesList,
-      activeAudioDevice
-    )
+    // console.log(
+    //   "devicesInfo",
+    //   devicesInfo,
+    //   audioDevicesList,
+    //   videoDevicesList,
+    //   activeAudioDevice
+    // )
   })
 
   stopScreenAreaBtn.addEventListener("click", () => {
@@ -39,6 +39,8 @@ import { destroyCanvas } from "./draw.renderer"
       moveable.destroy()
       moveable = undefined
     }
+
+    console.log("videoRecorder stop click", videoRecorder)
 
     if (videoRecorder) {
       videoRecorder.stop()
@@ -114,7 +116,7 @@ import { destroyCanvas } from "./draw.renderer"
     screen.id = "__screen__"
     screen.classList.add("clickable")
     screen.style.cssText =
-      "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 640px; height: 480px; outline: solid 2px #4af; outline-offset: 2px;"
+      "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 640px; height: 480px; outline: solid 2px #4af; outline-offset: 2px; box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 0px 9999px;"
     document.body.appendChild(screen)
 
     // Создание canvas для захвата области экрана
@@ -155,38 +157,11 @@ import { destroyCanvas } from "./draw.renderer"
     }
 
     if (_canvas) {
-      const canvasPosition = document
-        .getElementById("__screen__")
-        .getBoundingClientRect()
       const canvasVideo = document.createElement("video")
       canvasVideo.id = "__canvas_video_stream__"
+      canvasVideo.style.cssText = `pointer-events: none; opacity: 0;`
       canvasVideo.srcObject = new MediaStream([..._stream.getVideoTracks()])
-      canvasVideo.play()
-
-      // Координаты области экрана для захвата
-      const ctx = _canvas.getContext("2d")
-      const captureX = canvasPosition.left
-      const captureY = canvasPosition.top
-      const captureWidth = canvasPosition.width
-      const captureHeight = canvasPosition.height
-
-      // Обновление canvas с захваченной областью экрана
-      function updateCanvas() {
-        ctx.drawImage(
-          canvasVideo,
-          captureX,
-          captureY,
-          captureWidth,
-          captureHeight,
-          0,
-          0,
-          canvasPosition.width,
-          canvasPosition.height
-        )
-        requestAnimationFrame(updateCanvas)
-      }
-
-      updateCanvas()
+      document.body.appendChild(canvasVideo)
     }
 
     videoRecorder.onpause = function (e) {
@@ -201,7 +176,7 @@ import { destroyCanvas } from "./draw.renderer"
       chunks.push(e.data)
     }
 
-    videoRecorder.onstop = async function (e) {
+    videoRecorder.onstop = function (e) {
       const blob = new Blob(chunks, { type: "video/webm" })
       chunks = [] // Reset the chunks for the next recording
 
@@ -232,6 +207,10 @@ import { destroyCanvas } from "./draw.renderer"
       }
 
       if (_video) {
+        const videoContainer = document.querySelector(
+          ".webcamera-only-container"
+        )
+        videoContainer.setAttribute("hidden", "")
         _video.srcObject = null
       }
     }
@@ -251,35 +230,96 @@ import { destroyCanvas } from "./draw.renderer"
     }
   }
 
+  window.electronAPI.ipcRenderer.on("start-recording", (event, data) => {
+    if (data.action == "fullScreenVideo") {
+      const countdownContainer = document.querySelector(
+        ".fullscreen-countdown-container"
+      )
+      const countdown = document.querySelector("#fullscreen_countdown")
+      countdownContainer.removeAttribute("hidden")
+      let timeleft = 2
+      const startTimer = setInterval(function () {
+        if (timeleft <= 0) {
+          clearInterval(startTimer)
+          countdownContainer.setAttribute("hidden", "")
+          countdown.innerHTML = ""
+          setTimeout(() => {
+            startRecording()
+          }, 10)
+        } else {
+          countdown.innerHTML = `${timeleft}`
+        }
+        timeleft -= 1
+      }, 1000)
+    } else {
+      if (data.action == "cropVideo") {
+        const backdropLocker = document.querySelector(".page-backdrop-locker")
+        backdropLocker.setAttribute("hidden", "")
+        const screen = document.getElementById("__screen__")
+        screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
+        const screenMove = moveable.getControlBoxElement()
+        screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
+
+        const canvasVideo = document.querySelector(
+          "#__canvas_video_stream__"
+        ) as HTMLVideoElement
+        console.log("canvasVideo", canvasVideo)
+        canvasVideo.play()
+
+        // Координаты области экрана для захвата
+        const canvas = document.querySelector(
+          "#__screen_canvas__"
+        ) as HTMLCanvasElement
+        const canvasPosition = document
+          .getElementById("__screen__")
+          .getBoundingClientRect()
+        const ctx = canvas.getContext("2d")
+        const captureX = canvasPosition.left
+        const captureY = canvasPosition.top
+        const captureWidth = canvasPosition.width
+        const captureHeight = canvasPosition.height
+
+        // Обновление canvas с захваченной областью экрана
+        function updateCanvas() {
+          ctx.drawImage(
+            canvasVideo,
+            captureX,
+            captureY,
+            captureWidth,
+            captureHeight,
+            0,
+            0,
+            canvasPosition.width,
+            canvasPosition.height
+          )
+          requestAnimationFrame(updateCanvas)
+        }
+
+        updateCanvas()
+      }
+
+      startRecording()
+    }
+  })
+
   window.electronAPI.ipcRenderer.on(
-    "start-recording",
+    "record-settings-change",
     (event, data: StreamSettings) => {
+      const backdropLocker = document.querySelector(".page-backdrop-locker")
+
+      if (data.action == "cropVideo") {
+        backdropLocker.removeAttribute("hidden")
+      } else {
+        backdropLocker.setAttribute("hidden", "")
+      }
+
       // TODO:
       // добавить initView функцию, которая сдеает настройку страницы для каждого data.action
       // Показать нужные элементы в зависимости от настроек записи
 
       if (data.action == "fullScreenVideo") {
-        const countdownContainer = document.querySelector(
-          ".fullscreen-countdown-container"
-        )
-        const countdown = document.querySelector("#fullscreen_countdown")
-        countdownContainer.removeAttribute("hidden")
         initStream(data).then((stream) => {
           createVideo(stream, undefined, undefined)
-          let timeleft = 2
-          const startTimer = setInterval(function () {
-            if (timeleft <= 0) {
-              clearInterval(startTimer)
-              countdownContainer.setAttribute("hidden", "")
-              countdown.innerHTML = ""
-              setTimeout(() => {
-                startRecording()
-              }, 10)
-            } else {
-              countdown.innerHTML = `${timeleft}`
-            }
-            timeleft -= 1
-          }, 1000)
         })
       }
 
@@ -298,18 +338,11 @@ import { destroyCanvas } from "./draw.renderer"
         initStream(data).then((stream) => {
           createVideo(stream, undefined, video)
         })
-
-        startScreenAreaBtn.addEventListener(
-          "click",
-          () => {
-            startRecording()
-          },
-          false
-        )
       }
 
       if (data.action == "cropVideo") {
         createCanvas()
+
         const screen = document.getElementById("__screen__")
         moveable = new Moveable(document.body, {
           target: screen as MoveableRefTargetType,
@@ -387,27 +420,12 @@ import { destroyCanvas } from "./draw.renderer"
           .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
             console.log("onResizeEnd", target, isDrag)
           })
-        const startScreenAreaBtn = document.getElementById(
-          "startScreenAreaBtn"
-        ) as HTMLButtonElement
-        startScreenAreaBtn.addEventListener(
-          "click",
-          () => {
-            const screen = document.getElementById("__screen__")
-            screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
-            const screenMove = moveable.getControlBoxElement()
-            screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
-            initStream(data).then((stream) => {
-              const canvas = document.getElementById("__screen_canvas__")
-              createVideo(stream, canvas, undefined)
-              startRecording()
-            })
-          },
-          false
-        )
-      }
 
-      console.log("Index Page start-recording", data.audioDeviseId)
+        initStream(data).then((stream) => {
+          const canvas = document.getElementById("__screen_canvas__")
+          createVideo(stream, canvas, undefined)
+        })
+      }
     }
   )
 })()
