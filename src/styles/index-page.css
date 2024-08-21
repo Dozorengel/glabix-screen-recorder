@@ -6,6 +6,7 @@ body {
   background: transparent;
   overflow: hidden;
 }
+
 h1 {
   margin: 0;
 }
@@ -42,6 +43,29 @@ h1 {
   right: 20px;
   width: 100px;
   height: 100px;
+}
+
+.webcamera-controls {
+  position: fixed;
+  top: 300px;
+  left: 20px;
+  width: 120px;
+  height: 120px;
+}
+
+.webcamera-frame {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.webcamera-view {
+  position: fixed;
+  top: 400px;
+  left: 20px;
+  width: 120px;
+  height: 120px;
 }
 
 .draw-container {

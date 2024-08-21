@@ -1,7 +1,6 @@
 import Moveable, { MoveableRefTargetType } from "moveable"
-import { destroyCanvas } from "./renderer"
-import { getMediaPermission } from "./helpers/media-permissions"
-import { ScreenAction, StreamSettings } from "./helpers/types"
+import { StreamSettings } from "./helpers/types"
+import { destroyCanvas } from "./draw.renderer"
 ;(function () {
   // const getScreenAreaBtn = document.getElementById(
   //   "getScreenAreaBtn"

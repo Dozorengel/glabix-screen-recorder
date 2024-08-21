@@ -37,8 +37,27 @@
       <br />
       <button id="stopScreenAreaBtn">Остановить запись части экрана</button>
     </div>
+
+    <div class="webcamera-controls">
+      <select id="cameraSelect" class="clickable">
+        <option value="">Нет камеры</option>
+      </select>
+    </div>
+
+    <div class="webcamera-view">
+      <video
+        id="video"
+        class="webcamera-frame"
+        width="640"
+        height="480"
+        autoplay
+      ></video>
+    </div>
+
     <!-- You can also require other files to run in this process -->
     <script type="module" src="/src/renderer.ts"></script>
-    <script type="module" src="/src/area-record-renderer.ts"></script>
+    <script type="module" src="/src/recorder.renderer.ts"></script>
+    <script type="module" src="/src/webcamera.renderer.ts"></script>
+    <script type="module" src="/src/draw.renderer.ts"></script>
   </body>
 </html>

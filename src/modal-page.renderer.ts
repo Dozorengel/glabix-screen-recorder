@@ -2,7 +2,6 @@ import "./styles/modal-page.css"
 import Moveable, { MoveableRefTargetType } from "moveable"
 import { getMediaPermission } from "./helpers/media-permissions"
 import { ScreenAction, StreamSettings } from "./helpers/types"
-
 ;(function () {
   let videoRecorder: MediaRecorder
   let audioRecorder: MediaRecorder
