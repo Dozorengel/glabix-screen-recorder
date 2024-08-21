@@ -1,3 +1,4 @@
+import "@dotenvx/dotenvx"
 import {
   app,
   BrowserWindow,

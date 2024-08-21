@@ -6,7 +6,7 @@
   "description": "Glabix video recorder",
   "main": ".vite/build/main.js",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "dotenvx run --env-file=.env -- electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -14,6 +14,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.8.0",
     "electron-squirrel-startup": "^1.0.1",
     "konva": "^9.3.14",
     "moveable": "^0.53.0"

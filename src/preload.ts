@@ -28,6 +28,12 @@ export const electronAPI = {
 
 contextBridge.exposeInMainWorld("electronAPI", electronAPI)
 
+export const envVars = {
+  API_PATH: { ...process }.env.API_PATH, // hack with spread operator because I can't find who is rewriting the precession object
+  AUTH_APP_URL: { ...process }.env.AUTH_APP_URL,
+}
+contextBridge.exposeInMainWorld("envVars", envVars)
+
 window.addEventListener("DOMContentLoaded", () => {
   const backdrop = document.querySelector(".page-backdrop")
 
