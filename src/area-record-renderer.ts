@@ -1,5 +1,5 @@
 import Moveable, { MoveableRefTargetType } from "moveable"
-import { destroyCanvas } from "./renderer"
+import { destroyCanvas } from "./draw.renderer"
 ;(function () {
   const getScreenAreaBtn = document.getElementById(
     "getScreenAreaBtn"
