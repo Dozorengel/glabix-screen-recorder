@@ -34,107 +34,7 @@ import { destroyCanvas } from "./draw.renderer"
     )
   })
 
-  // const setButtonsState = (activeState) => {
-  //   const buttons = [getScreenAreaBtn, startScreenAreaBtn]
-  //   buttons.forEach((button) => {
-  //     if (activeState == "cropScreen") {
-  //       button.disabled = button.id == "startScreenAreaBtn" ? false : true
-  //     }
-  //     // if (activeState == "start") {
-  //     //   button.disabled = button.id == "stopScreenAreaBtn" ? false : true
-  //     // }
-  //     if (activeState == "stop") {
-  //       button.disabled = button.id == "getScreenAreaBtn" ? false : true
-  //     }
-  //   })
-  // }
-
-  // getScreenAreaBtn.addEventListener("click", () => {
-  //   window.electronAPI.setIgnoreMouseEvents(false)
-  //   setButtonsState("cropScreen")
-  //   createCanvas()
-  //   const screen = document.getElementById("__screen__")
-  //   moveable = new Moveable(document.body, {
-  //     target: screen as MoveableRefTargetType,
-  //     // If the container is null, the position is fixed. (default: parentElement(document.body))
-  //     container: document.body,
-  //     className: "clickable",
-  //     preventClickDefault: true,
-  //     draggable: true,
-  //     resizable: true,
-  //     scalable: false,
-  //     rotatable: false,
-  //     warpable: false,
-  //     // Enabling pinchable lets you use events that
-  //     // can be used in draggable, resizable, scalable, and rotateable.
-  //     pinchable: false, // ["resizable", "scalable", "rotatable"]
-  //     origin: true,
-  //     keepRatio: true,
-  //     // Resize, Scale Events at edges.
-  //     edge: false,
-  //     throttleDrag: 0,
-  //     throttleResize: 0,
-  //     throttleScale: 0,
-  //     throttleRotate: 0,
-  //   })
-
-  //   moveable
-  //     .on("dragStart", ({ target, clientX, clientY }) => {
-  //       console.log("onDragStart", target)
-  //     })
-  //     .on(
-  //       "drag",
-  //       ({
-  //         target,
-  //         transform,
-  //         left,
-  //         top,
-  //         right,
-  //         bottom,
-  //         beforeDelta,
-  //         beforeDist,
-  //         delta,
-  //         dist,
-  //         clientX,
-  //         clientY,
-  //       }) => {
-  //         console.log("onDrag left, top", left, top)
-  //         target!.style.left = `${left}px`
-  //         target!.style.top = `${top}px`
-  //         // console.log("onDrag translate", dist);
-  //         // target!.style.transform = transform;
-  //       }
-  //     )
-  //     .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
-  //       console.log("onDragEnd", target, isDrag)
-  //     })
-
-  //   /* resizable */
-  //   moveable
-  //     .on("resizeStart", ({ target, clientX, clientY }) => {
-  //       console.log("onResizeStart", target)
-  //     })
-  //     .on(
-  //       "resize",
-  //       ({ target, width, height, dist, delta, clientX, clientY }) => {
-  //         console.log("onResize", target)
-  //         delta[0] && (target!.style.width = `${width}px`)
-  //         delta[1] && (target!.style.height = `${height}px`)
-  //         const canvasVideo = document.getElementById(
-  //           "__screen_canvas__"
-  //         ) as HTMLCanvasElement
-  //         canvasVideo.width = width
-  //         canvasVideo.height = height
-  //       }
-  //     )
-  //     .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
-  //       console.log("onResizeEnd", target, isDrag)
-  //     })
-  // })
-
   stopScreenAreaBtn.addEventListener("click", () => {
-    // setButtonsState("stop")
-
     if (moveable) {
       moveable.destroy()
       moveable = undefined
@@ -147,42 +47,6 @@ import { destroyCanvas } from "./draw.renderer"
 
     destroyCanvas()
   })
-
-  // startScreenAreaBtn.addEventListener("click", async () => {
-  //   // window.electronAPI.setIgnoreMouseEvents(true)
-  //   const screen = document.getElementById("__screen__")
-  //   screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
-  //   console.log("screen", screen)
-
-  //   const screenMove = moveable.getControlBoxElement()
-  //   screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
-
-  //   setButtonsState("start")
-
-  //   const videoStream = await navigator.mediaDevices.getDisplayMedia({
-  //     video: true,
-  //   })
-  //   const audioStream = await navigator.mediaDevices.getUserMedia({
-  //     audio: {
-  //       deviceId: activeAudioDevice.deviceId,
-  //       echoCancellation: true,
-  //       noiseSuppression: true,
-  //       sampleRate: 44100,
-  //     },
-  //     video: false,
-  //   })
-
-  //   const combinedStream = new MediaStream([
-  //     ...videoStream.getVideoTracks(),
-  //     ...audioStream.getAudioTracks(),
-  //   ])
-
-  //   const canvas = document.getElementById("__screen_canvas__")
-  //   createVideo(combinedStream, canvas)
-
-  //   // navigator.mediaDevices.getDisplayMedia({ video: true }).then((stream) => {
-  //   // })
-  // })
 
   const initStream = async (settings: StreamSettings): Promise<MediaStream> => {
     let videoStream: MediaStream
@@ -207,6 +71,22 @@ import { destroyCanvas } from "./draw.renderer"
     if (settings.action == "cropVideo") {
       videoStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
+      })
+
+      audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: settings.audioDeviseId,
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
+        },
+        video: false,
+      })
+    }
+
+    if (settings.action == "cameraOnly") {
+      videoStream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: settings.cameraDeviceId } },
       })
 
       audioStream = await navigator.mediaDevices.getUserMedia({
@@ -260,7 +140,7 @@ import { destroyCanvas } from "./draw.renderer"
     return canvas
   }
 
-  const createVideo = (_stream, _canvas) => {
+  const createVideo = (_stream, _canvas, _video) => {
     const stream = _canvas
       ? new MediaStream([
           ..._canvas.captureStream().getVideoTracks(),
@@ -269,6 +149,10 @@ import { destroyCanvas } from "./draw.renderer"
       : _stream
     videoRecorder = new MediaRecorder(stream)
     let chunks = []
+
+    if (_video) {
+      _video.srcObject = new MediaStream([..._stream.getVideoTracks()])
+    }
 
     if (_canvas) {
       const canvasPosition = document
@@ -346,6 +230,10 @@ import { destroyCanvas } from "./draw.renderer"
       if (canvasVideo) {
         canvasVideo.remove()
       }
+
+      if (_video) {
+        _video.srcObject = null
+      }
     }
 
     if (_canvas) {
@@ -355,17 +243,69 @@ import { destroyCanvas } from "./draw.renderer"
         }
       }
     }
+  }
 
-    videoRecorder.start()
+  const startRecording = () => {
+    if (videoRecorder) {
+      videoRecorder.start()
+    }
   }
 
   window.electronAPI.ipcRenderer.on(
     "start-recording",
     (event, data: StreamSettings) => {
+      // TODO:
+      // добавить initView функцию, которая сдеает настройку страницы для каждого data.action
+      // Показать нужные элементы в зависимости от настроек записи
+
       if (data.action == "fullScreenVideo") {
+        const countdownContainer = document.querySelector(
+          ".fullscreen-countdown-container"
+        )
+        const countdown = document.querySelector("#fullscreen_countdown")
+        countdownContainer.removeAttribute("hidden")
         initStream(data).then((stream) => {
-          createVideo(stream, undefined)
+          createVideo(stream, undefined, undefined)
+          let timeleft = 2
+          const startTimer = setInterval(function () {
+            if (timeleft <= 0) {
+              clearInterval(startTimer)
+              countdownContainer.setAttribute("hidden", "")
+              countdown.innerHTML = ""
+              setTimeout(() => {
+                startRecording()
+              }, 10)
+            } else {
+              countdown.innerHTML = `${timeleft}`
+            }
+            timeleft -= 1
+          }, 1000)
         })
+      }
+
+      if (data.action == "cameraOnly") {
+        const videoContainer = document.querySelector(
+          ".webcamera-only-container"
+        )
+        const video = document.querySelector(
+          "#webcam_only_video"
+        ) as HTMLVideoElement
+        videoContainer.removeAttribute("hidden")
+        const rect = videoContainer.getBoundingClientRect()
+        video.width = rect.width
+        video.height = rect.height
+
+        initStream(data).then((stream) => {
+          createVideo(stream, undefined, video)
+        })
+
+        startScreenAreaBtn.addEventListener(
+          "click",
+          () => {
+            startRecording()
+          },
+          false
+        )
       }
 
       if (data.action == "cropVideo") {
@@ -459,7 +399,8 @@ import { destroyCanvas } from "./draw.renderer"
             screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
             initStream(data).then((stream) => {
               const canvas = document.getElementById("__screen_canvas__")
-              createVideo(stream, canvas)
+              createVideo(stream, canvas, undefined)
+              startRecording()
             })
           },
           false

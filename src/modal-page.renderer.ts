@@ -112,7 +112,7 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
         }
       }
 
-      if (activeScreenAction == "camera") {
+      if (activeScreenAction == "cameraOnly") {
         streamSettings = {
           ...streamSettings,
           cameraDeviceId: activeVideoDevice.deviceId,

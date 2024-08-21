@@ -29,10 +29,6 @@
     <canvas id="canvas" width="300" height="300"></canvas>
 
     <div class="screen-area-controls">
-      <!-- <button id="getScreenAreaBtn" class="clickable">
-        Выбрать часть экрана
-      </button>
-      <br /> -->
       <button id="startScreenAreaBtn">Начать запись части экрана</button>
       <br />
       <button id="stopScreenAreaBtn">Остановить запись части экрана</button>
@@ -42,6 +38,16 @@
       <select id="cameraSelect" class="clickable">
         <option value="">Нет камеры</option>
       </select>
+    </div>
+
+    <div class="webcamera-only-container" hidden>
+      <video id="webcam_only_video" autoplay></video>
+    </div>
+
+    <div class="fullscreen-countdown-container" hidden>
+      <div class="fullscreen-countdown">
+        <div id="fullscreen_countdown">3</div>
+      </div>
     </div>
 
     <div class="webcamera-view">

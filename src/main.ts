@@ -53,7 +53,7 @@ function createWindow() {
   // mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/index.html`)
@@ -71,7 +71,7 @@ function createModal() {
   modalWindow = new BrowserWindow({
     // frame: false,
     // thickFrame: false,
-    titleBarStyle: "hiddenInset",
+    titleBarStyle: "hidden",
     // fullscreenable: false,
     resizable: false,
     width: 300,
@@ -186,5 +186,5 @@ ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
 ipcMain.on("start-recording", (event, data) => {
   mainWindow.webContents.send("start-recording", data)
   modalWindow.hide()
-  // modalWindow.webContents.send('start-recording', data);
+  modalWindow.webContents.send("start-recording", data)
 })
