@@ -191,3 +191,7 @@ ipcMain.on("start-recording", (event, data) => {
   mainWindow.webContents.send("start-recording", data)
   modalWindow.hide()
 })
+
+ipcMain.on("main-window-focus", (event, data) => {
+  mainWindow.focus()
+})

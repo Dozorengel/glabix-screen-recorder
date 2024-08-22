@@ -13,19 +13,13 @@ h1 {
   margin: 0;
 }
 
-.page-backdrop,
-.page-backdrop-locker {
+.page-backdrop {
   position: fixed;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
-}
-
-.page-backdrop-locker[lock] {
-  pointer-events: none;
-  /* background-color: silver; */
 }
 
 .controls {

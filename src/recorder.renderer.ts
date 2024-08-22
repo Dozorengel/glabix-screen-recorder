@@ -2,7 +2,6 @@ import Moveable, { MoveableRefTargetType } from "moveable"
 import { StreamSettings } from "./helpers/types"
 import { destroyCanvas } from "./draw.renderer"
 ;(function () {
-  const backdropLocker = document.querySelector(".page-backdrop-locker")
   const stopScreenAreaBtn = document.getElementById(
     "stopScreenAreaBtn"
   ) as HTMLButtonElement
@@ -207,12 +206,6 @@ import { destroyCanvas } from "./draw.renderer"
   const initView = (settings: StreamSettings) => {
     clearView()
 
-    if (settings.action == "cropVideo") {
-      backdropLocker.removeAttribute("hidden")
-    } else {
-      backdropLocker.setAttribute("hidden", "")
-    }
-
     if (settings.action == "cameraOnly") {
       const videoContainer = document.querySelector(".webcamera-only-container")
       const video = document.querySelector(
@@ -361,7 +354,6 @@ import { destroyCanvas } from "./draw.renderer"
         }, 1000)
       } else {
         if (data.action == "cropVideo") {
-          backdropLocker.setAttribute("hidden", "")
           const screen = document.getElementById("__screen__")
           screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
           const screenMove = moveable.getControlBoxElement()
