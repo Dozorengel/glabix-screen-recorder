@@ -49,7 +49,13 @@
 
     <template id="media_device_tpl">
       <div class="mb-20">
-        <button class="btn"></button>
+        <div
+          class="btn text-overflow"
+          style="display: flex; align-items: center; gap: 5px"
+        >
+          <span class="text-overflow"></span>
+          <input class="media-device-checkbox" type="checkbox" />
+        </div>
       </div>
     </template>
     <script type="module" src="/src/modal-page.renderer.ts"></script>

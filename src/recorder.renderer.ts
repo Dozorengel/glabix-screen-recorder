@@ -51,14 +51,10 @@ import { destroyCanvas } from "./draw.renderer"
   })
 
   const initStream = async (settings: StreamSettings): Promise<MediaStream> => {
-    let videoStream: MediaStream
-    let audioStream: MediaStream
+    let videoStream: MediaStream = new MediaStream()
+    let audioStream: MediaStream = new MediaStream()
 
-    if (settings.action == "fullScreenVideo") {
-      videoStream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-      })
-
+    if (settings.audioDeviseId) {
       audioStream = await navigator.mediaDevices.getUserMedia({
         audio: {
           deviceId: settings.audioDeviseId,
@@ -67,6 +63,12 @@ import { destroyCanvas } from "./draw.renderer"
           sampleRate: 44100,
         },
         video: false,
+      })
+    }
+
+    if (settings.action == "fullScreenVideo") {
+      videoStream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
       })
     }
 
@@ -74,31 +76,11 @@ import { destroyCanvas } from "./draw.renderer"
       videoStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
       })
-
-      audioStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          deviceId: settings.audioDeviseId,
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 44100,
-        },
-        video: false,
-      })
     }
 
-    if (settings.action == "cameraOnly") {
+    if (settings.action == "cameraOnly" && settings.cameraDeviceId) {
       videoStream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: settings.cameraDeviceId } },
-      })
-
-      audioStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          deviceId: settings.audioDeviseId,
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 44100,
-        },
-        video: false,
       })
     }
 
@@ -230,82 +212,87 @@ import { destroyCanvas } from "./draw.renderer"
     }
   }
 
-  window.electronAPI.ipcRenderer.on("start-recording", (event, data) => {
-    if (data.action == "fullScreenVideo") {
-      const countdownContainer = document.querySelector(
-        ".fullscreen-countdown-container"
-      )
-      const countdown = document.querySelector("#fullscreen_countdown")
-      countdownContainer.removeAttribute("hidden")
-      let timeleft = 2
-      const startTimer = setInterval(function () {
-        if (timeleft <= 0) {
-          clearInterval(startTimer)
-          countdownContainer.setAttribute("hidden", "")
-          countdown.innerHTML = ""
-          setTimeout(() => {
-            startRecording()
-          }, 10)
-        } else {
-          countdown.innerHTML = `${timeleft}`
+  window.electronAPI.ipcRenderer.on(
+    "start-recording",
+    (event, data: StreamSettings) => {
+      if (data.action == "fullScreenVideo") {
+        const countdownContainer = document.querySelector(
+          ".fullscreen-countdown-container"
+        )
+        const countdown = document.querySelector("#fullscreen_countdown")
+        countdownContainer.removeAttribute("hidden")
+        let timeleft = 2
+        const startTimer = setInterval(function () {
+          if (timeleft <= 0) {
+            clearInterval(startTimer)
+            countdownContainer.setAttribute("hidden", "")
+            countdown.innerHTML = ""
+            setTimeout(() => {
+              startRecording()
+            }, 10)
+          } else {
+            countdown.innerHTML = `${timeleft}`
+          }
+          timeleft -= 1
+        }, 1000)
+      } else {
+        if (data.action == "cropVideo") {
+          const backdropLocker = document.querySelector(".page-backdrop-locker")
+          backdropLocker.setAttribute("hidden", "")
+          const screen = document.getElementById("__screen__")
+          screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
+          const screenMove = moveable.getControlBoxElement()
+          screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
+
+          const canvasVideo = document.querySelector(
+            "#__canvas_video_stream__"
+          ) as HTMLVideoElement
+          console.log("canvasVideo", canvasVideo)
+          canvasVideo.play()
+
+          // Координаты области экрана для захвата
+          const canvas = document.querySelector(
+            "#__screen_canvas__"
+          ) as HTMLCanvasElement
+          const canvasPosition = document
+            .getElementById("__screen__")
+            .getBoundingClientRect()
+          const ctx = canvas.getContext("2d")
+          const captureX = canvasPosition.left
+          const captureY = canvasPosition.top
+          const captureWidth = canvasPosition.width
+          const captureHeight = canvasPosition.height
+
+          // Обновление canvas с захваченной областью экрана
+          function updateCanvas() {
+            ctx.drawImage(
+              canvasVideo,
+              captureX,
+              captureY,
+              captureWidth,
+              captureHeight,
+              0,
+              0,
+              canvasPosition.width,
+              canvasPosition.height
+            )
+            requestAnimationFrame(updateCanvas)
+          }
+
+          updateCanvas()
         }
-        timeleft -= 1
-      }, 1000)
-    } else {
-      if (data.action == "cropVideo") {
-        const backdropLocker = document.querySelector(".page-backdrop-locker")
-        backdropLocker.setAttribute("hidden", "")
-        const screen = document.getElementById("__screen__")
-        screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
-        const screenMove = moveable.getControlBoxElement()
-        screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
 
-        const canvasVideo = document.querySelector(
-          "#__canvas_video_stream__"
-        ) as HTMLVideoElement
-        console.log("canvasVideo", canvasVideo)
-        canvasVideo.play()
-
-        // Координаты области экрана для захвата
-        const canvas = document.querySelector(
-          "#__screen_canvas__"
-        ) as HTMLCanvasElement
-        const canvasPosition = document
-          .getElementById("__screen__")
-          .getBoundingClientRect()
-        const ctx = canvas.getContext("2d")
-        const captureX = canvasPosition.left
-        const captureY = canvasPosition.top
-        const captureWidth = canvasPosition.width
-        const captureHeight = canvasPosition.height
-
-        // Обновление canvas с захваченной областью экрана
-        function updateCanvas() {
-          ctx.drawImage(
-            canvasVideo,
-            captureX,
-            captureY,
-            captureWidth,
-            captureHeight,
-            0,
-            0,
-            canvasPosition.width,
-            canvasPosition.height
-          )
-          requestAnimationFrame(updateCanvas)
-        }
-
-        updateCanvas()
+        startRecording()
       }
-
-      startRecording()
     }
-  })
+  )
 
   window.electronAPI.ipcRenderer.on(
     "record-settings-change",
     (event, data: StreamSettings) => {
       const backdropLocker = document.querySelector(".page-backdrop-locker")
+
+      console.log("record-settings-change", data)
 
       if (data.action == "cropVideo") {
         backdropLocker.removeAttribute("hidden")

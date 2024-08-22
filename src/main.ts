@@ -185,9 +185,6 @@ ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
 
 ipcMain.on("record-settings-change", (event, data) => {
   mainWindow.webContents.send("record-settings-change", data)
-  if (["fullScreenVideo"].includes(data.action)) {
-    modalWindow.hide()
-  }
 })
 
 ipcMain.on("start-recording", (event, data) => {
