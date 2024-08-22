@@ -1,0 +1,41 @@
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &-3 {
+    @extend .flex-center;
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  &-4 {
+    @extend .flex-center;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &-5 {
+    @extend .flex-center;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  &-6 {
+    @extend .flex-center;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &-8 {
+    @extend .flex-center;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &-12 {
+    @extend .flex-center;
+    width: 3rem;
+    height: 3rem;
+  }
+}

@@ -1,0 +1,29 @@
+@import "styles.css";
+
+.panel-controls {
+  position: fixed;
+  top: 160px;
+  left: 20px;
+  width: 100px;
+  height: 100px;
+}
+
+.panel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-600);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
+  border-radius: 0.5rem;
+  padding: 0.25rem 1rem;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+  white-space: nowrap;
+  font-weight: 500;
+
+  &:hover {
+    background-color: var(--gray-300);
+  }
+}
