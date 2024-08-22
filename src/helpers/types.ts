@@ -1,7 +1,7 @@
 export type ScreenAction = "fullScreenVideo" | "cropVideo" | "cameraOnly"
 export interface StreamSettings {
   action: ScreenAction
-  audioDeviseId?: string
+  audioDeviceId?: string
   video?: boolean
   cameraDeviceId?: string
 }
