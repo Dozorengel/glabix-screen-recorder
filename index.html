@@ -21,19 +21,16 @@
       <div id="recordTimer">00:00</div>
     </div>
 
-    <div class="draw-controls">
-      <button id="createCanvas" class="clickable">Начать рисование</button>
-      <button id="destroyCanvas" class="clickable">Закончить рисование</button>
+    <div class="panel-controls">
+      <button id="draw-toggle" class="panel-btn flex-center-8 clickable">
+        <span class="i i-pencil-mechanical i--lg"></span>
+      </button>
     </div>
 
     <canvas id="canvas" width="300" height="300"></canvas>
 
     <div class="screen-area-controls">
-      <!-- <button id="startScreenAreaBtn">Начать запись части экрана</button>
-      <br /> -->
-      <button id="stopScreenAreaBtn" class="clickable">
-        Остановить запись
-      </button>
+      <button id="stopScreenAreaBtn" class="btn">Остановить запись</button>
     </div>
 
     <div class="webcamera-only-container" hidden>

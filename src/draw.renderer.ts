@@ -1,19 +1,19 @@
 import { KonvaPointerEvent } from "konva/lib/PointerEvents"
 import Konva from "konva"
+import "./styles/panel.scss"
 
 let stage: Konva.Stage
-const createCanvasBtn = document.getElementById(
-  "createCanvas"
-) as HTMLButtonElement
-const destroyCanvasBtn = document.getElementById(
-  "destroyCanvas"
-) as HTMLButtonElement
+const drawToggle = document.getElementById("draw-toggle") as HTMLButtonElement
 let countdownTimer: number | null
 
-createCanvasBtn.addEventListener("click", () => {
+drawToggle.addEventListener("click", () => {
+  drawToggle.classList.toggle("bg-gray-300")
+
   if (stage) {
+    destroyCanvas()
     return
   }
+
   stage = new Konva.Stage({
     container: "draw-container",
     width: window.innerWidth,
@@ -104,10 +104,6 @@ createCanvasBtn.addEventListener("click", () => {
     })
     tweenOpacity.play()
   })
-})
-
-destroyCanvasBtn.addEventListener("click", () => {
-  destroyCanvas()
 })
 
 export function destroyCanvas() {

@@ -1,4 +1,5 @@
 @import "styles.css";
+@import "_buttons.css";
 
 html,
 body {
@@ -31,20 +32,10 @@ h1 {
   background: rgb(128, 191, 255);
 }
 
-.draw-controls {
-  position: fixed;
-  top: 160px;
-  left: 20px;
-  width: 100px;
-  height: 100px;
-}
-
 .screen-area-controls {
   position: fixed;
   top: 20px;
   right: 20px;
-  width: 100px;
-  height: 100px;
 }
 
 .webcamera-frame {
