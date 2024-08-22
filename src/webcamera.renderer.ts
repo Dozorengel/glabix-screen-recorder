@@ -1,4 +1,5 @@
 import { StreamSettings } from "./helpers/types"
+import Moveable, { MoveableRefTargetType } from "moveable"
 
 const videoContainer = document.getElementById(
   "webcamera-view"
@@ -11,6 +12,7 @@ const bigSizeBtn = document.getElementById("big-camera") as HTMLButtonElement
 
 let currentStream: MediaStream
 let isVideoBig: Boolean
+let moveable: Moveable
 
 window.electronAPI.ipcRenderer.on(
   "record-settings-change",
@@ -36,6 +38,63 @@ bigSizeBtn.addEventListener("click", () => {
   isVideoBig = true
   toggleVideoSize()
 })
+
+videoContainer.classList.add("clickable")
+
+moveable = new Moveable(document.body, {
+  target: videoContainer as MoveableRefTargetType,
+  // If the container is null, the position is fixed. (default: parentElement(document.body))
+  container: document.body,
+  className: "clickable",
+  // preventClickDefault: true,
+  draggable: true,
+  // resizable: false,
+  // scalable: false,
+  // rotatable: false,
+  // warpable: false,
+  // // Enabling pinchable lets you use events that
+  // // can be used in draggable, resizable, scalable, and rotateable.
+  // pinchable: false, // ["resizable", "scalable", "rotatable"]
+  // origin: true,
+  // keepRatio: true,
+  // // Resize, Scale Events at edges.
+  // edge: false,
+  // throttleDrag: 0,
+  // throttleResize: 0,
+  // throttleScale: 0,
+  // throttleRotate: 0,
+})
+
+moveable
+  .on("dragStart", ({ target, clientX, clientY }) => {
+    // console.log("onDragStart", target)
+  })
+  .on(
+    "drag",
+    ({
+      target,
+      transform,
+      left,
+      top,
+      right,
+      bottom,
+      beforeDelta,
+      beforeDist,
+      delta,
+      dist,
+      clientX,
+      clientY,
+    }) => {
+      console.log("onDrag left, top", left, top)
+      target!.style.left = `${left}px`
+      target!.style.top = `${top}px`
+      // console.log("onDrag translate", dist);
+      // target!.style.transform = transform;
+    }
+  )
+  .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
+    console.log("onDragEnd", target, isDrag)
+  })
 
 function toggleVideoSize() {
   if (isVideoBig) {
