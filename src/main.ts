@@ -86,6 +86,10 @@ function createModal(parentWindow) {
     },
   })
 
+  modalWindow.on("blur", () => {
+    mainWindow.focus()
+  })
+
   modalWindow.on("close", () => {
     app.quit()
   })

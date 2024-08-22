@@ -34,8 +34,8 @@ h1 {
 
 .screen-area-controls {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 125px;
+  left: 20px;
 }
 
 .webcamera-frame {
