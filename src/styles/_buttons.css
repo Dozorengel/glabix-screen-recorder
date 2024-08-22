@@ -33,15 +33,14 @@
     color: var(--gray-600);
     pointer-events: none;
   }
+}
+.btn--primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--light);
+}
 
-  &--primary {
-    background-color: var(--primary);
-    border-color: var(--primary);
-    color: var(--light);
-  }
-
-  &--primary:hover {
-    background-color: var(--primary-300);
-    border-color: var(--primary-300);
-  }
+.btn--primary:hover {
+  background-color: var(--primary-300);
+  border-color: var(--primary-300);
 }
