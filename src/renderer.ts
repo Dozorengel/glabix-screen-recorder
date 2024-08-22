@@ -1,64 +1,5 @@
-import "./index.css"
-import Konva from "konva"
-
-let stage: Konva.Stage
-
-const createCanvasBtn = document.getElementById(
-  "createCanvas"
-) as HTMLButtonElement
-const destroyCanvasBtn = document.getElementById(
-  "destroyCanvas"
-) as HTMLButtonElement
-
-createCanvasBtn.addEventListener("click", () => {
-  stage = new Konva.Stage({
-    container: "draw-container",
-    width: window.innerWidth,
-    height: window.innerHeight,
-  })
-
-  const layer = new Konva.Layer()
-  stage.add(layer)
-
-  let arrow: Konva.Arrow
-  const startPoints: number[] = []
-  stage.on("mousedown", () => {
-    const { x, y } = stage.getPointerPosition()
-    startPoints.push(x, y)
-    arrow = new Konva.Arrow({
-      points: [],
-      stroke: "red",
-      fill: "red",
-    })
-    layer.add(arrow)
-  })
-
-  stage.on("mousemove", () => {
-    if (arrow) {
-      const { x, y } = stage.getPointerPosition()
-      const points = [...startPoints, x, y]
-      arrow.points(points)
-    }
-  })
-
-  stage.on("mouseup", () => {
-    arrow = null
-    startPoints.length = 0
-  })
-
-  layer.draw()
-})
-
-export function destroyCanvas() {
-  if (stage) {
-    stage.clear()
-    stage.destroy()
-  }
-}
-
-destroyCanvasBtn.addEventListener("click", () => {
-  destroyCanvas()
-})
+import { destroyCanvas } from "./draw.renderer"
+import "./styles/index-page.css"
 
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement
 const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
@@ -93,7 +34,6 @@ function stopRecordTimer() {
 }
 
 startBtn.addEventListener("click", () => {
-  // window.electronAPI.startRecording();
   // const resolution = await window.electronAPI.resolution()
   // width = resolution.width
   // height = resolution.height

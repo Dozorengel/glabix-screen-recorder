@@ -12,10 +12,11 @@
 
   <body>
     <div class="page-backdrop"></div>
+    <div class="page-backdrop-locker" hidden></div>
 
     <div id="draw-container"></div>
 
-    <div class="controls">
+    <div class="controls" hidden>
       <button id="startBtn" class="clickable">Записать весь экран</button>
       <button id="stopBtn" class="clickable" disabled>Остановить запись</button>
       <div id="recordTimer">00:00</div>
@@ -29,16 +30,10 @@
     <canvas id="canvas" width="300" height="300"></canvas>
 
     <div class="screen-area-controls">
-      <button id="getScreenAreaBtn" class="clickable">
-        Выбрать часть экрана
-      </button>
-      <br />
-      <button id="startScreenAreaBtn" class="clickable" disabled>
-        Начать запись части экрана
-      </button>
-      <br />
-      <button id="stopScreenAreaBtn" class="clickable" disabled>
-        Остановить запись части экрана
+      <!-- <button id="startScreenAreaBtn">Начать запись части экрана</button>
+      <br /> -->
+      <button id="stopScreenAreaBtn" class="clickable">
+        Остановить запись
       </button>
     </div>
 
@@ -46,6 +41,16 @@
       <select id="cameraSelect" class="clickable">
         <option value="">Нет камеры</option>
       </select>
+    </div>
+
+    <div class="webcamera-only-container" hidden>
+      <video id="webcam_only_video" autoplay></video>
+    </div>
+
+    <div class="fullscreen-countdown-container" hidden>
+      <div class="fullscreen-countdown">
+        <div id="fullscreen_countdown">3</div>
+      </div>
     </div>
 
     <div class="webcamera-view">
@@ -60,7 +65,8 @@
 
     <!-- You can also require other files to run in this process -->
     <script type="module" src="/src/renderer.ts"></script>
-    <script type="module" src="/src/area-record-renderer.ts"></script>
-    <script type="module" src="/src/webcamera-renderer.ts"></script>
+    <script type="module" src="/src/recorder.renderer.ts"></script>
+    <script type="module" src="/src/webcamera.renderer.ts"></script>
+    <script type="module" src="/src/draw.renderer.ts"></script>
   </body>
 </html>

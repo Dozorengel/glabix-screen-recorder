@@ -19,6 +19,7 @@ import os from "os"
 // }
 
 let mainWindow: BrowserWindow
+let modalWindow: BrowserWindow
 
 function createWindow() {
   const { x, y, width, height } = screen.getPrimaryDisplay().bounds
@@ -47,8 +48,8 @@ function createWindow() {
   if (os.platform() == "darwin") {
     mainWindow.setWindowButtonVisibility(false)
   }
-  mainWindow.loadFile("index.html")
-  mainWindow.setAlwaysOnTop(true, "normal", 3000)
+  // mainWindow.loadFile("index.html")
+  mainWindow.setAlwaysOnTop(true, "normal", 999999)
 
   // mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
@@ -56,7 +57,7 @@ function createWindow() {
   // mainWindow.webContents.openDevTools()
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
+    mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/index.html`)
   } else {
     mainWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
@@ -64,8 +65,42 @@ function createWindow() {
   }
 
   createMenu()
+  createModal(mainWindow)
 }
 
+function createModal(parentWindow) {
+  modalWindow = new BrowserWindow({
+    // frame: false,
+    // thickFrame: false,
+    titleBarStyle: "hidden",
+    // fullscreenable: false,
+    resizable: false,
+    width: 300,
+    show: false,
+    alwaysOnTop: true,
+    parent: parentWindow,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      zoomFactor: 1.0,
+      nodeIntegration: true, // Enable Node.js integration
+      // contextIsolation: false, // Disable context isolation (not recommended for production)
+    },
+  })
+
+  modalWindow.on("close", () => {
+    app.quit()
+  })
+
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    modalWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/modal.html`)
+  } else {
+    modalWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/modal.html`)
+    )
+  }
+
+  // modalWindow.webContents.openDevTools()
+}
 function createMenu() {
   const image = nativeImage
     .createFromPath(path.join(__dirname, "favicon-24.png"))
@@ -83,12 +118,14 @@ function createMenu() {
       label: "Начать",
       click: () => {
         mainWindow.show()
+        modalWindow.show()
       },
     },
     {
       label: "Скрыть",
       click: () => {
         mainWindow.hide()
+        modalWindow.hide()
       },
     },
     {
@@ -145,4 +182,16 @@ app.on("activate", () => {
 ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   win.setIgnoreMouseEvents(ignore, options)
+})
+
+ipcMain.on("record-settings-change", (event, data) => {
+  mainWindow.webContents.send("record-settings-change", data)
+  if (["fullScreenVideo"].includes(data.action)) {
+    modalWindow.hide()
+  }
+})
+
+ipcMain.on("start-recording", (event, data) => {
+  mainWindow.webContents.send("start-recording", data)
+  modalWindow.hide()
 })

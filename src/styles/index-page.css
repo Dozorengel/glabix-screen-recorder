@@ -1,22 +1,32 @@
+@import url("_normalize.css");
+@import url("_base.css");
+
 html,
 body {
   margin: 0;
   width: 100%;
   height: 100%;
   background: transparent;
+  overflow: hidden;
 }
 
 h1 {
   margin: 0;
 }
 
-.page-backdrop {
+.page-backdrop,
+.page-backdrop-locker {
   position: fixed;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
+}
+
+.page-backdrop-locker[lock] {
+  pointer-events: none;
+  /* background-color: silver; */
 }
 
 .controls {
@@ -74,4 +84,33 @@ h1 {
   width: 100%;
   height: 100%;
   z-index: 999;
+}
+
+.webcamera-only-container {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 640px;
+  aspect-ratio: 16/9;
+  outline: 2px solid red;
+  outline-offset: -2px;
+}
+
+.webcamera-only-container video {
+  object-fit: cover;
+}
+
+.fullscreen-countdown {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  color: var(--light);
+  font-size: 100px;
+  align-items: center;
+  justify-content: center;
 }

@@ -1,0 +1,19 @@
+:root {
+  --primary-100: #e3f4ee;
+  --primary-200: #b3e0d1;
+  --primary-300: #66c2a3;
+  --primary: #009966;
+  --light: #fff;
+  --dark: #0f1928;
+  --gray: #6f757e;
+  --gray-100: #f9f9f9;
+  --gray-200: #f3f3f4;
+  --gray-300: #e7e8e9;
+  --gray-400: #cfd1d4;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
