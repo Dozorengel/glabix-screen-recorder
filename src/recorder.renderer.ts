@@ -2,52 +2,20 @@ import Moveable, { MoveableRefTargetType } from "moveable"
 import { StreamSettings } from "./helpers/types"
 import { destroyCanvas } from "./draw.renderer"
 ;(function () {
-  // const getScreenAreaBtn = document.getElementById(
-  //   "getScreenAreaBtn"
-  // ) as HTMLButtonElement
-  const startScreenAreaBtn = document.getElementById(
-    "startScreenAreaBtn"
-  ) as HTMLButtonElement
+  const backdropLocker = document.querySelector(".page-backdrop-locker")
   const stopScreenAreaBtn = document.getElementById(
     "stopScreenAreaBtn"
   ) as HTMLButtonElement
   let videoRecorder: MediaRecorder
-  let audioRecorder: MediaRecorder
-  let audioDevicesList: MediaDeviceInfo[] = []
-  let activeAudioDevice: MediaDeviceInfo
-  let videoDevicesList: MediaDeviceInfo[] = []
   let moveable: Moveable
 
-  const devices = navigator.mediaDevices.enumerateDevices()
-  devices.then((devicesInfo) => {
-    audioDevicesList = devicesInfo.filter((d) => d.kind == "audioinput")
-    activeAudioDevice = audioDevicesList.length
-      ? audioDevicesList[0]
-      : undefined
-    videoDevicesList = devicesInfo.filter((d) => d.kind == "videoinput")
-    // console.log(
-    //   "devicesInfo",
-    //   devicesInfo,
-    //   audioDevicesList,
-    //   videoDevicesList,
-    //   activeAudioDevice
-    // )
-  })
-
   stopScreenAreaBtn.addEventListener("click", () => {
-    if (moveable) {
-      moveable.destroy()
-      moveable = undefined
-    }
-
-    console.log("videoRecorder stop click", videoRecorder)
-
     if (videoRecorder) {
       videoRecorder.stop()
       videoRecorder = undefined
-    }
 
-    destroyCanvas()
+      clearView()
+    }
   })
 
   const initStream = async (settings: StreamSettings): Promise<MediaStream> => {
@@ -178,12 +146,11 @@ import { destroyCanvas } from "./draw.renderer"
       }
 
       const screenOverlay = document.getElementById("__screen__")
-      const canvasVideo = document.getElementById("__canvas_video_stream__")
-
       if (screenOverlay) {
         screenOverlay.remove()
       }
 
+      const canvasVideo = document.getElementById("__canvas_video_stream__")
       if (canvasVideo) {
         canvasVideo.remove()
       }
@@ -212,22 +179,138 @@ import { destroyCanvas } from "./draw.renderer"
     }
   }
 
+  const clearView = () => {
+    const screenOverlay = document.getElementById("__screen__")
+    if (screenOverlay) {
+      screenOverlay.remove()
+    }
+
+    const canvasVideo = document.getElementById("__canvas_video_stream__")
+    if (canvasVideo) {
+      canvasVideo.remove()
+    }
+
+    const videoContainer = document.querySelector(".webcamera-only-container")
+
+    if (videoContainer) {
+      videoContainer.setAttribute("hidden", "")
+    }
+
+    if (moveable) {
+      moveable.destroy()
+      moveable = undefined
+    }
+
+    destroyCanvas()
+  }
+
+  const initView = (settings: StreamSettings) => {
+    clearView()
+
+    if (settings.action == "cropVideo") {
+      backdropLocker.removeAttribute("hidden")
+    } else {
+      backdropLocker.setAttribute("hidden", "")
+    }
+
+    if (settings.action == "cameraOnly") {
+      const videoContainer = document.querySelector(".webcamera-only-container")
+      const video = document.querySelector(
+        "#webcam_only_video"
+      ) as HTMLVideoElement
+      videoContainer.removeAttribute("hidden")
+      const rect = videoContainer.getBoundingClientRect()
+      video.width = rect.width
+      video.height = rect.height
+    }
+
+    if (settings.action == "cropVideo") {
+      createCanvas()
+
+      const screen = document.getElementById("__screen__")
+      moveable = new Moveable(document.body, {
+        target: screen as MoveableRefTargetType,
+        // If the container is null, the position is fixed. (default: parentElement(document.body))
+        container: document.body,
+        className: "clickable",
+        preventClickDefault: true,
+        draggable: true,
+        resizable: true,
+        scalable: false,
+        rotatable: false,
+        warpable: false,
+        // Enabling pinchable lets you use events that
+        // can be used in draggable, resizable, scalable, and rotateable.
+        pinchable: false, // ["resizable", "scalable", "rotatable"]
+        origin: true,
+        keepRatio: true,
+        // Resize, Scale Events at edges.
+        edge: false,
+        throttleDrag: 0,
+        throttleResize: 0,
+        throttleScale: 0,
+        throttleRotate: 0,
+      })
+
+      moveable
+        .on("dragStart", ({ target, clientX, clientY }) => {
+          console.log("onDragStart", target)
+        })
+        .on(
+          "drag",
+          ({
+            target,
+            transform,
+            left,
+            top,
+            right,
+            bottom,
+            beforeDelta,
+            beforeDist,
+            delta,
+            dist,
+            clientX,
+            clientY,
+          }) => {
+            console.log("onDrag left, top", left, top)
+            target!.style.left = `${left}px`
+            target!.style.top = `${top}px`
+            // console.log("onDrag translate", dist);
+            // target!.style.transform = transform;
+          }
+        )
+        .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
+          console.log("onDragEnd", target, isDrag)
+        })
+
+      /* resizable */
+      moveable
+        .on("resizeStart", ({ target, clientX, clientY }) => {
+          console.log("onResizeStart", target)
+        })
+        .on(
+          "resize",
+          ({ target, width, height, dist, delta, clientX, clientY }) => {
+            console.log("onResize", target)
+            delta[0] && (target!.style.width = `${width}px`)
+            delta[1] && (target!.style.height = `${height}px`)
+            const canvasVideo = document.getElementById(
+              "__screen_canvas__"
+            ) as HTMLCanvasElement
+            canvasVideo.width = width
+            canvasVideo.height = height
+          }
+        )
+        .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
+          console.log("onResizeEnd", target, isDrag)
+        })
+    }
+  }
+
   window.electronAPI.ipcRenderer.on(
     "record-settings-change",
     (event, data: StreamSettings) => {
-      const backdropLocker = document.querySelector(".page-backdrop-locker")
-
-      console.log("record-settings-change", data)
-
-      if (data.action == "cropVideo") {
-        backdropLocker.removeAttribute("hidden")
-      } else {
-        backdropLocker.setAttribute("hidden", "")
-      }
-
-      // TODO:
-      // добавить initView функцию, которая сдеает настройку страницы для каждого data.action
-      // Показать нужные элементы в зависимости от настроек записи
+      initView(data)
 
       if (data.action == "fullScreenVideo") {
         initStream(data).then((stream) => {
@@ -236,105 +319,17 @@ import { destroyCanvas } from "./draw.renderer"
       }
 
       if (data.action == "cameraOnly") {
-        const videoContainer = document.querySelector(
-          ".webcamera-only-container"
-        )
         const video = document.querySelector(
           "#webcam_only_video"
         ) as HTMLVideoElement
-        videoContainer.removeAttribute("hidden")
-        const rect = videoContainer.getBoundingClientRect()
-        video.width = rect.width
-        video.height = rect.height
-
         initStream(data).then((stream) => {
           createVideo(stream, undefined, video)
         })
       }
 
       if (data.action == "cropVideo") {
-        createCanvas()
-
-        const screen = document.getElementById("__screen__")
-        moveable = new Moveable(document.body, {
-          target: screen as MoveableRefTargetType,
-          // If the container is null, the position is fixed. (default: parentElement(document.body))
-          container: document.body,
-          className: "clickable",
-          preventClickDefault: true,
-          draggable: true,
-          resizable: true,
-          scalable: false,
-          rotatable: false,
-          warpable: false,
-          // Enabling pinchable lets you use events that
-          // can be used in draggable, resizable, scalable, and rotateable.
-          pinchable: false, // ["resizable", "scalable", "rotatable"]
-          origin: true,
-          keepRatio: true,
-          // Resize, Scale Events at edges.
-          edge: false,
-          throttleDrag: 0,
-          throttleResize: 0,
-          throttleScale: 0,
-          throttleRotate: 0,
-        })
-
-        moveable
-          .on("dragStart", ({ target, clientX, clientY }) => {
-            console.log("onDragStart", target)
-          })
-          .on(
-            "drag",
-            ({
-              target,
-              transform,
-              left,
-              top,
-              right,
-              bottom,
-              beforeDelta,
-              beforeDist,
-              delta,
-              dist,
-              clientX,
-              clientY,
-            }) => {
-              console.log("onDrag left, top", left, top)
-              target!.style.left = `${left}px`
-              target!.style.top = `${top}px`
-              // console.log("onDrag translate", dist);
-              // target!.style.transform = transform;
-            }
-          )
-          .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
-            console.log("onDragEnd", target, isDrag)
-          })
-
-        /* resizable */
-        moveable
-          .on("resizeStart", ({ target, clientX, clientY }) => {
-            console.log("onResizeStart", target)
-          })
-          .on(
-            "resize",
-            ({ target, width, height, dist, delta, clientX, clientY }) => {
-              console.log("onResize", target)
-              delta[0] && (target!.style.width = `${width}px`)
-              delta[1] && (target!.style.height = `${height}px`)
-              const canvasVideo = document.getElementById(
-                "__screen_canvas__"
-              ) as HTMLCanvasElement
-              canvasVideo.width = width
-              canvasVideo.height = height
-            }
-          )
-          .on("resizeEnd", ({ target, isDrag, clientX, clientY }) => {
-            console.log("onResizeEnd", target, isDrag)
-          })
-
+        const canvas = document.getElementById("__screen_canvas__")
         initStream(data).then((stream) => {
-          const canvas = document.getElementById("__screen_canvas__")
           createVideo(stream, canvas, undefined)
         })
       }
@@ -366,7 +361,6 @@ import { destroyCanvas } from "./draw.renderer"
         }, 1000)
       } else {
         if (data.action == "cropVideo") {
-          const backdropLocker = document.querySelector(".page-backdrop-locker")
           backdropLocker.setAttribute("hidden", "")
           const screen = document.getElementById("__screen__")
           screen.style.cssText = `pointer-events: none; ${screen.style.cssText} outline: 2px solid red;`
