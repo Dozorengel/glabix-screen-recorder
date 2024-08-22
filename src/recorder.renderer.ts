@@ -140,14 +140,10 @@ import { destroyCanvas } from "./draw.renderer"
       a.click()
       window.URL.revokeObjectURL(url)
 
-      if (stream.getTracks()) {
-        stream.getTracks().forEach((track) => track.stop())
-      }
+      stream.getTracks().forEach((track) => track.stop())
 
       if (_canvas) {
-        if (_stream.getTracks()) {
-          _stream.getTracks().forEach((track) => track.stop())
-        }
+        _stream.getTracks().forEach((track) => track.stop())
       }
 
       const screenOverlay = document.getElementById("__screen__")
