@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <div class="webcamera-view">
+    <div id="webcamera-view" class="webcamera-view hidden">
       <video
         id="video"
         class="webcamera-frame"
@@ -54,6 +54,10 @@
         height="480"
         autoplay
       ></video>
+      <div class="webcamera-controls">
+        <button id="small-camera">small</button>
+        <button id="big-camera">big</button>
+      </div>
     </div>
 
     <!-- You can also require other files to run in this process -->

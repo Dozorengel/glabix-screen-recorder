@@ -58,8 +58,22 @@ h1 {
   position: fixed;
   top: 400px;
   left: 20px;
-  width: 120px;
-  height: 120px;
+  /* width: 120px;
+  height: 120px; */
+}
+
+.webcamera-small {
+  width: 200px;
+  height: 200px;
+}
+
+.webcamera-big {
+  width: 400px;
+  height: 400px;
+}
+
+.hidden {
+  display: none;
 }
 
 .draw-container {
