@@ -53,14 +53,6 @@ h1 {
   height: 100px;
 }
 
-.webcamera-controls {
-  position: fixed;
-  top: 300px;
-  left: 20px;
-  width: 120px;
-  height: 120px;
-}
-
 .webcamera-frame {
   width: 200px;
   height: 200px;
