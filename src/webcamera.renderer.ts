@@ -6,6 +6,10 @@ let currentStream: MediaStream
 window.electronAPI.ipcRenderer.on(
   "record-settings-change",
   (event, data: StreamSettings) => {
+    if (data.action == "cameraOnly") {
+      stopStream()
+      return
+    }
     if (data.cameraDeviceId) {
       startStream(data.cameraDeviceId)
     } else {
@@ -15,18 +19,22 @@ window.electronAPI.ipcRenderer.on(
 )
 
 function startStream(deviseId) {
-  const constraints = {
-    video: { deviceId: { exact: deviseId } },
+  if (!currentStream) {
+    const constraints = {
+      video: { deviceId: { exact: deviseId } },
+    }
+
+    const media = navigator.mediaDevices.getUserMedia(constraints)
+
+    media
+      .then((stream) => {
+        currentStream = stream
+        video.srcObject = currentStream
+      })
+      .catch((e) => console.log(e))
+  } else {
+    video.srcObject = currentStream
   }
-
-  const media = navigator.mediaDevices.getUserMedia(constraints)
-
-  media
-    .then((stream) => {
-      currentStream = stream
-      video.srcObject = currentStream
-    })
-    .catch((e) => console.log(e))
 }
 
 function stopStream() {
