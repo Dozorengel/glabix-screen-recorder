@@ -1,7 +1,7 @@
 import { StreamSettings } from "./helpers/types"
 
 const video = document.getElementById("video") as HTMLVideoElement
-let currentStream
+let currentStream: MediaStream
 
 window.electronAPI.ipcRenderer.on(
   "record-settings-change",
