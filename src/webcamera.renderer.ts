@@ -72,9 +72,11 @@ function startStream(deviseId) {
 }
 
 function stopStream() {
-  const tracks = currentStream.getTracks()
-  tracks.forEach((track) => track.stop())
-  video.srcObject = null
-  videoContainer.classList.add("hidden")
-  currentStream = null
+  if (currentStream) {
+    const tracks = currentStream.getTracks()
+    tracks.forEach((track) => track.stop())
+    video.srcObject = null
+    videoContainer.classList.add("hidden")
+    currentStream = null
+  }
 }
