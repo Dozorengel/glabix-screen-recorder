@@ -16,6 +16,7 @@
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
     "konva": "^9.3.14",
+    "modern-normalize": "^3.0.0",
     "moveable": "^0.53.0"
   },
   "devDependencies": {

@@ -1,6 +1,5 @@
-@import url("_normalize.css");
-@import url("_base.css");
-@import url("_buttons.css");
+@import "styles.css";
+@import "_buttons.css";
 
 body,
 html {
