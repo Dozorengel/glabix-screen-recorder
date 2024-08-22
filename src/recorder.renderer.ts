@@ -1,10 +1,11 @@
 import Moveable, { MoveableRefTargetType } from "moveable"
-import { StreamSettings } from "./helpers/types"
+import { ScreenAction, StreamSettings } from "./helpers/types"
 import { destroyCanvas } from "./draw.renderer"
 ;(function () {
   const stopScreenAreaBtn = document.getElementById(
     "stopScreenAreaBtn"
   ) as HTMLButtonElement
+  let lastScreenAction: ScreenAction = "fullScreenVideo"
   let videoRecorder: MediaRecorder
   let moveable: Moveable
 
@@ -139,9 +140,14 @@ import { destroyCanvas } from "./draw.renderer"
       a.click()
       window.URL.revokeObjectURL(url)
 
-      stream.getTracks().forEach((track) => track.stop())
+      if (stream.getTracks()) {
+        stream.getTracks().forEach((track) => track.stop())
+      }
+
       if (_canvas) {
-        _stream.getTracks().forEach((track) => track.stop())
+        if (_stream.getTracks()) {
+          _stream.getTracks().forEach((track) => track.stop())
+        }
       }
 
       const screenOverlay = document.getElementById("__screen__")
@@ -204,6 +210,11 @@ import { destroyCanvas } from "./draw.renderer"
   }
 
   const initView = (settings: StreamSettings) => {
+    if (lastScreenAction == settings.action) {
+      return
+    }
+
+    lastScreenAction = settings.action
     clearView()
 
     if (settings.action == "cameraOnly") {
