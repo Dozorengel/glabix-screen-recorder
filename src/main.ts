@@ -9,9 +9,14 @@ import {
   Tray,
   Menu,
   nativeImage,
+  protocol,
+  dialog,
 } from "electron"
 import path from "path"
 import os from "os"
+import { getCurrentUser } from "./commands/cirrent-user.command"
+import { e } from "vite/dist/node/types.d-aGj9QkWt"
+import { LoginEvents } from "./events/login.events"
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 // if (require("electron-squirrel-startup")) {
@@ -20,6 +25,63 @@ import os from "os"
 
 let mainWindow: BrowserWindow
 let modalWindow: BrowserWindow
+let loginWindow: BrowserWindow
+const appState = {
+  user: null,
+}
+
+app.removeAsDefaultProtocolClient("glabix-video-recorder")
+
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on("second-instance", (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+    const url = commandLine.pop()
+    const u = new URL(url)
+    const token = u.searchParams.get("token")
+    if (token) {
+      loginWindow.show()
+      ipcMain.emit(LoginEvents.TOKEN_CONFIRMED, token)
+    }
+  })
+
+  // This method will be called when Electron has finished
+  // initialization and is ready to create browser windows.
+  // Some APIs can only be used after this event occurs.
+  app.whenReady().then(() => {
+    // ipcMain.handle(
+    //   "get-screen-resolution",
+    //   () => screen.getPrimaryDisplay().workAreaSize
+    // )
+
+    createWindow()
+    session.defaultSession.setDisplayMediaRequestHandler(
+      (request, callback) => {
+        desktopCapturer.getSources({ types: ["screen"] }).then((sources) => {
+          // Grant access to the first screen found.
+          callback({ video: sources[0], audio: "loopback" })
+        })
+      }
+    )
+  })
+}
+
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient("glabix-video-recorder", process.execPath, [
+      path.resolve(process.argv[1]),
+    ])
+  }
+} else {
+  app.setAsDefaultProtocolClient("glabix-video-recorder")
+}
 
 function createWindow() {
   const { x, y, width, height } = screen.getPrimaryDisplay().bounds
@@ -63,9 +125,9 @@ function createWindow() {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     )
   }
-
   createMenu()
   createModal(mainWindow)
+  createLoginWindow()
 }
 
 function createModal(parentWindow) {
@@ -101,6 +163,30 @@ function createModal(parentWindow) {
 
   // modalWindow.webContents.openDevTools()
 }
+
+function createLoginWindow() {
+  loginWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"), // для безопасного взаимодействия с рендерером
+      nodeIntegration: true, // повышаем безопасность
+      // contextIsolation: true,  // повышаем безопасность
+    },
+  })
+  loginWindow.on("close", () => {
+    app.quit()
+  })
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    loginWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/login.html`)
+  } else {
+    loginWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/login.html`)
+    )
+  }
+}
+
 function createMenu() {
   const image = nativeImage
     .createFromPath(path.join(__dirname, "favicon-24.png"))
@@ -117,8 +203,12 @@ function createMenu() {
     {
       label: "Начать",
       click: () => {
-        mainWindow.show()
-        modalWindow.show()
+        if (!+process.env.LOGIN_IS_REQUIRED || appState.user) {
+          mainWindow.show()
+          modalWindow.show()
+        } else {
+          loginWindow.show()
+        }
       },
     },
     {
@@ -139,25 +229,6 @@ function createMenu() {
   tray.setToolTip("Glabix video app")
   tray.setContextMenu(contextMenu)
 }
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  // ipcMain.handle(
-  //   "get-screen-resolution",
-  //   () => screen.getPrimaryDisplay().workAreaSize
-  // )
-
-  createWindow()
-
-  session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
-    desktopCapturer.getSources({ types: ["screen"] }).then((sources) => {
-      // Grant access to the first screen found.
-      callback({ video: sources[0], audio: "loopback" })
-    })
-  })
-})
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -194,4 +265,29 @@ ipcMain.on("record-settings-change", (event, data) => {
 ipcMain.on("start-recording", (event, data) => {
   mainWindow.webContents.send("start-recording", data)
   modalWindow.hide()
+})
+
+ipcMain.on(LoginEvents.LOGIN_ATTEMPT, (event, credentials) => {
+  const { username, password } = credentials
+  // Простой пример проверки логина
+  if (username === "1" && password === "1") {
+    ipcMain.emit(LoginEvents.LOGIN_SUCCESS, event)
+  } else {
+    event.reply(LoginEvents.LOGIN_FAILED)
+  }
+})
+
+ipcMain.on(LoginEvents.LOGIN_SUCCESS, (event) => {
+  loginWindow.hide()
+  mainWindow.show()
+  modalWindow.show()
+})
+
+ipcMain.on(LoginEvents.TOKEN_CONFIRMED, (event) => {
+  getCurrentUser(event as string)
+})
+
+ipcMain.on(LoginEvents.USER_VERIFIED, (event) => {
+  appState.user = event as any
+  ipcMain.emit(LoginEvents.LOGIN_SUCCESS)
 })

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.8.0",
+    "axios": "^1.7.4",
     "electron-squirrel-startup": "^1.0.1",
     "konva": "^9.3.14",
     "moveable": "^0.53.0"

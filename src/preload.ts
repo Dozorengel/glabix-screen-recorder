@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron"
+import { contextBridge, ipcRenderer, shell } from "electron"
 let isIgnoreMouseEventsFreeze = false
 // rename "electronAPI" ? to more suitable
 export const electronAPI = {
@@ -7,7 +7,7 @@ export const electronAPI = {
     on: (channel, func) =>
       ipcRenderer.on(channel, (event, ...args) => func(event, ...args)),
   },
-
+  openLinkInBrowser: (href) => shell.openExternal(href),
   setIgnoreMouseEvents: (flag: boolean) => {
     if (!flag) {
       isIgnoreMouseEventsFreeze = true
