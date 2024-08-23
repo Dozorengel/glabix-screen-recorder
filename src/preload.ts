@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron"
+import { contextBridge, ipcRenderer, shell } from "electron"
 let isIgnoreMouseEventsFreeze = false
 // rename "electronAPI" ? to more suitable
 export const electronAPI = {
@@ -7,7 +7,7 @@ export const electronAPI = {
     on: (channel, func) =>
       ipcRenderer.on(channel, (event, ...args) => func(event, ...args)),
   },
-
+  openLinkInBrowser: (href) => shell.openExternal(href),
   setIgnoreMouseEvents: (flag: boolean) => {
     if (!flag) {
       isIgnoreMouseEventsFreeze = true
@@ -34,6 +34,12 @@ export const electronAPI = {
 }
 
 contextBridge.exposeInMainWorld("electronAPI", electronAPI)
+
+export const envVars = {
+  API_PATH: { ...process }.env.API_PATH, // hack with spread operator because I can't find who is rewriting the precession object
+  AUTH_APP_URL: { ...process }.env.AUTH_APP_URL,
+}
+contextBridge.exposeInMainWorld("envVars", envVars)
 
 window.addEventListener("DOMContentLoaded", () => {
   const backdrop = document.querySelector(".page-backdrop")

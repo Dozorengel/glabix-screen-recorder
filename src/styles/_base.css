@@ -1,43 +1,23 @@
 :root {
-  --light: #ffffff;
-  --dark: #0f1928;
+  --font-3xl: 40px;
+  --font-2xl: 36px;
+  --font-xl: 20px;
+  --font-lg: 17px;
+  --font-md: 14px;
+  --font-sm: 13px;
+  --font-xs: 12px;
+  --font-2xs: 11px;
+  --font-3xs: 9px;
 
-  --primary-100: #e3f4ee;
-  --primary-200: #b3e0d1;
-  --primary-300: #66c2a3;
-  --primary: #009966;
-  --primary-700: #007a52;
-
-  --accent: #ff8a00;
-
-  --gray-100: #f9f9f9;
-  --gray-200: #f3f3f4;
-  --gray-300: #e7e8e9;
-  --gray-400: #cfd1d4;
-  --gray: #9fa3a9;
-  --gray-600: #6f757e;
-  --gray-700: #3f4753;
-  --gray-900: #0f1928;
-
-  --fs-3xl: 40px;
-  --fs-2xl: 36px;
-  --fs-xl: 20px;
-  --fs-lg: 17px;
-  --fs-md: 14px;
-  --fs-sm: 13px;
-  --fs-xs: 12px;
-  --fs-2xs: 11px;
-  --fs-3xs: 9px;
-
-  --lh-3xl: 44px;
-  --lh-2xl: 42px;
-  --lh-xl: 24px;
-  --lh-lg: 24px;
-  --lh-md: 20px;
-  --lh-sm: 16px;
-  --lh-xs: 16px;
-  --lh-2xs: 16px;
-  --lh-3xs: 9px;
+  --leading-3xl: 44px;
+  --leading-2xl: 42px;
+  --leading-xl: 24px;
+  --leading-lg: 24px;
+  --leading-md: 20px;
+  --leading-sm: 16px;
+  --leading-xs: 16px;
+  --leading-2xs: 16px;
+  --leading-3xs: 9px;
 }
 
 *,

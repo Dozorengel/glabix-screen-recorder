@@ -6,7 +6,7 @@
   "description": "Glabix video recorder",
   "main": ".vite/build/main.js",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "dotenvx run --env-file=.env -- electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -14,6 +14,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.8.0",
+    "axios": "^1.7.4",
     "electron-squirrel-startup": "^1.0.1",
     "konva": "^9.3.14",
     "modern-normalize": "^3.0.0",
@@ -31,7 +33,7 @@
     "@electron/fuses": "^1.8.0",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
     "@typescript-eslint/parser": "^8.1.0",
-    "electron": "31.3.1",
+    "electron": "31.4.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.25.0",

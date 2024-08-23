@@ -10,10 +10,6 @@ body {
   overflow: hidden;
 }
 
-h1 {
-  margin: 0;
-}
-
 .page-backdrop {
   position: fixed;
   left: 0;
@@ -30,12 +26,6 @@ h1 {
   width: 100px;
   height: 100px;
   background: rgb(128, 191, 255);
-}
-
-.screen-area-controls {
-  position: fixed;
-  top: 20px;
-  right: 20px;
 }
 
 .webcamera-frame {
@@ -70,10 +60,6 @@ h1 {
 .webcamera-big {
   width: 400px;
   height: 400px;
-}
-
-.hidden {
-  display: none;
 }
 
 .draw-container {

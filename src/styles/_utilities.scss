@@ -605,40 +605,40 @@
 
 // Font size
 .text-3xl {
-  font-size: var(--fs-3xl) !important;
-  line-height: var(--lh-3xl) !important;
+  font-size: var(--font-3xl) !important;
+  line-height: var(--leading-3xl) !important;
 }
 .text-2xl {
-  font-size: var(--fs-2xl) !important;
-  line-height: var(--lh-2xl) !important;
+  font-size: var(--font-2xl) !important;
+  line-height: var(--leading-2xl) !important;
 }
 .text-xl {
-  font-size: var(--fs-xl) !important;
-  line-height: var(--lh-xl) !important;
+  font-size: var(--font-xl) !important;
+  line-height: var(--leading-xl) !important;
 }
 .text-lg {
-  font-size: var(--fs-lg) !important;
-  line-height: var(--lh-lg) !important;
+  font-size: var(--font-lg) !important;
+  line-height: var(--leading-lg) !important;
 }
 .text-md {
-  font-size: var(--fs-md) !important;
-  line-height: var(--lh-md) !important;
+  font-size: var(--font-md) !important;
+  line-height: var(--leading-md) !important;
 }
 .text-sm {
-  font-size: var(--fs-sm) !important;
-  line-height: var(--lh-sm) !important;
+  font-size: var(--font-sm) !important;
+  line-height: var(--leading-sm) !important;
 }
 .text-xs {
-  font-size: var(--fs-xs) !important;
-  line-height: var(--lh-xs) !important;
+  font-size: var(--font-xs) !important;
+  line-height: var(--leading-xs) !important;
 }
 .text-2xs {
-  font-size: var(--fs-2xs) !important;
-  line-height: var(--lh-2xs) !important;
+  font-size: var(--font-2xs) !important;
+  line-height: var(--leading-2xs) !important;
 }
 .text-3xs {
-  font-size: var(--fs-3xs) !important;
-  line-height: var(--lh-3xs) !important;
+  font-size: var(--font-3xs) !important;
+  line-height: var(--leading-3xs) !important;
 }
 // @end Font size
 // -----------------
@@ -714,61 +714,61 @@
 }
 
 .text-accent-0 {
-  color: var(--palette-common-0) !important;
+  color: var(--accent-0) !important;
 }
 .text-accent-1 {
-  color: var(--palette-common-1) !important;
+  color: var(--accent-1) !important;
 }
 .text-accent-2 {
-  color: var(--palette-common-2) !important;
+  color: var(--accent-2) !important;
 }
 .text-accent-4 {
-  color: var(--palette-common-4) !important;
+  color: var(--accent-4) !important;
 }
 .text-accent-5 {
-  color: var(--palette-common-5) !important;
+  color: var(--accent-5) !important;
 }
 .text-accent-6 {
-  color: var(--palette-common-6) !important;
+  color: var(--accent-6) !important;
 }
 .text-accent-7 {
-  color: var(--palette-common-7) !important;
+  color: var(--accent-7) !important;
 }
 .text-accent-8 {
-  color: var(--palette-common-8) !important;
+  color: var(--accent-8) !important;
 }
 .text-accent-9 {
-  color: var(--palette-common-9) !important;
+  color: var(--accent-9) !important;
 }
 .text-accent-10 {
-  color: var(--palette-common-10) !important;
+  color: var(--accent-10) !important;
 }
 .text-accent-11 {
-  color: var(--palette-common-11) !important;
+  color: var(--accent-11) !important;
 }
 .text-accent-12 {
-  color: var(--palette-common-12) !important;
+  color: var(--accent-12) !important;
 }
 .text-accent-13 {
-  color: var(--palette-common-13) !important;
+  color: var(--accent-13) !important;
 }
 .text-accent-14 {
-  color: var(--palette-common-14) !important;
+  color: var(--accent-14) !important;
 }
 .text-accent-15 {
-  color: var(--palette-common-15) !important;
+  color: var(--accent-15) !important;
 }
 .text-accent-16 {
-  color: var(--palette-common-16) !important;
+  color: var(--accent-16) !important;
 }
 .text-accent-17 {
-  color: var(--palette-common-17) !important;
+  color: var(--accent-17) !important;
 }
 .text-accent-18 {
-  color: var(--palette-common-18) !important;
+  color: var(--accent-18) !important;
 }
 .text-accent-19 {
-  color: var(--palette-common-19) !important;
+  color: var(--accent-19) !important;
 }
 
 .text-warning {
@@ -1634,6 +1634,15 @@
 // Transform/translate helpers
 .rotate-180 {
   transform: rotate(180deg) !important;
+}
+
+.scale-125 {
+  transform: scale(1.25) !important;
+  transition: transform 0.15s;
+}
+.hover\:scale-125:hover {
+  transform: scale(1.25) !important;
+  transition: transform 0.15s;
 }
 
 .-translate-x-full {

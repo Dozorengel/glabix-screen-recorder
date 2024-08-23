@@ -3,16 +3,33 @@ import Konva from "konva"
 import "./styles/panel.scss"
 
 let stage: Konva.Stage
-const drawToggle = document.getElementById("draw-toggle") as HTMLButtonElement
+const drawToggle = document.getElementById("draw-toggle")
 let countdownTimer: number | null
+let laserColor = getComputedStyle(document.documentElement).getPropertyValue(
+  "--accent-13"
+)
 
 drawToggle.addEventListener("click", () => {
   drawToggle.classList.toggle("bg-gray-300")
+
+  const panelDraw = document.querySelector("#panel-draw")!
+  panelDraw.classList.toggle("visible")
+  panelDraw.classList.toggle("invisible")
 
   if (stage) {
     destroyCanvas()
     return
   }
+
+  panelDraw
+    .querySelectorAll("[data-color]")
+    ?.forEach((colorBtn: HTMLButtonElement) => {
+      colorBtn.addEventListener("click", () => {
+        laserColor = getComputedStyle(
+          document.documentElement
+        ).getPropertyValue(`--${colorBtn.dataset.color}`)
+      })
+    })
 
   stage = new Konva.Stage({
     container: "draw-container",
@@ -44,7 +61,7 @@ drawToggle.addEventListener("click", () => {
     const pos = stage.getPointerPosition()
 
     lastLine = new Konva.Line({
-      stroke: "red",
+      stroke: laserColor,
       strokeWidth: 20,
       bezier: true,
       lineCap: "round",
@@ -55,7 +72,7 @@ drawToggle.addEventListener("click", () => {
     circle = new Konva.Circle({
       x: pos.x,
       y: pos.y,
-      fill: "red",
+      fill: laserColor,
       radius: 35,
       opacity: 0.5,
     })
