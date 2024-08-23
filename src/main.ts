@@ -157,11 +157,13 @@ function createModal(parentWindow) {
     app.quit()
   })
 
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    modalWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/modal.html`)
+  if (MODAL_WINDOW_VITE_DEV_SERVER_URL) {
+    modalWindow.loadURL(
+      `${MODAL_WINDOW_VITE_DEV_SERVER_URL}/src/modal-page.index.html`
+    )
   } else {
     modalWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/modal.html`)
+      path.join(__dirname, `../renderer/${MODAL_WINDOW_VITE_NAME}/index.html`)
     )
   }
 
@@ -182,11 +184,13 @@ function createLoginWindow() {
   loginWindow.on("close", () => {
     app.quit()
   })
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    loginWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/login.html`)
+  if (LOGIN_WINDOW_VITE_DEV_SERVER_URL) {
+    loginWindow.loadURL(
+      `${LOGIN_WINDOW_VITE_DEV_SERVER_URL}/src/login-page/index.html`
+    )
   } else {
     loginWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/login.html`)
+      path.join(__dirname, `../renderer/${LOGIN_WINDOW_VITE_NAME}/index.html`)
     )
   }
 }

@@ -1,6 +1,6 @@
-@import "styles.css";
-@import "_forms.css";
-@import "_buttons.css";
+@import "../styles/styles.css";
+@import "../styles/_forms.css";
+@import "../styles/_buttons.css";
 
 body,
 html {

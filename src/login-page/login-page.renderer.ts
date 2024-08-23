@@ -1,5 +1,4 @@
-import { LoginEvents } from "./events/login.events"
-
+import { LoginEvents } from "../events/login.events"
 ;(function () {})()
 
 document.addEventListener("DOMContentLoaded", () => {
