@@ -35,12 +35,13 @@ body {
   object-fit: cover;
 }
 
+/* change width height movable styles */
 .webcamera-view {
   position: fixed;
-  top: 400px;
+  top: 600px;
   left: 20px;
-  /* width: 120px;
-  height: 120px; */
+  width: 100px;
+  height: 100px;
 }
 
 .webcamera-small {
