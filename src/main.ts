@@ -14,7 +14,7 @@ import {
 } from "electron"
 import path from "path"
 import os from "os"
-import { getCurrentUser } from "./commands/cirrent-user.command"
+import { getCurrentUser } from "./commands/current-user.command"
 import { e } from "vite/dist/node/types.d-aGj9QkWt"
 import { LoginEvents } from "./events/login.events"
 
