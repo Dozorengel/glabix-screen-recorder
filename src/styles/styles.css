@@ -1,6 +1,8 @@
 @import "/node_modules/modern-normalize/modern-normalize.css";
 
+@import "_colors.css";
 @import "_base.css";
+@import "_components.scss";
 @import "_helpers.scss";
 @import "_utilities.scss";
 @import "_icons.scss";

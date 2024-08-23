@@ -21,20 +21,59 @@
       <div id="recordTimer">00:00</div>
     </div>
 
-    <div class="panel-controls">
-      <button id="draw-toggle" class="panel-btn flex-center-8 clickable">
-        <span class="i i-pencil-mechanical i--lg"></span>
-      </button>
+    <div class="panel-wrapper">
+      <div class="panel">
+        <button id="stopScreenAreaBtn" class="panel-btn flex-center-10">
+          <span class="i i-stop i--lg"></span>
+        </button>
+        <div class="panel-divider"></div>
+        <button id="draw-toggle" class="panel-btn flex-center-10 clickable">
+          <span class="i i-pencil-mechanical i--lg"></span>
+        </button>
+      </div>
+
+      <div id="panel-draw" class="panel transition-visibility invisible p-4">
+        <div class="flex gap-4 mb-4">
+          <div class="flex flex-col gap-2">
+            <button
+              class="bullet-xl hover:scale-125 text-accent-13"
+              data-color="accent-13"
+            ></button>
+            <button
+              class="bullet-xl hover:scale-125 text-warning"
+              data-color="warning"
+            ></button>
+            <button
+              class="bullet-xl hover:scale-125 text-accent-18"
+              data-color="accent-18"
+            ></button>
+            <button
+              class="bullet-xl hover:scale-125 text-accent-16"
+              data-color="accent-16"
+            ></button>
+            <button
+              class="bullet-xl hover:scale-125 text-accent-19"
+              data-color="accent-19"
+            ></button>
+            <button
+              class="bullet-xl hover:scale-125 text-light border border-gray-300"
+              data-color="light"
+            ></button>
+            <button
+              class="bullet-xl hover:scale-125 text-dark"
+              data-color="dark"
+            ></button>
+          </div>
+          <div class="slider"></div>
+        </div>
+
+        <button class="panel-btn clickable" id="panel-draw-close-btn">
+          Готово
+        </button>
+      </div>
     </div>
 
     <canvas id="canvas" width="300" height="300"></canvas>
-
-    <div class="screen-area-controls">
-      <button
-        id="stopScreenAreaBtn"
-        class="panel-btn flex-center-8 i i-stop"
-      ></button>
-    </div>
 
     <div class="webcamera-only-container" hidden>
       <video id="webcam_only_video" autoplay></video>
