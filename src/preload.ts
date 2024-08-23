@@ -63,4 +63,8 @@ window.addEventListener("DOMContentLoaded", () => {
       false
     )
   }
+
+  document.body.addEventListener("mouseenter", (event) => {
+    electronAPI.ipcRenderer.send("main-window-focus", null)
+  })
 })

@@ -1,35 +1,59 @@
-;(function () {
-  const cameraSelect = document.getElementById(
-    "cameraSelect"
-  ) as HTMLSelectElement
-  const video = document.getElementById("video") as HTMLVideoElement
+import { StreamSettings } from "./helpers/types"
 
-  let currentStream
+const videoContainer = document.getElementById(
+  "webcamera-view"
+) as HTMLDivElement
+const video = document.getElementById("video") as HTMLVideoElement
+const smallSizeBtn = document.getElementById(
+  "small-camera"
+) as HTMLButtonElement
+const bigSizeBtn = document.getElementById("big-camera") as HTMLButtonElement
 
-  async function getCameras() {
-    const devices = await navigator.mediaDevices.enumerateDevices()
-    const videoDevices = devices.filter(
-      (device) => device.kind === "videoinput"
-    )
+let currentStream: MediaStream
+let isVideoBig: Boolean
 
-    videoDevices.forEach((device) => {
-      const option = document.createElement("option")
-      option.value = device.deviceId
-      option.text = device.label || `Camera ${cameraSelect.length + 1}`
-      cameraSelect.appendChild(option)
-    })
-  }
-
-  cameraSelect.addEventListener("change", (event) => {
-    const selectedDeviceId = (event.target as HTMLSelectElement).value
-    if (selectedDeviceId.length > 0) {
-      startVideo(selectedDeviceId)
-    } else {
-      stopVideo()
+window.electronAPI.ipcRenderer.on(
+  "record-settings-change",
+  (event, data: StreamSettings) => {
+    if (data.action == "cameraOnly") {
+      stopStream()
+      return
     }
-  })
+    if (data.cameraDeviceId) {
+      startStream(data.cameraDeviceId)
+    } else {
+      stopStream()
+    }
+  }
+)
 
-  function startVideo(deviseId) {
+smallSizeBtn.addEventListener("click", () => {
+  isVideoBig = false
+  toggleVideoSize()
+})
+
+bigSizeBtn.addEventListener("click", () => {
+  isVideoBig = true
+  toggleVideoSize()
+})
+
+function toggleVideoSize() {
+  if (isVideoBig) {
+    video.classList.remove("webcamera-small")
+    video.classList.add("webcamera-big")
+  } else {
+    video.classList.add("webcamera-small")
+    video.classList.remove("webcamera-big")
+  }
+}
+
+function showVideo() {
+  video.srcObject = currentStream
+  videoContainer.classList.remove("hidden")
+}
+
+function startStream(deviseId) {
+  if (!currentStream) {
     const constraints = {
       video: { deviceId: { exact: deviseId } },
     }
@@ -39,17 +63,20 @@
     media
       .then((stream) => {
         currentStream = stream
-        video.srcObject = stream
+        showVideo()
       })
       .catch((e) => console.log(e))
+  } else {
+    showVideo()
   }
+}
 
-  function stopVideo() {
+function stopStream() {
+  if (currentStream) {
     const tracks = currentStream.getTracks()
     tracks.forEach((track) => track.stop())
     video.srcObject = null
+    videoContainer.classList.add("hidden")
     currentStream = null
   }
-
-  getCameras()
-})()
+}

@@ -149,6 +149,10 @@ function createModal(parentWindow) {
     },
   })
 
+  modalWindow.on("blur", () => {
+    mainWindow.focus()
+  })
+
   modalWindow.on("close", () => {
     app.quit()
   })
@@ -257,14 +261,15 @@ ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
 
 ipcMain.on("record-settings-change", (event, data) => {
   mainWindow.webContents.send("record-settings-change", data)
-  if (["fullScreenVideo"].includes(data.action)) {
-    modalWindow.hide()
-  }
 })
 
 ipcMain.on("start-recording", (event, data) => {
   mainWindow.webContents.send("start-recording", data)
   modalWindow.hide()
+})
+
+ipcMain.on("main-window-focus", (event, data) => {
+  mainWindow.focus()
 })
 
 ipcMain.on(LoginEvents.LOGIN_ATTEMPT, (event, credentials) => {

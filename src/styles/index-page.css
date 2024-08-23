@@ -1,5 +1,5 @@
-@import url("_normalize.css");
-@import url("_base.css");
+@import "styles.css";
+@import "_buttons.css";
 
 html,
 body {
@@ -14,19 +14,13 @@ h1 {
   margin: 0;
 }
 
-.page-backdrop,
-.page-backdrop-locker {
+.page-backdrop {
   position: fixed;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
-}
-
-.page-backdrop-locker[lock] {
-  pointer-events: none;
-  /* background-color: silver; */
 }
 
 .controls {
@@ -38,28 +32,10 @@ h1 {
   background: rgb(128, 191, 255);
 }
 
-.draw-controls {
-  position: fixed;
-  top: 160px;
-  left: 20px;
-  width: 100px;
-  height: 100px;
-}
-
 .screen-area-controls {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 100px;
-  height: 100px;
-}
-
-.webcamera-controls {
-  position: fixed;
-  top: 300px;
+  top: 125px;
   left: 20px;
-  width: 120px;
-  height: 120px;
 }
 
 .webcamera-frame {
@@ -73,8 +49,22 @@ h1 {
   position: fixed;
   top: 400px;
   left: 20px;
-  width: 120px;
-  height: 120px;
+  /* width: 120px;
+  height: 120px; */
+}
+
+.webcamera-small {
+  width: 200px;
+  height: 200px;
+}
+
+.webcamera-big {
+  width: 400px;
+  height: 400px;
+}
+
+.hidden {
+  display: none;
 }
 
 .draw-container {

@@ -18,25 +18,28 @@
   text-decoration: none;
   width: 100%;
   -webkit-app-region: no-drag;
-}
-.btn:hover,
-.btn.hover {
-  text-decoration: none;
-  border-color: var(--primary-100);
-  background-color: var(--primary-100);
-}
-.btn:disabled,
-.btn[disabled] {
-  border-color: var(--gray-300);
-  background-color: var(--gray-300);
-  color: var(--gray-600);
-  pointer-events: none;
+
+  &:hover,
+  &.hover {
+    text-decoration: none;
+    border-color: var(--primary-100);
+    background-color: var(--primary-100);
+  }
+
+  &:disabled,
+  &[disabled] {
+    border-color: var(--gray-300);
+    background-color: var(--gray-300);
+    color: var(--gray-600);
+    pointer-events: none;
+  }
 }
 .btn--primary {
   background-color: var(--primary);
   border-color: var(--primary);
   color: var(--light);
 }
+
 .btn--primary:hover {
   background-color: var(--primary-300);
   border-color: var(--primary-300);

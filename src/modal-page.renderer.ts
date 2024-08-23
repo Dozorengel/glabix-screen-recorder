@@ -10,6 +10,10 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
   let videoDevicesList: MediaDeviceInfo[] = []
   let activeVideoDevice: MediaDeviceInfo
   let activeScreenAction: ScreenAction = "fullScreenVideo"
+  let streamSettings: StreamSettings = {
+    action: activeScreenAction,
+    video: true,
+  }
   let moveable: Moveable
 
   async function setupMediaPermissions() {
@@ -42,48 +46,21 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
     device: MediaDeviceInfo
   ): HTMLElement {
     const clone = template.content.cloneNode(true) as HTMLElement
-    const button = clone.querySelector("button")
-    button.textContent = device.label
+    const text = clone.querySelector("span")
+    const checkbox = clone.querySelector(
+      "input[type='checkbox']"
+    ) as HTMLInputElement
+    text.textContent = device.label
+    checkbox.name =
+      device.kind == "videoinput" ? "isVideoEnabled" : "isAudioEnabled"
     return clone
-  }
-
-  function setupStreamSettings(): StreamSettings {
-    console.log("activeAudioDevice", activeAudioDevice, audioDevicesList)
-    let streamSettings: StreamSettings = {
-      action: activeScreenAction,
-    }
-
-    if (activeScreenAction == "fullScreenVideo") {
-      streamSettings = {
-        ...streamSettings,
-        video: true,
-        audioDeviseId: activeAudioDevice.deviceId,
-      }
-    }
-
-    if (activeScreenAction == "cropVideo") {
-      streamSettings = {
-        ...streamSettings,
-        video: true,
-        audioDeviseId: activeAudioDevice.deviceId,
-      }
-    }
-
-    if (activeScreenAction == "cameraOnly") {
-      streamSettings = {
-        ...streamSettings,
-        cameraDeviceId: activeVideoDevice.deviceId,
-        audioDeviseId: activeAudioDevice.deviceId,
-      }
-    }
-
-    return streamSettings
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     const actionButtons = document.querySelectorAll(
       ".js-btn-action-type"
     ) as NodeListOf<HTMLElement>
+
     actionButtons.forEach((button) => {
       button.addEventListener(
         "click",
@@ -96,10 +73,11 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
 
           if (action != activeScreenAction) {
             activeScreenAction = button.dataset.action as ScreenAction
-            const settings = setupStreamSettings()
+            streamSettings = { ...streamSettings, action: activeScreenAction }
+
             window.electronAPI.ipcRenderer.send(
               "record-settings-change",
-              settings
+              streamSettings
             )
           }
         },
@@ -126,6 +104,36 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
           renderDeviceButton(mediaDeviceTpl, activeAudioDevice)
         )
       }
+
+      const checkboxes = document.querySelectorAll(".media-device-checkbox")
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", (event) => {
+          const input = event.target as HTMLInputElement
+          let options = {}
+
+          if (input.name == "isVideoEnabled") {
+            options = {
+              cameraDeviceId: input.checked
+                ? activeVideoDevice.deviceId
+                : undefined,
+            }
+          }
+
+          if (input.name == "isAudioEnabled") {
+            options = {
+              audioDeviceId: input.checked
+                ? activeAudioDevice.deviceId
+                : undefined,
+            }
+          }
+
+          streamSettings = { ...streamSettings, ...options }
+          window.electronAPI.ipcRenderer.send(
+            "record-settings-change",
+            streamSettings
+          )
+        })
+      })
     })
   })
 
@@ -133,19 +141,14 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
   startBtn.addEventListener(
     "click",
     () => {
-      const activeSettings = setupStreamSettings()
-
-      if (activeSettings.action == "fullScreenVideo") {
+      if (streamSettings.action == "fullScreenVideo") {
         window.electronAPI.ipcRenderer.send(
           "record-settings-change",
-          setupStreamSettings()
+          streamSettings
         )
       }
 
-      window.electronAPI.ipcRenderer.send(
-        "start-recording",
-        setupStreamSettings()
-      )
+      window.electronAPI.ipcRenderer.send("start-recording", streamSettings)
     },
     false
   )
