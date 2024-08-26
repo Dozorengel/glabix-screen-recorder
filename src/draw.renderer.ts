@@ -8,6 +8,7 @@ let countdownTimer: number | null
 let laserColor = getComputedStyle(document.documentElement).getPropertyValue(
   "--accent-13"
 )
+let laserStrokeWidth = 15
 
 drawToggle.addEventListener("click", () => {
   drawToggle.classList.toggle("bg-gray-300")
@@ -21,6 +22,7 @@ drawToggle.addEventListener("click", () => {
     return
   }
 
+  // change laser color
   panelDraw
     .querySelectorAll("[data-color]")
     ?.forEach((colorBtn: HTMLButtonElement) => {
@@ -29,6 +31,13 @@ drawToggle.addEventListener("click", () => {
           document.documentElement
         ).getPropertyValue(`--${colorBtn.dataset.color}`)
       })
+    })
+
+  // change laser stroke width
+  panelDraw
+    .querySelector(".panel-slider")
+    .addEventListener("input", (event) => {
+      laserStrokeWidth = +(event.target as HTMLInputElement).value
     })
 
   stage = new Konva.Stage({
@@ -62,7 +71,7 @@ drawToggle.addEventListener("click", () => {
 
     lastLine = new Konva.Line({
       stroke: laserColor,
-      strokeWidth: 20,
+      strokeWidth: laserStrokeWidth,
       bezier: true,
       lineCap: "round",
       points: [pos.x, pos.y, pos.x, pos.y],
