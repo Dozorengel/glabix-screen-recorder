@@ -1,5 +1,5 @@
 import { destroyCanvas } from "./draw.renderer"
-import "./styles/index-page.css"
+import "./styles/index-page.scss"
 
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement
 const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement

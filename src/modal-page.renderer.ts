@@ -1,4 +1,4 @@
-import "./styles/modal-page.css"
+import "./styles/modal-page.scss"
 import Moveable, { MoveableRefTargetType } from "moveable"
 import { getMediaPermission } from "./helpers/media-permissions"
 import { ScreenAction, StreamSettings } from "./helpers/types"
