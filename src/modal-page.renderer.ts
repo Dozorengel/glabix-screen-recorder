@@ -1,5 +1,4 @@
 import "./styles/modal-page.scss"
-import Moveable, { MoveableRefTargetType } from "moveable"
 import { getMediaPermission } from "./helpers/media-permissions"
 import { ScreenAction, StreamSettings } from "./helpers/types"
 ;(function () {
@@ -14,7 +13,6 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
     action: activeScreenAction,
     video: true,
   }
-  let moveable: Moveable
 
   async function setupMediaPermissions() {
     const devices = await navigator.mediaDevices.enumerateDevices()

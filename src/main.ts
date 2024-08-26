@@ -15,7 +15,6 @@ import {
 import path from "path"
 import os from "os"
 import { getCurrentUser } from "./commands/current-user.command"
-import { e } from "vite/dist/node/types.d-aGj9QkWt"
 import { LoginEvents } from "./events/login.events"
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -31,6 +30,7 @@ const appState = {
 }
 
 app.removeAsDefaultProtocolClient("glabix-video-recorder")
+app.disableHardwareAcceleration()
 
 const gotTheLock = app.requestSingleInstanceLock()
 
@@ -125,6 +125,7 @@ function createWindow() {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     )
   }
+  mainWindow.webContents.setFrameRate(60)
   createMenu()
   createModal(mainWindow)
   createLoginWindow()

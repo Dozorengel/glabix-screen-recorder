@@ -1,0 +1,12 @@
+.moveable-container.moveable-control-box {
+  --moveable-color: #fff;
+
+  .moveable-control.moveable-origin {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .moveable-line {
+    border-bottom: dashed 1px rgba(0, 0, 0, 0.6);
+  }
+}
