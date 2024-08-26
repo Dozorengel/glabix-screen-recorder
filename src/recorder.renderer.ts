@@ -1,6 +1,9 @@
 import Moveable, { MoveableRefTargetType } from "moveable"
 import { ScreenAction, StreamSettings } from "./helpers/types"
 import { destroyCanvas } from "./draw.renderer"
+import { ChunkSlicer } from "./file-uploader/chunk-slicer"
+import { FileUploadEvents } from "./events/file-upload.events"
+
 ;(function () {
   const stopScreenAreaBtn = document.getElementById(
     "stopScreenAreaBtn"
@@ -129,6 +132,17 @@ import { destroyCanvas } from "./draw.renderer"
     videoRecorder.onstop = function (e) {
       const blob = new Blob(chunks, { type: "video/webm" })
       chunks = [] // Reset the chunks for the next recording
+
+      const reader = new FileReader()
+      reader.onload = function () {
+        const arrayBuffer = reader.result
+
+        window.electronAPI.ipcRenderer.send(
+          FileUploadEvents.FILE_CREATED,
+          arrayBuffer
+        )
+      }
+      reader.readAsArrayBuffer(blob)
 
       // Create a link to download the recorded video
       const url = URL.createObjectURL(blob)

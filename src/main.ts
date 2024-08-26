@@ -14,9 +14,14 @@ import {
 } from "electron"
 import path from "path"
 import os from "os"
-import { getCurrentUser } from "./commands/cirrent-user.command"
+import { getCurrentUser } from "./commands/current-user.command"
 import { e } from "vite/dist/node/types.d-aGj9QkWt"
 import { LoginEvents } from "./events/login.events"
+import { FileUploadEvents } from "./events/file-upload.events"
+import { uploadFileChunkCommand } from "./commands/upload-file-chunk.command"
+import { ChunksUploader } from "./file-uploader/chunks-uploader"
+import { createFileUploadCommand } from "./commands/create-file-upload.command"
+import { ChunkSlicer } from "./file-uploader/chunk-slicer"
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 // if (require("electron-squirrel-startup")) {
@@ -28,7 +33,9 @@ let modalWindow: BrowserWindow
 let loginWindow: BrowserWindow
 const appState = {
   user: null,
+  token: "",
 }
+const chunksUploaders: ChunksUploader[] = []
 
 app.removeAsDefaultProtocolClient("glabix-video-recorder")
 
@@ -47,6 +54,7 @@ if (!gotTheLock) {
     const u = new URL(url)
     const token = u.searchParams.get("token")
     if (token) {
+      appState.token = token
       loginWindow.show()
       ipcMain.emit(LoginEvents.TOKEN_CONFIRMED, token)
     }
@@ -276,7 +284,6 @@ ipcMain.on(LoginEvents.LOGIN_ATTEMPT, (event, credentials) => {
   const { username, password } = credentials
   // Простой пример проверки логина
   if (username === "1" && password === "1") {
-    ipcMain.emit(LoginEvents.LOGIN_SUCCESS, event)
   } else {
     event.reply(LoginEvents.LOGIN_FAILED)
   }
@@ -295,4 +302,37 @@ ipcMain.on(LoginEvents.TOKEN_CONFIRMED, (event) => {
 ipcMain.on(LoginEvents.USER_VERIFIED, (event) => {
   appState.user = event as any
   ipcMain.emit(LoginEvents.LOGIN_SUCCESS)
+})
+
+ipcMain.on(FileUploadEvents.FILE_CREATED, (event, file) => {
+  const blob = new Blob([file], { type: "video/webm" })
+  const size = 10 * 1024 * 1024
+  const chunksSlicer = new ChunkSlicer(blob, size)
+  const processedChunks = [...chunksSlicer.allChunks]
+  const fileName = "test-video-" + Date.now() + ".mp4"
+  createFileUploadCommand(appState.token, 16, fileName, processedChunks)
+})
+
+ipcMain.on(FileUploadEvents.FILE_CREATED_ON_SERVER, (event) => {
+  const { uuid, chunks } = event
+  const chunksUploader = new ChunksUploader(chunks, uuid)
+  chunksUploaders.push(chunksUploader)
+  chunksUploader.processNextChunk()
+})
+
+ipcMain.on(FileUploadEvents.LOAD_FILE_CHUNK, (event) => {
+  const { chunk, chunkNumber, uuid } = event
+  uploadFileChunkCommand(appState.token, 16, uuid, chunk, chunkNumber)
+})
+
+ipcMain.on(FileUploadEvents.FILE_CHUNK_UPLOADED, (event) => {
+  const { uuid, chunks } = event
+  const uploader = chunksUploaders.find((c) => c.uuid === uuid)
+  if (uploader) {
+    uploader.processNextChunk()
+  }
+})
+
+ipcMain.on("log", (evt, data) => {
+  console.log(data)
 })
