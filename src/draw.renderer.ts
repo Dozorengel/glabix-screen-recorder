@@ -82,7 +82,7 @@ drawToggle.addEventListener("click", () => {
       x: pos.x,
       y: pos.y,
       fill: laserColor,
-      radius: 35,
+      radius: laserStrokeWidth * 2,
       opacity: 0.5,
     })
     layerOpacity.add(circle)
