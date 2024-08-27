@@ -9,4 +9,17 @@
   .moveable-line {
     border-bottom: dashed 1px rgba(0, 0, 0, 0.6);
   }
+
+  .moveable-dragging {
+    z-index: 9999;
+    position: fixed;
+  }
+}
+
+.moveable-invisible-container.moveable-control-box {
+  .moveable-control,
+  .moveable-line {
+    opacity: 0;
+    pointer-events: none;
+  }
 }

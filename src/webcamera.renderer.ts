@@ -43,12 +43,13 @@ function initMovable() {
   moveable = new Moveable(document.body, {
     target: videoContainer as MoveableRefTargetType,
     container: document.body,
-    className: "clickable",
+    className: "moveable-invisible-container",
     draggable: true,
   })
 
   moveable
     .on("dragStart", ({ target, clientX, clientY }) => {
+      target.classList.add("moveable-dragging")
       // console.log("onDragStart", target)
     })
     .on(
@@ -75,10 +76,9 @@ function initMovable() {
       }
     )
     .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
+      target.classList.remove("moveable-dragging")
       console.log("onDragEnd", target, isDrag)
     })
-
-  moveable.updateRect()
 }
 
 function toggleVideoSize() {
