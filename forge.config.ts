@@ -19,7 +19,7 @@ const config: ForgeConfig = {
       certificateFile: "./cert.pfx",
       certificatePassword: process.env.CERTIFICATE_PASSWORD,
     }),
-    new MakerZIP({}, ["darwin", "mas", "win32", "linux"]),
+    new MakerZIP({}, ["darwin"]),
     new MakerRpm({}),
     new MakerDeb({}),
   ],

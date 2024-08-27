@@ -1,11 +1,19 @@
-@import "styles.css";
+@import "styles.scss";
 
-.panel-controls {
+.panel-wrapper {
   position: fixed;
-  top: 160px;
-  left: 20px;
-  width: 100px;
-  height: 100px;
+  top: 350px;
+  left: 30px;
+  display: flex;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.panel {
+  background-color: var(--light);
+  border: 1px solid var(--gray-600);
+  border-radius: 1rem;
+  padding: 10px;
 }
 
 .panel-btn {
@@ -13,8 +21,8 @@
   align-items: center;
   justify-content: center;
   color: var(--gray-600);
-  font-size: var(--fs-xs);
-  line-height: var(--lh-xs);
+  font-size: var(--font-xs);
+  line-height: var(--leading-xs);
   border-radius: 0.5rem;
   padding: 0.25rem 1rem;
   transition:
@@ -27,5 +35,21 @@
 
   &:hover {
     background-color: var(--gray-300);
+    color: var(--dark);
   }
+}
+
+.panel-divider {
+  background-color: var(--gray-400);
+  width: 100%;
+  height: 1px;
+  margin: 0.5rem 0;
+}
+
+.panel-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  appearance: slider-vertical;
+  width: 32px;
+  vertical-align: bottom;
 }

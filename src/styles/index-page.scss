@@ -1,5 +1,5 @@
-@import "styles.css";
-@import "_buttons.css";
+@import "styles.scss";
+@import "_buttons.scss";
 
 html,
 body {
@@ -8,10 +8,6 @@ body {
   height: 100%;
   background: transparent;
   overflow: hidden;
-}
-
-h1 {
-  margin: 0;
 }
 
 .page-backdrop {
@@ -32,12 +28,6 @@ h1 {
   background: rgb(128, 191, 255);
 }
 
-.screen-area-controls {
-  position: fixed;
-  top: 125px;
-  left: 20px;
-}
-
 .webcamera-frame {
   width: 200px;
   height: 200px;
@@ -45,12 +35,13 @@ h1 {
   object-fit: cover;
 }
 
+/* change width height movable styles */
 .webcamera-view {
   position: fixed;
-  top: 400px;
+  top: 600px;
   left: 20px;
-  /* width: 120px;
-  height: 120px; */
+  width: 100px;
+  height: 100px;
 }
 
 .webcamera-small {
@@ -58,13 +49,18 @@ h1 {
   height: 200px;
 }
 
+/* .moveable-control {
+  display: none;
+
+} */
+
+/* .moveable-line {
+  display: none;
+} */
+
 .webcamera-big {
   width: 400px;
   height: 400px;
-}
-
-.hidden {
-  display: none;
 }
 
 .draw-container {

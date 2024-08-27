@@ -3,16 +3,42 @@ import Konva from "konva"
 import "./styles/panel.scss"
 
 let stage: Konva.Stage
-const drawToggle = document.getElementById("draw-toggle") as HTMLButtonElement
+const drawToggle = document.getElementById("draw-toggle")
 let countdownTimer: number | null
+let laserColor = getComputedStyle(document.documentElement).getPropertyValue(
+  "--accent-13"
+)
+let laserStrokeWidth = 15
 
 drawToggle.addEventListener("click", () => {
   drawToggle.classList.toggle("bg-gray-300")
+
+  const panelDraw = document.querySelector("#panel-draw")!
+  panelDraw.classList.toggle("visible")
+  panelDraw.classList.toggle("invisible")
 
   if (stage) {
     destroyCanvas()
     return
   }
+
+  // change laser color
+  panelDraw
+    .querySelectorAll("[data-color]")
+    ?.forEach((colorBtn: HTMLButtonElement) => {
+      colorBtn.addEventListener("click", () => {
+        laserColor = getComputedStyle(
+          document.documentElement
+        ).getPropertyValue(`--${colorBtn.dataset.color}`)
+      })
+    })
+
+  // change laser stroke width
+  panelDraw
+    .querySelector(".panel-slider")
+    .addEventListener("input", (event) => {
+      laserStrokeWidth = +(event.target as HTMLInputElement).value
+    })
 
   stage = new Konva.Stage({
     container: "draw-container",
@@ -44,8 +70,8 @@ drawToggle.addEventListener("click", () => {
     const pos = stage.getPointerPosition()
 
     lastLine = new Konva.Line({
-      stroke: "red",
-      strokeWidth: 20,
+      stroke: laserColor,
+      strokeWidth: laserStrokeWidth,
       bezier: true,
       lineCap: "round",
       points: [pos.x, pos.y, pos.x, pos.y],
@@ -55,7 +81,7 @@ drawToggle.addEventListener("click", () => {
     circle = new Konva.Circle({
       x: pos.x,
       y: pos.y,
-      fill: "red",
+      fill: laserColor,
       radius: 35,
       opacity: 0.5,
     })
