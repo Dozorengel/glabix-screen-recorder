@@ -11,7 +11,10 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "make:win": "electron-forge make --platform win32 --arch x64",
+    "make:mac-intel": "electron-forge make --platform darwin --arch x64",
+    "make:mac-m1": "electron-forge make --platform darwin --arch arm64"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.8.0",
