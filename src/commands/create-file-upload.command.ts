@@ -7,7 +7,7 @@ export function createFileUploadCommand(
   filename: string,
   chunks: Blob[]
 ) {
-  const url = `${process.env.API_PATH}screen_recorder/organizations/${orgId}/uploads`
+  const url = `${import.meta.env.VITE_API_PATH}screen_recorder/organizations/${orgId}/uploads`
   const params = { chunks_count: chunks.length, filename }
   axios
     .post<{ uuid: string }>(

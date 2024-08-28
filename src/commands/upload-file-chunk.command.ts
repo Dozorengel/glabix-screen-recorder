@@ -9,7 +9,7 @@ export function uploadFileChunkCommand(
   chunk: Blob,
   chunkNumber: number
 ) {
-  const url = `${process.env.API_PATH}screen_recorder/organizations/${orgId}/uploads/${uuid}`
+  const url = `${import.meta.env.VITE_API_PATH}screen_recorder/organizations/${orgId}/uploads/${uuid}`
   const chunkFormData = new FormData()
   const file = new File([chunk], "chunk" + "_" + chunkNumber)
   chunkFormData.append("number", chunkNumber)

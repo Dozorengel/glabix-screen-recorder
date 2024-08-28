@@ -1,9 +1,8 @@
 import { LoginEvents } from "./events/login.events"
-
 ;(function () {})()
 
 document.addEventListener("DOMContentLoaded", () => {
-  const link = window.envVars.AUTH_APP_URL + "recorder/auth"
+  const link = import.meta.env.VITE_AUTH_APP_URL + "recorder/auth"
   const loginLink = document.getElementById("login-link") as HTMLLinkElement
   loginLink.addEventListener("click", (event) => {
     event.preventDefault()

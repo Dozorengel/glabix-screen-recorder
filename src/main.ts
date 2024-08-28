@@ -53,28 +53,30 @@ if (!gotTheLock) {
       mainWindow.focus()
     }
     const url = commandLine.pop()
-    const u = new URL(url)
-    const access_token = u.searchParams.get("access_token")
-    const refresh_token = u.searchParams.get("refresh_token")
-    let expires_at = u.searchParams.get("expires_at")
-    const organization_id = u.searchParams.get("organization_id")
-    if ((access_token, refresh_token, expires_at, organization_id)) {
-      if (expires_at.includes("00:00") && !expires_at.includes("T00:00")) {
-        //небольшой хак, чтобы дата распарсилась корректно
-        expires_at = expires_at.replace("00:00", "+00:00") // Заменяем на корректный формат ISO
-        expires_at = expires_at.replace(" ", "") // Заменяем на корректный формат ISO
+    try {
+      const u = new URL(url)
+      const access_token = u.searchParams.get("access_token")
+      const refresh_token = u.searchParams.get("refresh_token")
+      let expires_at = u.searchParams.get("expires_at")
+      const organization_id = u.searchParams.get("organization_id")
+      if ((access_token, refresh_token, expires_at, organization_id)) {
+        if (expires_at.includes("00:00") && !expires_at.includes("T00:00")) {
+          //небольшой хак, чтобы дата распарсилась корректно
+          expires_at = expires_at.replace("00:00", "+00:00") // Заменяем на корректный формат ISO
+          expires_at = expires_at.replace(" ", "") // Заменяем на корректный формат ISO
+        }
+        const authData: IAuthData = {
+          token: {
+            access_token,
+            refresh_token,
+            expires_at: expires_at,
+          },
+          organization_id: +organization_id,
+        }
+        loginWindow.show()
+        ipcMain.emit(LoginEvents.TOKEN_CONFIRMED, authData)
       }
-      const authData: IAuthData = {
-        token: {
-          access_token,
-          refresh_token,
-          expires_at: expires_at,
-        },
-        organization_id: +organization_id,
-      }
-      loginWindow.show()
-      ipcMain.emit(LoginEvents.TOKEN_CONFIRMED, authData)
-    }
+    } catch (e) {}
   })
 
   // This method will be called when Electron has finished
