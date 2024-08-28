@@ -94,3 +94,6 @@ out/
 # VSCode
 .vscode/easycode.ignore
 .vscode/settings.json
+
+# Encrypted files
+.enc

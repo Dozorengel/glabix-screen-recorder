@@ -4,13 +4,11 @@ export class ChunkSlicer {
   private chunkEnd = 0
   private chunkStart = 0
   readonly file: Blob
-  private videoId: string
   private currentChunkCounter = 0
   private numberOfChunks = 0
   constructor(file: Blob, chunkSize: number) {
     this.file = file
     this.chunkSize = chunkSize
-    this.videoId = Date.now().toString()
     this.process()
   }
 
