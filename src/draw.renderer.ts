@@ -1,6 +1,6 @@
 import { KonvaPointerEvent } from "konva/lib/PointerEvents"
 import Konva from "konva"
-import Moveable, { MoveableRefTargetType } from "moveable"
+import Moveable, { MoveableRefTargetType, MoveableRefType } from "moveable"
 import "./styles/panel.scss"
 
 let stage: Konva.Stage
@@ -15,7 +15,6 @@ drawToggle.addEventListener("click", () => {
   const panelControls = document.querySelector("#panel-controls")!
   const panelDraw = document.querySelector("#panel-draw")!
 
-  drawToggle.classList.add("bg-gray-300")
   panelControls.classList.remove("visible")
   panelControls.classList.add("invisible")
   panelDraw.classList.add("visible")
@@ -32,7 +31,6 @@ drawToggle.addEventListener("click", () => {
         countdownTimer = null
       }
 
-      drawToggle.classList.remove("bg-gray-300")
       panelControls.classList.add("visible")
       panelControls.classList.remove("invisible")
       panelDraw.classList.remove("visible")
@@ -103,7 +101,7 @@ drawToggle.addEventListener("click", () => {
       x: pos.x,
       y: pos.y,
       fill: laserColor,
-      radius: laserStrokeWidth,
+      radius: laserStrokeWidth / 2,
       opacity: 0.5,
     })
     layerOpacity.add(circle)
@@ -170,13 +168,14 @@ function startCountdown(): Promise<boolean> {
 
 ;(function () {
   document.addEventListener("DOMContentLoaded", () => {
-    // let moveable: Moveable
     const container = document.querySelector(".panel-wrapper")
-    let moveable = new Moveable(document.body, {
+    const dragIcon = document.querySelector(".panel-drag-icon")
+    const moveable = new Moveable(document.body, {
       target: container as MoveableRefTargetType,
       container: document.body,
       className: "moveable-invisible-container",
       draggable: true,
+      dragTarget: dragIcon as MoveableRefType,
     })
 
     moveable

@@ -46,6 +46,28 @@
   }
 }
 
+.hover {
+  @media (hover: hover) and (pointer: fine) {
+    &-visible,
+    &:hover &-hidden,
+    &:hover &:not(:hover) &-visible,
+    &:hover &:hover &:not(:hover) &-visible {
+      opacity: 0;
+      visibility: hidden;
+
+      transition-property: opacity, visibility;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 150ms;
+    }
+    &:hover &-visible,
+    &:hover &:not(:hover) &-hidden,
+    &:hover &:hover &:not(:hover) &-hidden {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
 .visible {
   opacity: 1 !important;
   visibility: visible !important;
