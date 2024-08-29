@@ -11,14 +11,30 @@ let laserColor = getComputedStyle(document.documentElement).getPropertyValue(
 let laserStrokeWidth = 15
 
 drawToggle.addEventListener("click", () => {
-  drawToggle.classList.toggle("bg-gray-300")
-
+  const panelControls = document.querySelector("#panel-controls")!
   const panelDraw = document.querySelector("#panel-draw")!
-  panelDraw.classList.toggle("visible")
-  panelDraw.classList.toggle("invisible")
+
+  drawToggle.classList.add("bg-gray-300")
+  panelControls.classList.remove("visible")
+  panelControls.classList.add("invisible")
+  panelDraw.classList.add("visible")
+  panelDraw.classList.remove("invisible")
+
+  const panelDrawCloseBtn = panelDraw.querySelector("#panel-draw-close-btn")!
+  panelDrawCloseBtn.addEventListener("click", () => {
+    destroyCanvas()
+
+    drawToggle.classList.remove("bg-gray-300")
+    panelControls.classList.add("visible")
+    panelControls.classList.remove("invisible")
+    panelDraw.classList.remove("visible")
+    panelDraw.classList.add("invisible")
+  })
 
   if (stage) {
     destroyCanvas()
+    // panelDraw.classList.toggle("visible")
+    // panelDraw.classList.toggle("invisible")
     return
   }
 
