@@ -59,6 +59,28 @@
     background-color: var(--gray-300);
     color: var(--dark);
   }
+
+  &--stop {
+    background-color: var(--error);
+    border-color: var(--error);
+    color: var(--dark);
+  }
+
+  &--stop:hover {
+    background-color: #e00000;
+    border-color: #e00000;
+  }
+
+  &--play {
+    background-color: #4ea3f1;
+    border-color: #4ea3f1;
+    color: var(--dark);
+  }
+
+  &--play:hover {
+    background-color: #0079e9;
+    border-color: #0079e9;
+  }
 }
 
 .panel-divider {

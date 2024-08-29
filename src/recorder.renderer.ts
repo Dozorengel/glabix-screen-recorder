@@ -1,13 +1,24 @@
 import Moveable, { MoveableRefTargetType } from "moveable"
-import { ScreenAction, StreamSettings } from "./helpers/types"
+import {
+  ISimpleStoreData,
+  RecorderState,
+  ScreenAction,
+  SimpleStoreEvents,
+  StreamSettings,
+} from "./helpers/types"
 import { destroyCanvas } from "./draw.renderer"
 import { ChunkSlicer } from "./file-uploader/chunk-slicer"
 import { FileUploadEvents } from "./events/file-upload.events"
+import { Timer } from "./helpers/timer"
 
 ;(function () {
-  const stopScreenAreaBtn = document.getElementById(
-    "stopScreenAreaBtn"
+  const timerDisplay = document.getElementById(
+    "timerDisplay"
   ) as HTMLButtonElement
+  const timer = new Timer(timerDisplay)
+  const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
+  const pauseBtn = document.getElementById("pauseBtn") as HTMLButtonElement
+  const resumeBtn = document.getElementById("resumeBtn") as HTMLButtonElement
   const changeCameraOnlySizeBtn = document.querySelectorAll(
     ".js-camera-only-size"
   )
@@ -34,12 +45,26 @@ import { FileUploadEvents } from "./events/file-upload.events"
     )
   })
 
-  stopScreenAreaBtn.addEventListener("click", () => {
+  stopBtn.addEventListener("click", () => {
     if (videoRecorder) {
       videoRecorder.stop()
       videoRecorder = undefined
 
       clearView()
+    }
+  })
+
+  resumeBtn.addEventListener("click", () => {
+    if (videoRecorder && videoRecorder.state == "paused") {
+      videoRecorder.resume()
+      timer.start()
+    }
+  })
+
+  pauseBtn.addEventListener("click", () => {
+    if (videoRecorder && videoRecorder.state == "recording") {
+      videoRecorder.pause()
+      timer.pause()
     }
   })
 
@@ -113,11 +138,16 @@ import { FileUploadEvents } from "./events/file-upload.events"
     }
 
     videoRecorder.onpause = function (e) {
-      console.log("stream pause")
+      updateRecorderState("paused")
     }
 
     videoRecorder.onstart = function (e) {
-      // chrome.storage.local.set({ streamState: 'STARTED' })
+      timer.start()
+      updateRecorderState("recording")
+    }
+
+    videoRecorder.onresume = function (e) {
+      updateRecorderState("recording")
     }
 
     videoRecorder.ondataavailable = function (e) {
@@ -125,6 +155,7 @@ import { FileUploadEvents } from "./events/file-upload.events"
     }
 
     videoRecorder.onstop = function (e) {
+      timer.stop()
       const blob = new Blob(chunks, { type: "video/webm" })
       chunks = [] // Reset the chunks for the next recording
 
@@ -172,6 +203,7 @@ import { FileUploadEvents } from "./events/file-upload.events"
         videoContainer.setAttribute("hidden", "")
         _video.srcObject = null
       }
+      updateRecorderState("stopped")
     }
 
     if (_canvas) {
@@ -181,6 +213,15 @@ import { FileUploadEvents } from "./events/file-upload.events"
         }
       }
     }
+  }
+
+  const updateRecorderState = (state: RecorderState) => {
+    const data: ISimpleStoreData = {
+      key: "recordingState",
+      value: state,
+    }
+
+    window.electronAPI.ipcRenderer.send(SimpleStoreEvents.UPDATE, data)
   }
 
   const startRecording = () => {
@@ -389,6 +430,30 @@ import { FileUploadEvents } from "./events/file-upload.events"
         }
 
         startRecording()
+      }
+    }
+  )
+
+  window.electronAPI.ipcRenderer.on(
+    SimpleStoreEvents.CHANGED,
+    (event, state) => {
+      console.log("state", state["recordingState"])
+      if (["recording", "paused"].includes(state["recordingState"])) {
+        stopBtn.classList.add("panel-btn--stop")
+      } else {
+        stopBtn.classList.remove("panel-btn--stop")
+      }
+
+      if (["paused"].includes(state["recordingState"])) {
+        resumeBtn.removeAttribute("hidden")
+        pauseBtn.setAttribute("hidden", "")
+      } else {
+        resumeBtn.setAttribute("hidden", "")
+        pauseBtn.removeAttribute("hidden")
+      }
+
+      if (["stopped"].includes(state["recordingState"])) {
+        window.electronAPI.ipcRenderer.send("stop-recording", {})
       }
     }
   )

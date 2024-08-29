@@ -33,83 +33,20 @@ function stopRecordTimer() {
   recordTimer.textContent = "00:00"
 }
 
-startBtn.addEventListener("click", () => {
-  // const resolution = await window.electronAPI.resolution()
-  // width = resolution.width
-  // height = resolution.height
+// stopBtn.addEventListener("click", () => {
+//   // window.electronAPI.stopRecording();
 
-  // return
-  console.log("Btn clicked")
+//   console.log("Stopped")
 
-  // Web Camera
-  // const media2 = navigator.mediaDevices.getUserMedia({ video: true })
+//   destroyCanvas()
 
-  // console.log(media2)
-
-  const media = navigator.mediaDevices.getDisplayMedia({
-    audio: false,
-    video: true,
-    // video: {
-    //   width,
-    //   height,
-    //   frameRate: 30,
-    // },
-  })
-
-  console.log(media)
-
-  media
-    .then((stream) => {
-      console.log("Stream")
-
-      // Initialize MediaRecorder
-      mediaRecorder = new MediaRecorder(stream)
-
-      // Event handler for dataavailable event
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordedChunks.push(event.data)
-        }
-      }
-
-      // When recording is stopped, create a blob and save it
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: "video/webm" })
-        recordedChunks = [] // Reset the chunks for the next recording
-
-        // Create a link to download the recorded video
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.style.display = "none"
-        a.href = url
-        a.download = "recorded-video.webm"
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
-      }
-
-      // Start recording
-      mediaRecorder.start()
-      startRecordTimer()
-      window.electronAPI.toggleRecordButtons(true)
-    })
-    .catch((e) => console.log(e))
-})
-
-stopBtn.addEventListener("click", () => {
-  // window.electronAPI.stopRecording();
-
-  console.log("Stopped")
-
-  destroyCanvas()
-
-  // Stop recording
-  if (mediaRecorder) {
-    mediaRecorder.stop()
-    stopRecordTimer()
-    window.electronAPI.toggleRecordButtons(false)
-  }
-})
+//   // Stop recording
+//   if (mediaRecorder) {
+//     mediaRecorder.stop()
+//     stopRecordTimer()
+//     window.electronAPI.toggleRecordButtons(false)
+//   }
+// })
 
 // window.electronAPI.onRecordingFinished((event, filePath) => {
 //   console.log('Recording finished:', filePath);

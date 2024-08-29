@@ -16,8 +16,6 @@
     <div id="draw-container"></div>
 
     <div class="controls" hidden>
-      <button id="startBtn" class="clickable">Записать весь экран</button>
-      <button id="stopBtn" class="clickable" disabled>Остановить запись</button>
       <div id="recordTimer">00:00</div>
     </div>
 
@@ -26,8 +24,21 @@
         <i class="i i--lg i-grip-horizontal"></i>
       </div>
       <div id="panel-controls" class="panel transition-visibility">
-        <button id="stopScreenAreaBtn" class="panel-btn flex-center-10">
+        <button id="stopBtn" class="panel-btn mb-2 flex-center-10">
           <span class="i i-stop i--lg"></span>
+        </button>
+        <div id="timerDisplay" class="mb-2 text-center text-gray-600 text-xs">
+          00:00
+        </div>
+        <button id="pauseBtn" class="panel-btn mb-2 flex-center-10">
+          <span class="i i-pause i--lg"></span>
+        </button>
+        <button
+          id="resumeBtn"
+          class="panel-btn mb-2 panel-btn--play flex-center-10"
+          hidden
+        >
+          <span class="i i-play i--lg"></span>
         </button>
         <div class="panel-divider"></div>
         <button id="draw-toggle" class="panel-btn flex-center-10 clickable">

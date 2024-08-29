@@ -1,6 +1,10 @@
 import "./styles/modal-page.scss"
 import { getMediaPermission } from "./helpers/media-permissions"
-import { ScreenAction, StreamSettings } from "./helpers/types"
+import {
+  ScreenAction,
+  SimpleStoreEvents,
+  StreamSettings,
+} from "./helpers/types"
 ;(function () {
   let videoRecorder: MediaRecorder
   let audioRecorder: MediaRecorder
@@ -152,5 +156,12 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
       window.electronAPI.ipcRenderer.send("start-recording", streamSettings)
     },
     false
+  )
+
+  window.electronAPI.ipcRenderer.on(
+    SimpleStoreEvents.CHANGED,
+    (event, data) => {
+      console.log("modal SimpleStoreEvents.CHANGED", data)
+    }
   )
 })()

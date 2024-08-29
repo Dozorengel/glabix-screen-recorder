@@ -22,8 +22,14 @@ import { ChunksUploader } from "./file-uploader/chunks-uploader"
 import { createFileUploadCommand } from "./commands/create-file-upload.command"
 import { ChunkSlicer } from "./file-uploader/chunk-slicer"
 import { TokenStorage } from "./storages/token-storage"
-import { IAuthData, IUser } from "./helpers/types"
+import {
+  IAuthData,
+  ISimpleStoreData,
+  IUser,
+  SimpleStoreEvents,
+} from "./helpers/types"
 import { AppState } from "./storages/app-state"
+import { SimpleStore } from "./storages/simple-store"
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -38,6 +44,7 @@ let contextMenu: Menu
 let chunksUploaders: ChunksUploader[] = []
 const tokenStorage = new TokenStorage()
 const appState = new AppState()
+const store = new SimpleStore()
 
 app.removeAsDefaultProtocolClient("glabix-video-recorder")
 app.disableHardwareAcceleration()
@@ -319,6 +326,16 @@ ipcMain.on("record-settings-change", (event, data) => {
 ipcMain.on("start-recording", (event, data) => {
   mainWindow.webContents.send("start-recording", data)
   modalWindow.hide()
+})
+ipcMain.on("stop-recording", (event, data) => {
+  modalWindow.show()
+})
+
+ipcMain.on(SimpleStoreEvents.UPDATE, (event, data: ISimpleStoreData) => {
+  const { key, value } = data
+  store.set(key, value)
+  mainWindow.webContents.send(SimpleStoreEvents.CHANGED, store.get())
+  modalWindow.webContents.send(SimpleStoreEvents.CHANGED, store.get())
 })
 
 ipcMain.on("main-window-focus", (event, data) => {
