@@ -15,12 +15,8 @@
 
     <div id="draw-container"></div>
 
-    <div class="controls" hidden>
-      <div id="recordTimer">00:00</div>
-    </div>
-
-    <div class="panel-wrapper">
-      <div class="panel-drag-icon">
+    <div class="panel-wrapper hover">
+      <div class="panel-drag-icon hover-visible">
         <i class="i i--lg i-grip-horizontal"></i>
       </div>
       <div id="panel-controls" class="panel transition-visibility">
@@ -50,7 +46,7 @@
         <div class="flex gap-4 mb-4">
           <div class="flex flex-col gap-2">
             <button
-              class="bullet-xl hover:scale-125 text-accent-13"
+              class="bullet-xl hover:scale-125 text-accent-13 border-b-2 border-primary"
               data-color="accent-13"
             ></button>
             <button
@@ -84,11 +80,15 @@
             orient="vertical"
             min="1"
             max="25"
+            value="5"
           />
         </div>
 
-        <button class="panel-btn clickable" id="panel-draw-close-btn">
-          Готово
+        <button
+          id="panel-draw-close-btn"
+          class="flex text-xs mx-auto clickable"
+        >
+          Закрыть
         </button>
       </div>
     </div>
@@ -174,7 +174,6 @@
     </div>
 
     <!-- You can also require other files to run in this process -->
-    <script type="module" src="/src/renderer.ts"></script>
     <script type="module" src="/src/recorder.renderer.ts"></script>
     <script type="module" src="/src/webcamera.renderer.ts"></script>
     <script type="module" src="/src/draw.renderer.ts"></script>

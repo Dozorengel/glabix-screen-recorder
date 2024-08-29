@@ -91,6 +91,9 @@ typings/
 # Electron-Forge
 out/
 
+# Electron Builder
+dist/
+
 # VSCode
 .vscode/easycode.ignore
 .vscode/settings.json

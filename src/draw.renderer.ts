@@ -1,6 +1,6 @@
 import { KonvaPointerEvent } from "konva/lib/PointerEvents"
 import Konva from "konva"
-import Moveable, { MoveableRefTargetType } from "moveable"
+import Moveable, { MoveableRefTargetType, MoveableRefType } from "moveable"
 import "./styles/panel.scss"
 
 let stage: Konva.Stage
@@ -9,46 +9,48 @@ let countdownTimer: number | null
 let laserColor = getComputedStyle(document.documentElement).getPropertyValue(
   "--accent-13"
 )
-let laserStrokeWidth = 15
+let laserStrokeWidth = 5
 
 drawToggle.addEventListener("click", () => {
   const panelControls = document.querySelector("#panel-controls")!
   const panelDraw = document.querySelector("#panel-draw")!
 
-  drawToggle.classList.add("bg-gray-300")
   panelControls.classList.remove("visible")
   panelControls.classList.add("invisible")
   panelDraw.classList.add("visible")
   panelDraw.classList.remove("invisible")
 
-  const panelDrawCloseBtn = panelDraw.querySelector("#panel-draw-close-btn")!
-  panelDrawCloseBtn.addEventListener("click", () => {
-    destroyCanvas()
+  // handle draw end
+  panelDraw
+    .querySelector("#panel-draw-close-btn")
+    .addEventListener("click", () => {
+      if (stage) {
+        stage.clear()
+        stage.destroy()
+        stage = null
+        countdownTimer = null
+      }
 
-    drawToggle.classList.remove("bg-gray-300")
-    panelControls.classList.add("visible")
-    panelControls.classList.remove("invisible")
-    panelDraw.classList.remove("visible")
-    panelDraw.classList.add("invisible")
-  })
-
-  if (stage) {
-    destroyCanvas()
-    // panelDraw.classList.toggle("visible")
-    // panelDraw.classList.toggle("invisible")
-    return
-  }
+      panelControls.classList.add("visible")
+      panelControls.classList.remove("invisible")
+      panelDraw.classList.remove("visible")
+      panelDraw.classList.add("invisible")
+    })
 
   // change laser color
-  panelDraw
-    .querySelectorAll("[data-color]")
-    ?.forEach((colorBtn: HTMLButtonElement) => {
-      colorBtn.addEventListener("click", () => {
-        laserColor = getComputedStyle(
-          document.documentElement
-        ).getPropertyValue(`--${colorBtn.dataset.color}`)
+  const bullets = panelDraw.querySelectorAll("[data-color]")
+  bullets.forEach((bullet: HTMLButtonElement) => {
+    bullet.addEventListener("click", () => {
+      bullets.forEach((b: HTMLButtonElement) => {
+        b.classList.remove("border-2", "border-primary")
       })
+
+      bullet.classList.add("border-2", "border-primary")
+      laserColor = getComputedStyle(document.documentElement).getPropertyValue(
+        `--${bullet.dataset.color}`
+      )
     })
+  })
 
   // change laser stroke width
   panelDraw
@@ -99,7 +101,7 @@ drawToggle.addEventListener("click", () => {
       x: pos.x,
       y: pos.y,
       fill: laserColor,
-      radius: laserStrokeWidth * 2,
+      radius: laserStrokeWidth / 2,
       opacity: 0.5,
     })
     layerOpacity.add(circle)
@@ -149,15 +151,6 @@ drawToggle.addEventListener("click", () => {
   })
 })
 
-export function destroyCanvas() {
-  if (stage) {
-    stage.clear()
-    stage.destroy()
-    stage = null
-    countdownTimer = null
-  }
-}
-
 function startCountdown(): Promise<boolean> {
   return new Promise((resolve) => {
     if (countdownTimer) {
@@ -175,13 +168,14 @@ function startCountdown(): Promise<boolean> {
 
 ;(function () {
   document.addEventListener("DOMContentLoaded", () => {
-    // let moveable: Moveable
     const container = document.querySelector(".panel-wrapper")
-    let moveable = new Moveable(document.body, {
+    const dragIcon = document.querySelector(".panel-drag-icon")
+    const moveable = new Moveable(document.body, {
       target: container as MoveableRefTargetType,
       container: document.body,
       className: "moveable-invisible-container",
       draggable: true,
+      dragTarget: dragIcon as MoveableRefType,
     })
 
     moveable

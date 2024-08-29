@@ -1,3 +1,4 @@
+import "./styles/index-page.scss"
 import Moveable, { MoveableRefTargetType } from "moveable"
 import {
   ISimpleStoreData,
@@ -6,11 +7,8 @@ import {
   SimpleStoreEvents,
   StreamSettings,
 } from "./helpers/types"
-import { destroyCanvas } from "./draw.renderer"
-import { ChunkSlicer } from "./file-uploader/chunk-slicer"
-import { FileUploadEvents } from "./events/file-upload.events"
 import { Timer } from "./helpers/timer"
-
+import { FileUploadEvents } from "./events/file-upload.events"
 ;(function () {
   const timerDisplay = document.getElementById(
     "timerDisplay"
@@ -260,8 +258,6 @@ import { Timer } from "./helpers/timer"
       cameraMoveable.destroy()
       cameraMoveable = undefined
     }
-
-    destroyCanvas()
   }
 
   const initView = (settings: StreamSettings) => {
