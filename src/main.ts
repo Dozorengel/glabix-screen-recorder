@@ -197,12 +197,16 @@ function createModal(parentWindow) {
 
 function createLoginWindow() {
   loginWindow = new BrowserWindow({
-    width: 400,
-    height: 300,
+    width: 390,
+    height: 265,
     show: false,
+    resizable: false,
+    frame: false,
+    roundedCorners: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"), // для безопасного взаимодействия с рендерером
       nodeIntegration: true, // повышаем безопасность
+      zoomFactor: 1.0,
       // contextIsolation: true,  // повышаем безопасность
     },
   })

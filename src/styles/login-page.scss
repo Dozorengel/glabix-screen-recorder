@@ -1,0 +1,21 @@
+@import "styles.scss";
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: space-between;
+}
+.login-page-button {
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  border: 1px solid var(--gray-600);
+  color: var(--dark);
+  &--primary {
+    color: var(--light);
+    background-color: var(--primary);
+    border: none;
+  }
+}

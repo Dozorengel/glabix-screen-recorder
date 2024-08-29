@@ -1,14 +1,14 @@
 import { LoginEvents } from "./events/login.events"
+import "./styles/login-page.scss"
 ;(function () {})()
 
 document.addEventListener("DOMContentLoaded", () => {
   const link = import.meta.env.VITE_AUTH_APP_URL + "recorder/auth"
-  const loginLink = document.getElementById("login-link") as HTMLLinkElement
-  loginLink.addEventListener("click", (event) => {
+  const authBtn = document.getElementById("auth-btn")
+  authBtn.addEventListener("click", (event) => {
     event.preventDefault()
     window.electronAPI.openLinkInBrowser(link)
   })
-  loginLink.href = link
 })
 
 // document.getElementById('loginForm').addEventListener('submit', (event) => {
