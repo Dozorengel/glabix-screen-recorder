@@ -104,6 +104,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.i-grip-horizontal:before {
+  content: "\ea4b";
+}
 .i-expand:before {
   content: "\ea4a";
 }

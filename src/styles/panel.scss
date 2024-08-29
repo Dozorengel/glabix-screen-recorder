@@ -9,11 +9,33 @@
   gap: 0.75rem;
 }
 
+.panel-drag-icon {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 10px;
+  color: var(--gray-600);
+
+  .i {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+}
+.panel-wrapper:hover .panel-drag-icon .i {
+  opacity: 1;
+}
+
 .panel {
   background-color: var(--light);
   border: 1px solid var(--gray-600);
   border-radius: 1rem;
   padding: 10px;
+}
+
+.panel.invisible {
+  position: absolute;
 }
 
 .panel-btn {
