@@ -5,13 +5,11 @@ const videoContainer = document.getElementById(
   "webcamera-view"
 ) as HTMLDivElement
 const video = document.getElementById("video") as HTMLVideoElement
-const smallSizeBtn = document.getElementById(
-  "small-camera"
-) as HTMLButtonElement
-const bigSizeBtn = document.getElementById("big-camera") as HTMLButtonElement
+const changeCameraViewSizeBtn = document.querySelectorAll(
+  ".js-camera-view-size"
+)
 
 let currentStream: MediaStream
-let isVideoBig: Boolean
 let moveable: Moveable
 
 window.electronAPI.ipcRenderer.on(
@@ -29,45 +27,35 @@ window.electronAPI.ipcRenderer.on(
   }
 )
 
-smallSizeBtn.addEventListener("click", () => {
-  isVideoBig = false
-  toggleVideoSize()
-})
+changeCameraViewSizeBtn.forEach((button) => {
+  button.addEventListener(
+    "click",
+    (event) => {
+      const target = event.target as HTMLElement
+      const size = target.dataset.size
+      const container = document.querySelector(".webcamera-view-container")
+      container.classList.remove("sm", "lg", "xl")
+      container.classList.add(size)
 
-bigSizeBtn.addEventListener("click", () => {
-  isVideoBig = true
-  toggleVideoSize()
+      if (moveable) {
+        moveable.updateRect()
+      }
+    },
+    false
+  )
 })
 
 function initMovable() {
-  videoContainer.classList.add("clickable")
-
   moveable = new Moveable(document.body, {
     target: videoContainer as MoveableRefTargetType,
-    // If the container is null, the position is fixed. (default: parentElement(document.body))
     container: document.body,
-    className: "clickable",
-    // preventClickDefault: true,
+    className: "moveable-invisible-container",
     draggable: true,
-    // resizable: false,
-    // scalable: false,
-    // rotatable: false,
-    // warpable: false,
-    // // Enabling pinchable lets you use events that
-    // // can be used in draggable, resizable, scalable, and rotateable.
-    // pinchable: false, // ["resizable", "scalable", "rotatable"]
-    // origin: true,
-    // keepRatio: true,
-    // // Resize, Scale Events at edges.
-    // edge: false,
-    // throttleDrag: 0,
-    // throttleResize: 0,
-    // throttleScale: 0,
-    // throttleRotate: 0,
   })
 
   moveable
     .on("dragStart", ({ target, clientX, clientY }) => {
+      target.classList.add("moveable-dragging")
       // console.log("onDragStart", target)
     })
     .on(
@@ -94,23 +82,15 @@ function initMovable() {
       }
     )
     .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
+      target.classList.remove("moveable-dragging")
       console.log("onDragEnd", target, isDrag)
     })
 }
-
-function toggleVideoSize() {
-  if (isVideoBig) {
-    video.classList.remove("webcamera-small")
-    video.classList.add("webcamera-big")
-  } else {
-    video.classList.add("webcamera-small")
-    video.classList.remove("webcamera-big")
-  }
-}
+initMovable()
 
 function showVideo() {
   video.srcObject = currentStream
-  videoContainer.classList.remove("hidden")
+  videoContainer.removeAttribute("hidden")
 }
 
 function startStream(deviseId) {
@@ -141,7 +121,7 @@ function stopStream() {
     const tracks = currentStream.getTracks()
     tracks.forEach((track) => track.stop())
     video.srcObject = null
-    videoContainer.classList.add("hidden")
+    videoContainer.setAttribute("hidden", "")
     currentStream = null
   }
 

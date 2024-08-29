@@ -15,28 +15,41 @@
       <div class="mb-5">
         <button
           type="button"
-          class="btn hover js-btn-action-type"
+          class="btn hover justify-start js-btn-action-type"
           data-action="fullScreenVideo"
         >
-          Запись всего экрана
+          <div class="flex-center-5 min-w-5 mr-3">
+            <i class="i i--lg relative i-display">
+              <i class="icon-dot i-br"></i>
+            </i>
+          </div>
+          <div>Запись всего экрана</div>
         </button>
       </div>
       <div class="mb-5">
         <button
           type="button"
-          class="btn js-btn-action-type"
+          class="btn justify-start js-btn-action-type"
           data-action="cropVideo"
         >
-          Произвольная область
+          <div class="flex-center-5 min-w-5 mr-3">
+            <i class="i i--lg i-expand-wide relative">
+              <i class="icon-dot i-br"></i>
+            </i>
+          </div>
+          <div>Произвольная область</div>
         </button>
       </div>
       <div class="mb-5">
         <button
           type="button"
-          class="btn js-btn-action-type"
+          class="btn justify-start js-btn-action-type"
           data-action="cameraOnly"
         >
-          Только камера
+          <div class="flex-center-5 min-w-5 mr-3">
+            <i class="i i--lg i-video"></i>
+          </div>
+          <div>Только камера</div>
         </button>
       </div>
     </div>
@@ -49,12 +62,18 @@
 
     <template id="media_device_tpl">
       <div class="mb-20">
-        <div
-          class="btn text-overflow"
-          style="display: flex; align-items: center; gap: 5px"
-        >
+        <div class="btn text-overflow items-center">
+          <div class="flex-center-5 min-w-5 mr-3">
+            <i class="i i--lg"></i>
+          </div>
           <span class="text-overflow"></span>
-          <input class="media-device-checkbox" type="checkbox" />
+          <label class="form-toggle ml-1">
+            <input
+              class="form-toggle-input media-device-checkbox"
+              type="checkbox"
+            />
+            <span class="form-toggle-label"></span>
+          </label>
         </div>
       </div>
     </template>

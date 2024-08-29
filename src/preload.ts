@@ -44,7 +44,6 @@ window.addEventListener("DOMContentLoaded", () => {
     backdrop.addEventListener(
       "mouseenter",
       (event) => {
-        console.log("backdrop mouseenter", event)
         ipcRenderer.send("set-ignore-mouse-events", true, { forward: true })
       },
       false
@@ -53,7 +52,6 @@ window.addEventListener("DOMContentLoaded", () => {
     backdrop.addEventListener(
       "mouseleave",
       (event) => {
-        console.log("backdrop mouseleave", event)
         ipcRenderer.send("set-ignore-mouse-events", false)
       },
       false

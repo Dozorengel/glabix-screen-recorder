@@ -1,5 +1,4 @@
 import "./styles/modal-page.scss"
-import Moveable, { MoveableRefTargetType } from "moveable"
 import { getMediaPermission } from "./helpers/media-permissions"
 import { ScreenAction, StreamSettings } from "./helpers/types"
 ;(function () {
@@ -14,7 +13,6 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
     action: activeScreenAction,
     video: true,
   }
-  let moveable: Moveable
 
   async function setupMediaPermissions() {
     const devices = await navigator.mediaDevices.enumerateDevices()
@@ -47,12 +45,15 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
   ): HTMLElement {
     const clone = template.content.cloneNode(true) as HTMLElement
     const text = clone.querySelector("span")
+    const icon = clone.querySelector("i")
+    const iconClass = device.kind == "videoinput" ? "i-video" : "i-microphone"
     const checkbox = clone.querySelector(
       "input[type='checkbox']"
     ) as HTMLInputElement
     text.textContent = device.label
     checkbox.name =
       device.kind == "videoinput" ? "isVideoEnabled" : "isAudioEnabled"
+    icon.classList.add(iconClass)
     return clone
   }
 

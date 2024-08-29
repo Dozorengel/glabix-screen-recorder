@@ -22,7 +22,7 @@
     </div>
 
     <div class="panel-wrapper">
-      <div class="panel">
+      <div id="panel-controls" class="panel transition-visibility">
         <button id="stopScreenAreaBtn" class="panel-btn flex-center-10">
           <span class="i i-stop i--lg"></span>
         </button>
@@ -32,7 +32,10 @@
         </button>
       </div>
 
-      <div id="panel-draw" class="panel transition-visibility invisible p-4">
+      <div
+        id="panel-draw"
+        class="panel absolute transition-visibility invisible p-4"
+      >
         <div class="flex gap-4 mb-4">
           <div class="flex flex-col gap-2">
             <button
@@ -81,8 +84,45 @@
 
     <canvas id="canvas" width="300" height="300"></canvas>
 
-    <div class="webcamera-only-container" hidden>
+    <div class="crop-screen-container" hidden>
+      <div id="crop_video_screen" class="screen-recorder-container">
+        <canvas></canvas>
+      </div>
+    </div>
+
+    <div class="webcamera-only-container sm" hidden>
+      <div class="webcamera-only-title">
+        <i class="i i-dot i--lg"></i>
+        <div class="fw-500">Запись только камеры</div>
+      </div>
       <video id="webcam_only_video" autoplay></video>
+      <div class="webcamera-only-menu-container">
+        <div class="webcamera-only-menu webcamera-only-menu-more">
+          <div class="flex-center-6 min-w-6">
+            <i class="i i--lg i-ellipsis"></i>
+          </div>
+        </div>
+        <div class="webcamera-only-menu webcamera-only-menu-actions">
+          <button
+            class="flex-center-6 min-w-6 js-camera-only-size"
+            data-size="sm"
+          >
+            <i class="i pointer-events-none text-gray-600 i--lg i-rect"></i>
+          </button>
+          <button
+            class="flex-center-6 min-w-6 js-camera-only-size"
+            data-size="lg"
+          >
+            <i class="i pointer-events-none text-gray-600 i--xl i-rect"></i>
+          </button>
+          <button
+            class="flex-center-6 min-w-6 js-camera-only-size"
+            data-size="xl"
+          >
+            <i class="i pointer-events-none text-gray-600 i--lg i-expand"></i>
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="fullscreen-countdown-container" hidden>
@@ -91,17 +131,34 @@
       </div>
     </div>
 
-    <div id="webcamera-view" class="webcamera-view hidden">
-      <video
-        id="video"
-        class="webcamera-frame"
-        width="640"
-        height="480"
-        autoplay
-      ></video>
-      <div class="webcamera-controls">
-        <button id="small-camera">small</button>
-        <button id="big-camera">big</button>
+    <div id="webcamera-view" class="webcamera-view-container sm" hidden>
+      <video id="video" autoplay></video>
+      <div class="webcamera-view-menu-container">
+        <div class="webcamera-view-menu webcamera-view-menu-more">
+          <div class="flex-center-6 min-w-6">
+            <i class="i i--lg i-ellipsis"></i>
+          </div>
+        </div>
+        <div class="webcamera-view-menu webcamera-view-menu-actions">
+          <button
+            class="flex-center-6 min-w-6 js-camera-view-size"
+            data-size="sm"
+          >
+            <i class="i pointer-events-none text-gray-600 i--lg i-dot"></i>
+          </button>
+          <button
+            class="flex-center-6 min-w-6 js-camera-view-size"
+            data-size="lg"
+          >
+            <i class="i pointer-events-none text-gray-600 i--xl i-dot"></i>
+          </button>
+          <button
+            class="flex-center-6 min-w-6 js-camera-view-size"
+            data-size="xl"
+          >
+            <i class="i pointer-events-none text-gray-600 i--lg i-expand"></i>
+          </button>
+        </div>
       </div>
     </div>
 
