@@ -16,6 +16,14 @@ import path from "path"
 import os from "os"
 import { getCurrentUser } from "./commands/current-user.command"
 import { LoginEvents } from "./events/login.events"
+import { FileUploadEvents } from "./events/file-upload.events"
+import { uploadFileChunkCommand } from "./commands/upload-file-chunk.command"
+import { ChunksUploader } from "./file-uploader/chunks-uploader"
+import { createFileUploadCommand } from "./commands/create-file-upload.command"
+import { ChunkSlicer } from "./file-uploader/chunk-slicer"
+import { TokenStorage } from "./storages/token-storage"
+import { IAuthData, IUser } from "./helpers/types"
+import { AppState } from "./storages/app-state"
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -25,32 +33,64 @@ if (require("electron-squirrel-startup")) {
 let mainWindow: BrowserWindow
 let modalWindow: BrowserWindow
 let loginWindow: BrowserWindow
-const appState = {
-  user: null,
-}
+let contextMenu: Menu
+
+let chunksUploaders: ChunksUploader[] = []
+const tokenStorage = new TokenStorage()
+const appState = new AppState()
 
 app.removeAsDefaultProtocolClient("glabix-video-recorder")
 app.disableHardwareAcceleration()
 
 const gotTheLock = app.requestSingleInstanceLock()
 
+function init(url: string) {
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore()
+    mainWindow.focus()
+  }
+  // const url = commandLine.pop()
+  try {
+    const u = new URL(url)
+    const access_token = u.searchParams.get("access_token")
+    const refresh_token = u.searchParams.get("refresh_token")
+    let expires_at = u.searchParams.get("expires_at")
+    const organization_id = u.searchParams.get("organization_id")
+    if ((access_token, refresh_token, expires_at, organization_id)) {
+      if (expires_at.includes("00:00") && !expires_at.includes("T00:00")) {
+        //небольшой хак, чтобы дата распарсилась корректно
+        expires_at = expires_at.replace("00:00", "+00:00") // Заменяем на корректный формат ISO
+        expires_at = expires_at.replace(" ", "") // Заменяем на корректный формат ISO
+      }
+      const authData: IAuthData = {
+        token: {
+          access_token,
+          refresh_token,
+          expires_at,
+        },
+        organization_id: +organization_id,
+      }
+      loginWindow.show()
+      ipcMain.emit(LoginEvents.TOKEN_CONFIRMED, authData)
+    }
+  } catch (e) {}
+}
+
 if (!gotTheLock) {
   app.quit()
 } else {
-  app.on("second-instance", (event, commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore()
-      mainWindow.focus()
-    }
-    const url = commandLine.pop()
-    const u = new URL(url)
-    const token = u.searchParams.get("token")
-    if (token) {
-      loginWindow.show()
-      ipcMain.emit(LoginEvents.TOKEN_CONFIRMED, token)
-    }
-  })
+  if (os.platform() == "darwin") {
+    app.on("open-url", (event, url) => {
+      init(url)
+    })
+  }
+  if (os.platform() == "win32") {
+    app.on("second-instance", (event, commandLine, workingDirectory) => {
+      const url = commandLine.pop()
+      init(url)
+    })
+  }
 
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
@@ -60,7 +100,7 @@ if (!gotTheLock) {
     //   "get-screen-resolution",
     //   () => screen.getPrimaryDisplay().workAreaSize
     // )
-
+    tokenStorage.readAuthData()
     createWindow()
     session.defaultSession.setDisplayMediaRequestHandler(
       (request, callback) => {
@@ -197,7 +237,7 @@ function createMenu() {
     .resize({ height: 16, width: 16 })
   const tray = new Tray(image)
 
-  const contextMenu = Menu.buildFromTemplate([
+  contextMenu = Menu.buildFromTemplate([
     // {
     //   label: "Запись видео всего экрана",
     //   click: () => {
@@ -207,7 +247,7 @@ function createMenu() {
     {
       label: "Начать",
       click: () => {
-        if (!+process.env.LOGIN_IS_REQUIRED || appState.user) {
+        if (tokenStorage.dataIsActual()) {
           mainWindow.show()
           modalWindow.show()
         } else {
@@ -226,6 +266,15 @@ function createMenu() {
       label: "Выйти",
       click: () => {
         app.quit()
+      },
+    },
+    {
+      label: "Разлогиниться",
+      click: () => {
+        tokenStorage.reset()
+        mainWindow.hide()
+        modalWindow.hide()
+        loginWindow.show()
       },
     },
   ])
@@ -276,7 +325,6 @@ ipcMain.on(LoginEvents.LOGIN_ATTEMPT, (event, credentials) => {
   const { username, password } = credentials
   // Простой пример проверки логина
   if (username === "1" && password === "1") {
-    ipcMain.emit(LoginEvents.LOGIN_SUCCESS, event)
   } else {
     event.reply(LoginEvents.LOGIN_FAILED)
   }
@@ -289,10 +337,65 @@ ipcMain.on(LoginEvents.LOGIN_SUCCESS, (event) => {
 })
 
 ipcMain.on(LoginEvents.TOKEN_CONFIRMED, (event) => {
-  getCurrentUser(event as string)
+  const { token, organization_id } = event as IAuthData
+  tokenStorage.encryptAuthData({ token, organization_id })
+  getCurrentUser(tokenStorage.token.access_token)
 })
 
 ipcMain.on(LoginEvents.USER_VERIFIED, (event) => {
-  appState.user = event as any
+  const user = event as IUser
+  appState.set({ ...appState.state, user })
   ipcMain.emit(LoginEvents.LOGIN_SUCCESS)
+})
+
+ipcMain.on(FileUploadEvents.FILE_CREATED, (event, file) => {
+  const blob = new Blob([file], { type: "video/webm" })
+  const size = 10 * 1024 * 1024
+  const chunksSlicer = new ChunkSlicer(blob, size)
+  const processedChunks = [...chunksSlicer.allChunks]
+  const fileName = "test-video-" + Date.now() + ".mp4"
+  createFileUploadCommand(
+    tokenStorage.token.access_token,
+    tokenStorage.organizationId,
+    fileName,
+    processedChunks
+  )
+})
+
+ipcMain.on(FileUploadEvents.FILE_CREATED_ON_SERVER, (event) => {
+  const { uuid, chunks } = event
+  const chunksUploader = new ChunksUploader(chunks, uuid)
+  chunksUploaders.push(chunksUploader)
+  chunksUploader.processNextChunk()
+})
+
+ipcMain.on(FileUploadEvents.LOAD_FILE_CHUNK, (event) => {
+  const { chunk, chunkNumber, uuid } = event
+  uploadFileChunkCommand(
+    tokenStorage.token.access_token,
+    tokenStorage.organizationId,
+    uuid,
+    chunk,
+    chunkNumber
+  )
+})
+
+ipcMain.on(FileUploadEvents.FILE_CHUNK_UPLOADED, (event) => {
+  const { uuid, chunks } = event
+  const uploader = chunksUploaders.find((c) => c.uuid === uuid)
+  if (uploader) {
+    const isNext = uploader.processNextChunk()
+    if (!isNext) {
+      console.log(
+        "file ",
+        uploader.uuid,
+        "was successfully loaded on the server!"
+      )
+      chunksUploaders = chunksUploaders.filter((u) => u !== uploader)
+    }
+  }
+})
+
+ipcMain.on("log", (evt, data) => {
+  console.log(data)
 })
