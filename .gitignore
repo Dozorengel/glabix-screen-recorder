@@ -96,4 +96,4 @@ out/
 .vscode/settings.json
 
 # Encrypted files
-.enc
+*.enc
