@@ -1,5 +1,6 @@
 import { KonvaPointerEvent } from "konva/lib/PointerEvents"
 import Konva from "konva"
+import Moveable, { MoveableRefTargetType } from "moveable"
 import "./styles/panel.scss"
 
 let stage: Konva.Stage
@@ -166,3 +167,44 @@ function startCountdown(): Promise<boolean> {
     }, 2000)
   })
 }
+
+;(function () {
+  document.addEventListener("DOMContentLoaded", () => {
+    // let moveable: Moveable
+    const container = document.querySelector(".panel-wrapper")
+    let moveable = new Moveable(document.body, {
+      target: container as MoveableRefTargetType,
+      container: document.body,
+      className: "moveable-invisible-container",
+      draggable: true,
+    })
+
+    moveable
+      .on("dragStart", ({ target, clientX, clientY }) => {
+        target.classList.add("moveable-dragging")
+      })
+      .on(
+        "drag",
+        ({
+          target,
+          transform,
+          left,
+          top,
+          right,
+          bottom,
+          beforeDelta,
+          beforeDist,
+          delta,
+          dist,
+          clientX,
+          clientY,
+        }) => {
+          target!.style.left = `${left}px`
+          target!.style.top = `${top}px`
+        }
+      )
+      .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
+        target.classList.remove("moveable-dragging")
+      })
+  })
+})()
