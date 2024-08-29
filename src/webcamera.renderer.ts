@@ -8,13 +8,8 @@ const video = document.getElementById("video") as HTMLVideoElement
 const changeCameraViewSizeBtn = document.querySelectorAll(
   ".js-camera-view-size"
 )
-// const smallSizeBtn = document.getElementById(
-//   "small-camera"
-// ) as HTMLButtonElement
-// const bigSizeBtn = document.getElementById("big-camera") as HTMLButtonElement
 
 let currentStream: MediaStream
-let isVideoBig: Boolean
 let moveable: Moveable
 
 window.electronAPI.ipcRenderer.on(
@@ -49,16 +44,6 @@ changeCameraViewSizeBtn.forEach((button) => {
     false
   )
 })
-
-// smallSizeBtn.addEventListener("click", () => {
-//   isVideoBig = false
-//   toggleVideoSize()
-// })
-
-// bigSizeBtn.addEventListener("click", () => {
-//   isVideoBig = true
-//   toggleVideoSize()
-// })
 
 function initMovable() {
   moveable = new Moveable(document.body, {
@@ -102,19 +87,10 @@ function initMovable() {
     })
 }
 initMovable()
-function toggleVideoSize() {
-  if (isVideoBig) {
-    video.classList.remove("webcamera-small")
-    video.classList.add("webcamera-big")
-  } else {
-    video.classList.add("webcamera-small")
-    video.classList.remove("webcamera-big")
-  }
-}
 
 function showVideo() {
   video.srcObject = currentStream
-  videoContainer.classList.remove("hidden")
+  videoContainer.removeAttribute("hidden")
 }
 
 function startStream(deviseId) {
@@ -145,7 +121,7 @@ function stopStream() {
     const tracks = currentStream.getTracks()
     tracks.forEach((track) => track.stop())
     video.srcObject = null
-    videoContainer.classList.add("hidden")
+    videoContainer.setAttribute("hidden", "")
     currentStream = null
   }
 
