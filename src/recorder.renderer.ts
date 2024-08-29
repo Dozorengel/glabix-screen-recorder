@@ -1,9 +1,7 @@
 import Moveable, { MoveableRefTargetType } from "moveable"
 import { ScreenAction, StreamSettings } from "./helpers/types"
-import { destroyCanvas } from "./draw.renderer"
 import { ChunkSlicer } from "./file-uploader/chunk-slicer"
 import { FileUploadEvents } from "./events/file-upload.events"
-
 ;(function () {
   const stopScreenAreaBtn = document.getElementById(
     "stopScreenAreaBtn"
@@ -219,8 +217,6 @@ import { FileUploadEvents } from "./events/file-upload.events"
       cameraMoveable.destroy()
       cameraMoveable = undefined
     }
-
-    destroyCanvas()
   }
 
   const initView = (settings: StreamSettings) => {
