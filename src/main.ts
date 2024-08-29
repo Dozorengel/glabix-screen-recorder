@@ -43,41 +43,53 @@ app.removeAsDefaultProtocolClient("glabix-video-recorder")
 
 const gotTheLock = app.requestSingleInstanceLock()
 
+function init(url: string) {
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore()
+    mainWindow.focus()
+  }
+  // const url = commandLine.pop()
+  try {
+    const u = new URL(url)
+    const access_token = u.searchParams.get("access_token")
+    const refresh_token = u.searchParams.get("refresh_token")
+    let expires_at = u.searchParams.get("expires_at")
+    const organization_id = u.searchParams.get("organization_id")
+    if ((access_token, refresh_token, expires_at, organization_id)) {
+      if (expires_at.includes("00:00") && !expires_at.includes("T00:00")) {
+        //небольшой хак, чтобы дата распарсилась корректно
+        expires_at = expires_at.replace("00:00", "+00:00") // Заменяем на корректный формат ISO
+        expires_at = expires_at.replace(" ", "") // Заменяем на корректный формат ISO
+      }
+      const authData: IAuthData = {
+        token: {
+          access_token,
+          refresh_token,
+          expires_at,
+        },
+        organization_id: +organization_id,
+      }
+      loginWindow.show()
+      ipcMain.emit(LoginEvents.TOKEN_CONFIRMED, authData)
+    }
+  } catch (e) {}
+}
+
 if (!gotTheLock) {
   app.quit()
 } else {
-  app.on("second-instance", (event, commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore()
-      mainWindow.focus()
-    }
-    const url = commandLine.pop()
-    try {
-      const u = new URL(url)
-      const access_token = u.searchParams.get("access_token")
-      const refresh_token = u.searchParams.get("refresh_token")
-      let expires_at = u.searchParams.get("expires_at")
-      const organization_id = u.searchParams.get("organization_id")
-      if ((access_token, refresh_token, expires_at, organization_id)) {
-        if (expires_at.includes("00:00") && !expires_at.includes("T00:00")) {
-          //небольшой хак, чтобы дата распарсилась корректно
-          expires_at = expires_at.replace("00:00", "+00:00") // Заменяем на корректный формат ISO
-          expires_at = expires_at.replace(" ", "") // Заменяем на корректный формат ISO
-        }
-        const authData: IAuthData = {
-          token: {
-            access_token,
-            refresh_token,
-            expires_at: expires_at,
-          },
-          organization_id: +organization_id,
-        }
-        loginWindow.show()
-        ipcMain.emit(LoginEvents.TOKEN_CONFIRMED, authData)
-      }
-    } catch (e) {}
-  })
+  if (os.platform() == "darwin") {
+    app.on("open-url", (event, url) => {
+      init(url)
+    })
+  }
+  if (os.platform() == "win32") {
+    app.on("second-instance", (event, commandLine, workingDirectory) => {
+      const url = commandLine.pop()
+      init(url)
+    })
+  }
 
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
