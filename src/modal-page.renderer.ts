@@ -45,12 +45,15 @@ import { ScreenAction, StreamSettings } from "./helpers/types"
   ): HTMLElement {
     const clone = template.content.cloneNode(true) as HTMLElement
     const text = clone.querySelector("span")
+    const icon = clone.querySelector("i")
+    const iconClass = device.kind == "videoinput" ? "i-video" : "i-microphone"
     const checkbox = clone.querySelector(
       "input[type='checkbox']"
     ) as HTMLInputElement
     text.textContent = device.label
     checkbox.name =
       device.kind == "videoinput" ? "isVideoEnabled" : "isAudioEnabled"
+    icon.classList.add(iconClass)
     return clone
   }
 

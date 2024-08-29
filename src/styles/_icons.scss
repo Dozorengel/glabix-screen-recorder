@@ -57,6 +57,39 @@
   top: -3px;
 }
 
+.icon-dot {
+  width: 8px;
+  height: 8px;
+  border: solid 1px var(--error);
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  &:before {
+    content: "";
+    display: block;
+    width: 4px;
+    height: 4px;
+    left: calc(50% - 2px);
+    top: calc(50% - 2px);
+    background-color: var(--error);
+    border-radius: 50%;
+    position: absolute;
+  }
+}
+.i .i-br {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.i-rect {
+  display: inline-block;
+  width: 1em;
+  height: 0.75em;
+  background-color: currentColor;
+  border-radius: 0.125em;
+}
+
 .i {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: "glabix-iconset" !important;
@@ -70,6 +103,27 @@
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+.i-expand:before {
+  content: "\ea4a";
+}
+.i-expand-2:before {
+  content: "\ea49";
+}
+.i-video-slash:before {
+  content: "\ea44";
+}
+.i-star-christmas:before {
+  content: "\ea45";
+}
+.i-microphone:before {
+  content: "\ea46";
+}
+.i-microphone-slash:before {
+  content: "\ea47";
+}
+.i-expand-wide:before {
+  content: "\ea48";
 }
 .i-sparkles:before {
   content: "\ea43";

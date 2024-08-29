@@ -18,9 +18,9 @@ import { getCurrentUser } from "./commands/current-user.command"
 import { LoginEvents } from "./events/login.events"
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-// if (require("electron-squirrel-startup")) {
-//   app.quit()
-// }
+if (require("electron-squirrel-startup")) {
+  app.quit()
+}
 
 let mainWindow: BrowserWindow
 let modalWindow: BrowserWindow
@@ -149,6 +149,7 @@ function createModal(parentWindow) {
       // contextIsolation: false, // Disable context isolation (not recommended for production)
     },
   })
+  // modalWindow.webContents.openDevTools()
 
   modalWindow.on("blur", () => {
     mainWindow.focus()
@@ -165,8 +166,6 @@ function createModal(parentWindow) {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/modal.html`)
     )
   }
-
-  // modalWindow.webContents.openDevTools()
 }
 
 function createLoginWindow() {

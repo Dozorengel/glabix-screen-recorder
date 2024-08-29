@@ -5,9 +5,31 @@ import { destroyCanvas } from "./draw.renderer"
   const stopScreenAreaBtn = document.getElementById(
     "stopScreenAreaBtn"
   ) as HTMLButtonElement
+  const changeCameraOnlySizeBtn = document.querySelectorAll(
+    ".js-camera-only-size"
+  )
   let lastScreenAction: ScreenAction = "fullScreenVideo"
   let videoRecorder: MediaRecorder
-  let moveable: Moveable
+  let cropMoveable: Moveable
+  let cameraMoveable: Moveable
+
+  changeCameraOnlySizeBtn.forEach((button) => {
+    button.addEventListener(
+      "click",
+      (event) => {
+        const target = event.target as HTMLElement
+        const size = target.dataset.size
+        const container = document.querySelector(".webcamera-only-container")
+        container.classList.remove("sm", "lg", "xl")
+        container.classList.add(size)
+
+        if (cameraMoveable) {
+          cameraMoveable.updateRect()
+        }
+      },
+      false
+    )
+  })
 
   stopScreenAreaBtn.addEventListener("click", () => {
     if (videoRecorder) {
@@ -72,6 +94,11 @@ import { destroyCanvas } from "./draw.renderer"
 
     if (_video) {
       _video.srcObject = new MediaStream([..._stream.getVideoTracks()])
+
+      if (_stream.getVideoTracks()[0]) {
+        const stream_settings = _stream.getVideoTracks()[0].getSettings()
+        console.log("stream_settings", stream_settings)
+      }
     }
 
     if (_canvas) {
@@ -163,14 +190,20 @@ import { destroyCanvas } from "./draw.renderer"
     if (videoContainer) {
       videoContainer.setAttribute("hidden", "")
     }
+
     const screenContainer = document.querySelector(".crop-screen-container")
     if (screenContainer) {
       screenContainer.setAttribute("hidden", "")
     }
 
-    if (moveable) {
-      moveable.destroy()
-      moveable = undefined
+    if (cropMoveable) {
+      cropMoveable.destroy()
+      cropMoveable = undefined
+    }
+
+    if (cameraMoveable) {
+      cameraMoveable.destroy()
+      cameraMoveable = undefined
     }
 
     destroyCanvas()
@@ -193,6 +226,18 @@ import { destroyCanvas } from "./draw.renderer"
       const rect = videoContainer.getBoundingClientRect()
       video.width = rect.width
       video.height = rect.height
+
+      cameraMoveable = new Moveable(document.body, {
+        target: videoContainer as MoveableRefTargetType,
+        container: document.body,
+        className: "moveable-invisible-container",
+        draggable: true,
+      })
+
+      cameraMoveable.on("drag", ({ target, left, top }) => {
+        target!.style.left = `${left}px`
+        target!.style.top = `${top}px`
+      })
     }
 
     if (settings.action == "cropVideo") {
@@ -203,7 +248,7 @@ import { destroyCanvas } from "./draw.renderer"
       canvasVideo.width = screen.getBoundingClientRect().width
       canvasVideo.height = screen.getBoundingClientRect().height
 
-      moveable = new Moveable(document.body, {
+      cropMoveable = new Moveable(document.body, {
         target: screen as MoveableRefTargetType,
         container: document.body,
         className: "moveable-container",
@@ -211,21 +256,25 @@ import { destroyCanvas } from "./draw.renderer"
         resizable: true,
       })
 
-      moveable.on("drag", ({ target, left, top }) => {
+      cropMoveable.on("drag", ({ target, left, top }) => {
         target!.style.left = `${left}px`
         target!.style.top = `${top}px`
       })
 
       /* resizable */
-      moveable.on("resize", ({ target, width, height, delta }) => {
-        delta[0] && (target!.style.width = `${width}px`)
-        delta[1] && (target!.style.height = `${height}px`)
+      cropMoveable.on("resize", (data) => {
+        const { target, width, height, drag } = data
+
+        target.style.top = `${drag.top}px`
+        target.style.left = `${drag.left}px`
+        target.style.width = `${width}px`
+        target.style.height = `${height}px`
 
         canvasVideo.width = width
         canvasVideo.height = height
       })
 
-      moveable.updateRect()
+      cropMoveable.updateRect()
     }
   }
 
@@ -287,7 +336,7 @@ import { destroyCanvas } from "./draw.renderer"
             "#crop_video_screen"
           ) as HTMLElement
           screen.classList.add("is-recording")
-          const screenMove = moveable.getControlBoxElement()
+          const screenMove = cropMoveable.getControlBoxElement()
           screenMove.style.cssText = `pointer-events: none; opacity: 0; ${screenMove.style.cssText}`
 
           const canvasVideo = document.querySelector(
