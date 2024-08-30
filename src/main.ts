@@ -30,6 +30,10 @@ import {
 } from "./helpers/types"
 import { AppState } from "./storages/app-state"
 import { SimpleStore } from "./storages/simple-store"
+import log from "electron-log/main"
+
+// Optional, initialize the logger for any renderer process
+log.initialize()
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -82,7 +86,10 @@ function init(url: string) {
       loginWindow.show()
       ipcMain.emit(LoginEvents.TOKEN_CONFIRMED, authData)
     }
-  } catch (e) {}
+  } catch (e) {
+    console.log("🌶️ ", e)
+    log.error("😄", e)
+  }
 }
 
 if (!gotTheLock) {

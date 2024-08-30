@@ -2,11 +2,13 @@ import { ipcMain, safeStorage } from "electron"
 import * as fs from "fs"
 import { IAuthData, IJWTToken } from "../helpers/types"
 import { LoginEvents } from "../events/login.events"
+import os from "os"
 
 export class TokenStorage {
   private _token: IJWTToken | null = null
   private _organizationId: number | null = null
-  readonly filename = "authData.enc"
+  readonly filename =
+    os.platform() == "darwin" ? "/tmp/authData.enc" : "authData.enc"
 
   get token(): IJWTToken | null {
     return this._token

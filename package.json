@@ -20,6 +20,7 @@
   "dependencies": {
     "@dotenvx/dotenvx": "^1.8.0",
     "axios": "^1.7.4",
+    "electron-log": "^5.1.7",
     "electron-squirrel-startup": "^1.0.1",
     "konva": "^9.3.14",
     "modern-normalize": "^3.0.0",
