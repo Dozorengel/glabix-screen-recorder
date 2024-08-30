@@ -40,6 +40,7 @@ let mainWindow: BrowserWindow
 let modalWindow: BrowserWindow
 let loginWindow: BrowserWindow
 let contextMenu: Menu
+let tray: Tray
 
 let chunksUploaders: ChunksUploader[] = []
 const tokenStorage = new TokenStorage()
@@ -246,50 +247,77 @@ function createMenu() {
   const image = nativeImage
     .createFromPath(path.join(__dirname, "favicon-24.png"))
     .resize({ height: 16, width: 16 })
-  const tray = new Tray(image)
+  tray = new Tray(image)
 
-  contextMenu = Menu.buildFromTemplate([
-    // {
-    //   label: "Запись видео всего экрана",
-    //   click: () => {
-    //     mainWindow.show()
-    //   },
-    // },
-    {
-      label: "Начать",
-      click: () => {
-        if (tokenStorage.dataIsActual()) {
-          mainWindow.show()
-          modalWindow.show()
-        } else {
+  buildTrayMenu()
+}
+
+function buildTrayMenu() {
+  const auth = tokenStorage.token
+  if (auth) {
+    contextMenu = Menu.buildFromTemplate([
+      {
+        label: "Начать",
+        click: () => {
+          if (tokenStorage.dataIsActual()) {
+            mainWindow.show()
+            modalWindow.show()
+          } else {
+            loginWindow.show()
+          }
+        },
+      },
+      {
+        label: "Скрыть",
+        click: () => {
+          mainWindow.hide()
+          modalWindow.hide()
+        },
+      },
+      {
+        label: "Разлогиниться",
+        click: () => {
+          tokenStorage.reset()
+          mainWindow.hide()
+          modalWindow.hide()
           loginWindow.show()
-        }
+        },
       },
-    },
-    {
-      label: "Скрыть",
-      click: () => {
-        mainWindow.hide()
-        modalWindow.hide()
+      {
+        label: "Выйти",
+        click: () => {
+          app.quit()
+        },
       },
-    },
-    {
-      label: "Выйти",
-      click: () => {
-        app.quit()
+    ])
+  } else {
+    contextMenu = Menu.buildFromTemplate([
+      {
+        label: "Начать",
+        click: () => {
+          if (tokenStorage.dataIsActual()) {
+            mainWindow.show()
+            modalWindow.show()
+          } else {
+            loginWindow.show()
+          }
+        },
       },
-    },
-    {
-      label: "Разлогиниться",
-      click: () => {
-        tokenStorage.reset()
-        mainWindow.hide()
-        modalWindow.hide()
-        loginWindow.show()
+      {
+        label: "Скрыть",
+        click: () => {
+          mainWindow.hide()
+          modalWindow.hide()
+        },
       },
-    },
-  ])
-
+      {
+        label: "Выйти",
+        click: () => {
+          app.quit()
+        },
+      },
+    ])
+  }
   tray.setToolTip("Glabix video app")
   tray.setContextMenu(contextMenu)
 }
@@ -352,6 +380,7 @@ ipcMain.on(LoginEvents.LOGIN_ATTEMPT, (event, credentials) => {
 })
 
 ipcMain.on(LoginEvents.LOGIN_SUCCESS, (event) => {
+  buildTrayMenu()
   loginWindow.hide()
   mainWindow.show()
   modalWindow.show()
@@ -415,6 +444,10 @@ ipcMain.on(FileUploadEvents.FILE_CHUNK_UPLOADED, (event) => {
       chunksUploaders = chunksUploaders.filter((u) => u !== uploader)
     }
   }
+})
+
+ipcMain.on(LoginEvents.LOGOUT, (event) => {
+  buildTrayMenu()
 })
 
 ipcMain.on("log", (evt, data) => {

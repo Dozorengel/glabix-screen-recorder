@@ -1,6 +1,7 @@
-import { safeStorage } from "electron"
+import { ipcMain, safeStorage } from "electron"
 import * as fs from "fs"
 import { IAuthData, IJWTToken } from "../helpers/types"
+import { LoginEvents } from "../events/login.events"
 
 export class TokenStorage {
   private _token: IJWTToken | null = null
@@ -53,6 +54,9 @@ export class TokenStorage {
   reset() {
     this._token = null
     this._organizationId = null
-    fs.unlinkSync(this.filename)
+    if (fs.existsSync(this.filename)) {
+      fs.unlinkSync(this.filename)
+    }
+    ipcMain.emit(LoginEvents.LOGOUT, {})
   }
 }

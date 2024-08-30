@@ -4,4 +4,5 @@ export enum LoginEvents {
   LOGIN_FAILED = "login-failed",
   USER_VERIFIED = "user-verified",
   TOKEN_CONFIRMED = "token-confirmed",
+  LOGOUT = "logout",
 }
