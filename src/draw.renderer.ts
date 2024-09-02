@@ -3,207 +3,262 @@ import Konva from "konva"
 import Moveable, { MoveableRefTargetType, MoveableRefType } from "moveable"
 import "./styles/panel.scss"
 
-let stage: Konva.Stage
-const drawToggle = document.getElementById("draw-toggle")
-let countdownTimer: number | null
-let laserColor = getComputedStyle(document.documentElement).getPropertyValue(
-  "--accent-13"
-)
-let laserStrokeWidth = 5
+const COUNTDOWN_DELAY = 2000
 
-drawToggle.addEventListener("click", () => {
-  const panelControls = document.querySelector("#panel-controls")!
-  const panelDraw = document.querySelector("#panel-draw")!
+class Draw {
+  stage: Konva.Stage
+  countdownTimer: number | null
+  laserColor = getComputedStyle(document.documentElement).getPropertyValue(
+    "--accent-13"
+  )
+  laserStrokeWidth = 5
+  panelDraw = document.querySelector("#panel-draw")
 
-  panelControls.classList.remove("visible")
-  panelControls.classList.add("invisible")
-  panelDraw.classList.add("visible")
-  panelDraw.classList.remove("invisible")
+  constructor() {
+    this.setListeners()
+  }
 
-  // handle draw end
-  panelDraw
-    .querySelector("#panel-draw-close-btn")
-    .addEventListener("click", () => {
-      if (stage) {
-        stage.clear()
-        stage.destroy()
-        stage = null
-        countdownTimer = null
+  setListeners() {
+    this.handleDrawToggle()
+    this.handleDrawSettingsToggle()
+    this.handleDrawSettingsClose()
+    this.handleLaserColorChange()
+    this.handleLaserStrokeWidthChange()
+
+    window.electronAPI.ipcRenderer.on("stop-recording", () => {
+      this.drawEnd()
+    })
+  }
+
+  handleDrawToggle() {
+    const drawToggle = document.querySelector("#draw-btn")
+    drawToggle.addEventListener("click", () => {
+      if (this.stage) {
+        this.drawEnd()
+      } else {
+        this.drawStart()
       }
+      drawToggle.classList.toggle("bg-gray-300")
+    })
+  }
 
-      panelControls.classList.add("visible")
-      panelControls.classList.remove("invisible")
-      panelDraw.classList.remove("visible")
-      panelDraw.classList.add("invisible")
+  handleDrawSettingsToggle() {
+    document
+      .querySelector("#draw-settings-btn")
+      .addEventListener("click", () => {
+        this.drawStart()
+        this.panelDraw.classList.toggle("visible")
+        this.panelDraw.classList.toggle("invisible")
+      })
+  }
+
+  handleDrawSettingsClose() {
+    document
+      .querySelector("#draw-settings-close-btn")
+      .addEventListener("click", () => {
+        this.closeSettings()
+      })
+  }
+
+  handleLaserColorChange() {
+    document
+      .querySelectorAll("[data-color]")
+      .forEach(
+        (b: HTMLButtonElement, _, bullets: NodeListOf<HTMLButtonElement>) => {
+          b.addEventListener("click", () => {
+            this.changeLaserColor(b, bullets)
+          })
+        }
+      )
+  }
+
+  handleLaserStrokeWidthChange() {
+    document
+      .querySelector(".panel-slider")
+      .addEventListener("input", (event) => {
+        this.laserStrokeWidth = +(event.target as HTMLInputElement).value
+      })
+  }
+
+  private drawStart() {
+    if (this.stage) return
+
+    this.stage = new Konva.Stage({
+      container: "draw-container",
+      width: window.innerWidth,
+      height: window.innerHeight,
     })
 
-  // change laser color
-  const bullets = panelDraw.querySelectorAll("[data-color]")
-  bullets.forEach((bullet: HTMLButtonElement) => {
-    bullet.addEventListener("click", () => {
-      bullets.forEach((b: HTMLButtonElement) => {
-        b.classList.remove("border-2", "border-primary")
+    const layer = new Konva.Layer()
+    this.stage.add(layer)
+    const layerOpacity = new Konva.Layer()
+    this.stage.add(layerOpacity)
+
+    let isPaint: boolean
+    let lastLine: Konva.Line
+    let circle: Konva.Circle
+
+    this.stage.on("mouseenter", () => {
+      this.stage.container().style.cursor = "cell"
+    })
+    this.stage.on("mouseleave", () => {
+      this.stage.container().style.cursor = "default"
+    })
+
+    this.stage.on("mousedown touchstart", () => {
+      if (this.countdownTimer) {
+        window.clearTimeout(this.countdownTimer)
+      }
+      isPaint = true
+      const pos = this.stage.getPointerPosition()
+
+      lastLine = new Konva.Line({
+        stroke: this.laserColor,
+        strokeWidth: this.laserStrokeWidth,
+        bezier: true,
+        lineCap: "round",
+        points: [pos.x, pos.y, pos.x, pos.y],
+      })
+      layer.add(lastLine)
+
+      circle = new Konva.Circle({
+        x: pos.x,
+        y: pos.y,
+        fill: this.laserColor,
+        radius: this.laserStrokeWidth / 2,
+        opacity: 0.5,
+      })
+      layerOpacity.add(circle)
+    })
+
+    this.stage.on("mousemove touchmove", (e: KonvaPointerEvent) => {
+      if (!isPaint) {
+        return
+      }
+      // prevent scrolling on touch devices
+      e.evt.preventDefault()
+
+      const pos = this.stage.getPointerPosition()
+      const newPoints = lastLine.points().concat([pos.x, pos.y])
+      lastLine.points(newPoints)
+      circle.x(pos.x)
+      circle.y(pos.y)
+    })
+
+    this.stage.on("mouseup touchend", () => {
+      isPaint = false
+
+      this.startCountdown().then(() => {
+        const tween = new Konva.Tween({
+          node: layer,
+          duration: 0.2,
+          opacity: 0,
+          onFinish: () => {
+            layer.destroyChildren()
+            layer.opacity(1)
+          },
+        })
+        tween.play()
       })
 
-      bullet.classList.add("border-2", "border-primary")
-      laserColor = getComputedStyle(document.documentElement).getPropertyValue(
-        `--${bullet.dataset.color}`
-      )
-    })
-  })
-
-  // change laser stroke width
-  panelDraw
-    .querySelector(".panel-slider")
-    .addEventListener("input", (event) => {
-      laserStrokeWidth = +(event.target as HTMLInputElement).value
-    })
-
-  stage = new Konva.Stage({
-    container: "draw-container",
-    width: window.innerWidth,
-    height: window.innerHeight,
-  })
-
-  const layer = new Konva.Layer()
-  stage.add(layer)
-  const layerOpacity = new Konva.Layer()
-  stage.add(layerOpacity)
-
-  let isPaint: boolean
-  let lastLine: Konva.Line
-  let circle: Konva.Circle
-
-  stage.on("mouseenter", () => {
-    stage.container().style.cursor = "cell"
-  })
-  stage.on("mouseleave", () => {
-    stage.container().style.cursor = "default"
-  })
-
-  stage.on("mousedown touchstart", () => {
-    if (countdownTimer) {
-      window.clearTimeout(countdownTimer)
-    }
-    isPaint = true
-    const pos = stage.getPointerPosition()
-
-    lastLine = new Konva.Line({
-      stroke: laserColor,
-      strokeWidth: laserStrokeWidth,
-      bezier: true,
-      lineCap: "round",
-      points: [pos.x, pos.y, pos.x, pos.y],
-    })
-    layer.add(lastLine)
-
-    circle = new Konva.Circle({
-      x: pos.x,
-      y: pos.y,
-      fill: laserColor,
-      radius: laserStrokeWidth / 2,
-      opacity: 0.5,
-    })
-    layerOpacity.add(circle)
-  })
-
-  stage.on("mousemove touchmove", (e: KonvaPointerEvent) => {
-    if (!isPaint) {
-      return
-    }
-
-    // prevent scrolling on touch devices
-    e.evt.preventDefault()
-
-    const pos = stage.getPointerPosition()
-    const newPoints = lastLine.points().concat([pos.x, pos.y])
-    lastLine.points(newPoints)
-    circle.x(pos.x)
-    circle.y(pos.y)
-  })
-
-  stage.on("mouseup touchend", () => {
-    isPaint = false
-
-    startCountdown().then(() => {
-      const tween = new Konva.Tween({
-        node: layer,
+      const tweenOpacity = new Konva.Tween({
+        node: layerOpacity,
         duration: 0.2,
         opacity: 0,
         onFinish: () => {
-          layer.destroyChildren()
-          layer.opacity(1)
+          layerOpacity.destroyChildren()
+          layerOpacity.opacity(1)
         },
       })
-      tween.play()
+      tweenOpacity.play()
     })
+  }
 
-    const tweenOpacity = new Konva.Tween({
-      node: layerOpacity,
-      duration: 0.2,
-      opacity: 0,
-      onFinish: () => {
-        layerOpacity.destroyChildren()
-        layerOpacity.opacity(1)
-      },
-    })
-    tweenOpacity.play()
-  })
-})
+  private drawEnd() {
+    if (this.stage) {
+      this.stage.clear()
+      this.stage.destroy()
+      this.stage = null
+      this.countdownTimer = null
 
-function startCountdown(): Promise<boolean> {
-  return new Promise((resolve) => {
-    if (countdownTimer) {
-      window.clearTimeout(countdownTimer)
+      this.closeSettings()
     }
+  }
 
-    countdownTimer = window.setTimeout(() => {
-      if (countdownTimer) {
-        countdownTimer = null
-        resolve(true)
+  private startCountdown(): Promise<boolean> {
+    return new Promise((resolve) => {
+      if (this.countdownTimer) {
+        window.clearTimeout(this.countdownTimer)
       }
-    }, 2000)
-  })
+
+      this.countdownTimer = window.setTimeout(() => {
+        if (this.countdownTimer) {
+          this.countdownTimer = null
+          resolve(true)
+        }
+      }, COUNTDOWN_DELAY)
+    })
+  }
+
+  private closeSettings() {
+    this.panelDraw.classList.add("invisible")
+    this.panelDraw.classList.remove("visible")
+  }
+
+  private changeLaserColor(
+    currentBullet: HTMLButtonElement,
+    bullets: NodeListOf<HTMLButtonElement>
+  ) {
+    bullets.forEach((b: HTMLButtonElement) => {
+      b.classList.remove("scale-140")
+    })
+
+    currentBullet.classList.add("scale-140")
+    this.laserColor = getComputedStyle(
+      document.documentElement
+    ).getPropertyValue(`--${currentBullet.dataset.color}`)
+  }
 }
 
-;(function () {
-  document.addEventListener("DOMContentLoaded", () => {
-    const container = document.querySelector(".panel-wrapper")
-    const dragIcon = document.querySelector(".panel-drag-icon")
-    const moveable = new Moveable(document.body, {
-      target: container as MoveableRefTargetType,
-      container: document.body,
-      className: "moveable-invisible-container",
-      draggable: true,
-      dragTarget: dragIcon as MoveableRefType,
-    })
+const draw = new Draw()
+setPanelDraggable()
 
-    moveable
-      .on("dragStart", ({ target, clientX, clientY }) => {
-        target.classList.add("moveable-dragging")
-      })
-      .on(
-        "drag",
-        ({
-          target,
-          transform,
-          left,
-          top,
-          right,
-          bottom,
-          beforeDelta,
-          beforeDist,
-          delta,
-          dist,
-          clientX,
-          clientY,
-        }) => {
-          target!.style.left = `${left}px`
-          target!.style.top = `${top}px`
-        }
-      )
-      .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
-        target.classList.remove("moveable-dragging")
-      })
+function setPanelDraggable() {
+  const container = document.querySelector(".panel-wrapper")
+  const dragIcon = document.querySelector(".panel-drag-icon")
+  const moveable = new Moveable(document.body, {
+    target: container as MoveableRefTargetType,
+    container: document.body,
+    className: "moveable-invisible-container",
+    draggable: true,
+    dragTarget: dragIcon as MoveableRefType,
   })
-})()
+
+  moveable
+    .on("dragStart", ({ target, clientX, clientY }) => {
+      target.classList.add("moveable-dragging")
+    })
+    .on(
+      "drag",
+      ({
+        target,
+        transform,
+        left,
+        top,
+        right,
+        bottom,
+        beforeDelta,
+        beforeDist,
+        delta,
+        dist,
+        clientX,
+        clientY,
+      }) => {
+        target!.style.left = `${left}px`
+        target!.style.top = `${top}px`
+      }
+    )
+    .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
+      target.classList.remove("moveable-dragging")
+    })
+}

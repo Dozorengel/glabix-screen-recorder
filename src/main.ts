@@ -363,6 +363,7 @@ ipcMain.on("start-recording", (event, data) => {
   modalWindow.hide()
 })
 ipcMain.on("stop-recording", (event, data) => {
+  mainWindow.webContents.send("stop-recording")
   modalWindow.show()
 })
 

@@ -10,8 +10,7 @@
 .panel-drag-icon {
   position: absolute;
   bottom: 100%;
-  left: 0;
-  right: 0;
+  left: 9px;
   text-align: center;
   padding: 10px;
   color: var(--gray-600);
@@ -22,10 +21,6 @@
   border: 1px solid var(--gray-600);
   border-radius: 1rem;
   padding: 10px;
-
-  &.invisible {
-    position: absolute;
-  }
 }
 
 .panel-btn {
