@@ -31,6 +31,8 @@ import {
 import { AppState } from "./storages/app-state"
 import { SimpleStore } from "./storages/simple-store"
 import log from "electron-log/main"
+import { ChunkStorageService } from "./file-uploader/chunk-storage.service"
+import { Chunk } from "./file-uploader/chunk"
 
 // Optional, initialize the logger for any renderer process
 log.initialize()
@@ -46,10 +48,10 @@ let loginWindow: BrowserWindow
 let contextMenu: Menu
 let tray: Tray
 
-let chunksUploaders: ChunksUploader[] = []
 const tokenStorage = new TokenStorage()
 const appState = new AppState()
 const store = new SimpleStore()
+const chunkStorage = new ChunkStorageService()
 
 app.removeAsDefaultProtocolClient("glabix-video-recorder")
 app.disableHardwareAcceleration()
@@ -117,6 +119,9 @@ if (!gotTheLock) {
     // )
     tokenStorage.readAuthData()
     createWindow()
+    chunkStorage.initStorages()
+    checkUnprocessedFiles()
+
     session.defaultSession.setDisplayMediaRequestHandler(
       (request, callback) => {
         desktopCapturer.getSources({ types: ["screen"] }).then((sources) => {
@@ -136,6 +141,19 @@ if (process.defaultApp) {
   }
 } else {
   app.setAsDefaultProtocolClient("glabix-video-recorder")
+}
+
+function checkUnprocessedFiles() {
+  if (chunkStorage.hasUnloadedFiles) {
+    console.log(123123123123)
+    const nextChunk = chunkStorage.getNextChunk()
+    if (nextChunk) {
+      console.log(12312312)
+      ipcMain.emit(FileUploadEvents.LOAD_FILE_CHUNK, {
+        chunk: nextChunk,
+      })
+    }
+  }
 }
 
 function createWindow() {
@@ -421,36 +439,57 @@ ipcMain.on(FileUploadEvents.FILE_CREATED, (event, file) => {
 
 ipcMain.on(FileUploadEvents.FILE_CREATED_ON_SERVER, (event) => {
   const { uuid, chunks } = event
-  const chunksUploader = new ChunksUploader(chunks, uuid)
-  chunksUploaders.push(chunksUploader)
-  chunksUploader.processNextChunk()
+  chunkStorage.addStorage(chunks, uuid).then(() => {
+    console.log(123 + "После resolve")
+    checkUnprocessedFiles()
+  })
 })
 
 ipcMain.on(FileUploadEvents.LOAD_FILE_CHUNK, (event) => {
-  const { chunk, chunkNumber, uuid } = event
-  uploadFileChunkCommand(
-    tokenStorage.token.access_token,
-    tokenStorage.organizationId,
-    uuid,
-    chunk,
-    chunkNumber
-  )
+  console.log("FileUploadEvents.LOAD_FILE_CHUNK")
+  const { chunk } = event
+  const typedChunk = chunk as Chunk
+  const uuid = typedChunk.fileUuid
+  const chunkNumber = typedChunk.index + 1
+  const callback = (err, data) => {
+    console.log("ура")
+    typedChunk.cancelProcess()
+    console.log("err", err)
+    if (!err) {
+      chunkStorage
+        .removeChunk(typedChunk)
+        .then(() => {
+          console.log("send event", "FileUploadEvents.FILE_CHUNK_UPLOADED")
+          ipcMain.emit(FileUploadEvents.FILE_CHUNK_UPLOADED, {
+            uuid,
+            chunkNumber,
+          })
+        })
+        .catch((e) => {
+          console.log("вонючее место")
+          console.log(e)
+        })
+    } else {
+      console.log(err)
+    }
+  }
+  typedChunk.getData().then((data) => {
+    typedChunk.startProcess()
+    uploadFileChunkCommand(
+      tokenStorage.token.access_token,
+      tokenStorage.organizationId,
+      uuid,
+      data,
+      chunkNumber,
+      callback
+    )
+  })
 })
 
 ipcMain.on(FileUploadEvents.FILE_CHUNK_UPLOADED, (event) => {
+  console.log("FileUploadEvents.FILE_CHUNK_UPLOADED")
   const { uuid, chunks } = event
-  const uploader = chunksUploaders.find((c) => c.uuid === uuid)
-  if (uploader) {
-    const isNext = uploader.processNextChunk()
-    if (!isNext) {
-      console.log(
-        "file ",
-        uploader.uuid,
-        "was successfully loaded on the server!"
-      )
-      chunksUploaders = chunksUploaders.filter((u) => u !== uploader)
-    }
-  }
+  checkUnprocessedFiles()
 })
 
 ipcMain.on(LoginEvents.LOGOUT, (event) => {

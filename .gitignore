@@ -100,3 +100,9 @@ dist/
 
 # Encrypted files
 *.enc
+
+# Chunks storage
+chunks_storage/
+
+# WebStorm
+*.idea
