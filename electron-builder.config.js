@@ -7,6 +7,7 @@
  */
 const options = {
   appId: "com.glabix-screen.app",
+  productName: "Глабикс Экран",
   protocols: {
     name: "Glabix Screen",
     schemes: ["glabix-screen"],
@@ -15,9 +16,12 @@ const options = {
   compression: "store",
   files: ["!out/"],
   icon: "public/logo-square.png",
-  win: { target: [{ target: "nsis-web", arch: ["x64"] }] },
+  win: {
+    target: [{ target: "nsis-web", arch: ["x64"] }],
+  },
   mac: {
     target: [{ target: "dmg", arch: ["arm64", "x64"] }],
+    category: "public.app-category.productivity",
     hardenedRuntime: true,
     gatekeeperAssess: true,
     extendInfo: {
