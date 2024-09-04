@@ -31,6 +31,7 @@ import {
 import { AppState } from "./storages/app-state"
 import { SimpleStore } from "./storages/simple-store"
 import log from "electron-log/main"
+import { autoUpdater } from "electron-updater"
 
 // Optional, initialize the logger for any renderer process
 log.initialize()
@@ -112,6 +113,8 @@ if (!gotTheLock) {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(() => {
+    autoUpdater.checkForUpdatesAndNotify()
+
     // ipcMain.handle(
     //   "get-screen-resolution",
     //   () => screen.getPrimaryDisplay().workAreaSize
