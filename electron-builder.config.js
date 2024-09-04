@@ -22,6 +22,7 @@ const options = {
   mac: {
     target: [{ target: "dmg", arch: ["arm64", "x64"] }],
     category: "public.app-category.productivity",
+    executableName: "Глабикс Экран",
     hardenedRuntime: true,
     gatekeeperAssess: true,
     extendInfo: {
@@ -30,6 +31,9 @@ const options = {
       NSCameraUsageDescription: "Предоставьте доступ к камере",
     },
     notarize: true,
+  },
+  nsisWeb: {
+    shortcutName: "Глабикс Экран",
   },
 }
 
