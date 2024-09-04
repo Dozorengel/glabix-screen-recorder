@@ -11,6 +11,7 @@ import {
   nativeImage,
   protocol,
   dialog,
+  nativeTheme,
 } from "electron"
 import path from "path"
 import os from "os"
@@ -255,12 +256,22 @@ function createLoginWindow() {
   }
 }
 
-function createMenu() {
-  const image = nativeImage
-    .createFromPath(path.join(__dirname, "favicon-24.png"))
-    .resize({ height: 16, width: 16 })
-  tray = new Tray(image)
+function createTrayIcon(): Electron.NativeImage {
+  let imagePath = "tray-win.png"
 
+  if (os.platform() == "darwin") {
+    imagePath = nativeTheme.shouldUseDarkColors
+      ? "tray-macos-light.png"
+      : "tray-macos-dark.png"
+  }
+
+  return nativeImage
+    .createFromPath(path.join(__dirname, imagePath))
+    .resize({ width: 20, height: 20 })
+}
+
+function createMenu() {
+  tray = new Tray(createTrayIcon())
   buildTrayMenu()
 }
 
