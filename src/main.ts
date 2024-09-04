@@ -122,7 +122,9 @@ if (!gotTheLock) {
     //   "get-screen-resolution",
     //   () => screen.getPrimaryDisplay().workAreaSize
     // )
-    tokenStorage.readAuthData()
+    setTimeout(() => {
+      tokenStorage.readAuthData()
+    })
     createWindow()
     session.defaultSession.setDisplayMediaRequestHandler(
       (request, callback) => {
