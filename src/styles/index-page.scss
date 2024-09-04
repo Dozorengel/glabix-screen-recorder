@@ -21,22 +21,6 @@ body {
   z-index: 0;
 }
 
-// .controls {
-//   position: fixed;
-//   top: 20px;
-//   left: 20px;
-//   width: 100px;
-//   height: 100px;
-//   background: rgb(128, 191, 255);
-// }
-
-// .webcamera-frame {
-//   width: 200px;
-//   height: 200px;
-//   border-radius: 50%;
-//   object-fit: cover;
-// }
-
 /* change width height movable styles */
 .webcamera-view-container {
   position: fixed;
@@ -48,6 +32,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 10;
 
   &.sm {
     width: 200px;
@@ -120,25 +105,6 @@ body {
 .webcamera-view-menu-container:hover .webcamera-view-menu-actions {
   opacity: 1;
   pointer-events: all;
-}
-
-.webcamera-small {
-  width: 200px;
-  height: 200px;
-}
-
-/* .moveable-control {
-  display: none;
-
-} */
-
-/* .moveable-line {
-  display: none;
-} */
-
-.webcamera-big {
-  width: 400px;
-  height: 400px;
 }
 
 .draw-container {
@@ -261,7 +227,7 @@ body {
   width: 640px;
   height: 480px;
   box-shadow: rgba(0, 0, 0, 0.6) 0px 0px 0px 9999px;
-  z-index: 9;
+  z-index: 1;
 
   &.is-recording {
     pointer-events: none;
