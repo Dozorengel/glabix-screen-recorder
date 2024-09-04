@@ -386,6 +386,13 @@ ipcMain.on("stop-recording", (event, data) => {
   mainWindow.webContents.send("stop-recording")
   modalWindow.show()
 })
+ipcMain.on("windows:minimize", (event, data) => {
+  mainWindow.minimize()
+  modalWindow.minimize()
+})
+ipcMain.on("windows:close", (event, data) => {
+  modalWindow.close()
+})
 
 ipcMain.on(SimpleStoreEvents.UPDATE, (event, data: ISimpleStoreData) => {
   const { key, value } = data

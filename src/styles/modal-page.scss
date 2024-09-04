@@ -16,6 +16,30 @@ body {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+.windows-toolbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+}
+.windows-toolbar-btn {
+  width: 33px;
+  height: 28px;
+  line-height: 30px;
+  overflow: hidden;
+  color: var(--gray-600);
+}
+.windows-toolbar-btn.minimize {
+  line-height: 31px;
+}
+.windows-toolbar-btn.minimize:hover {
+  background-color: var(--gray-200);
+}
+.windows-toolbar-btn.close:hover {
+  background-color: #d5322f;
+  color: var(--light);
+}
+
 .text-overflow {
   max-width: 100%;
   overflow: hidden;

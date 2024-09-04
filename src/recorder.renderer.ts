@@ -402,7 +402,7 @@ import { FileUploadEvents } from "./events/file-upload.events"
           const canvasPosition = canvas.getBoundingClientRect()
           const ctx = canvas.getContext("2d")
           const deviceRation =
-            navigator.platform.indexOf("Mac") != -1
+            navigator.userAgent.indexOf("Mac") != -1
               ? 1
               : window.devicePixelRatio
           const captureX = deviceRation * canvasPosition.left
