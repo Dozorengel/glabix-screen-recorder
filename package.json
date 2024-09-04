@@ -21,7 +21,7 @@
     "dist:win": "npm run package && npm run build -- --windows",
     "dist:mac-intel": "npm run package && npm run build -- --mac dmg:x64",
     "dist:mac-m1": "npm run package && npm run build -- --mac dmg:arm64",
-    "release": "npm run package && npm run build -- --mac --windows -c.compression=maximum"
+    "release": "npm run package && npm run build -- --mac --windows -c.compression=maximum -p always"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.8.0",
