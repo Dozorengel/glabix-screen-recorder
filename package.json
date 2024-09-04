@@ -16,11 +16,12 @@
     "make:mac-intel": "electron-forge make --platform darwin --arch x64",
     "make:mac-m1": "electron-forge make --platform darwin --arch arm64",
     "make:mac-universal": "electron-forge make --platform darwin --arch universal",
-    "dist": "npm run package && electron-builder --config electron-builder.config.js --mac --windows",
-    "dist:win": "npm run package && electron-builder --config electron-builder.config.js --windows",
-    "dist:mac-intel": "npm run package && electron-builder --config electron-builder.config.js --mac dmg:x64",
-    "dist:mac-m1": "npm run package && electron-builder --config electron-builder.config.js --mac dmg:arm64",
-    "release": "npm run package && electron-builder --config electron-builder.config.js --mac --windows -c.compression=maximum"
+    "build": "electron-builder --config electron-builder.config.js",
+    "dist": "npm run package && npm run build -- --mac --windows",
+    "dist:win": "npm run package && npm run build -- --windows",
+    "dist:mac-intel": "npm run package && npm run build -- --mac dmg:x64",
+    "dist:mac-m1": "npm run package && npm run build -- --mac dmg:arm64",
+    "release": "npm run package && npm run build -- --mac --windows -c.compression=maximum"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.8.0",

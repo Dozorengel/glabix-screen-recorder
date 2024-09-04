@@ -12,7 +12,7 @@ const options = {
     name: "Glabix Screen",
     schemes: ["glabix-screen"],
   },
-  // "store" | “normal" | "maximum". - For testing builds, use 'store' to reduce build time significantly.
+  // "store" | “normal" | "maximum" - For testing builds, use 'store' to reduce build time significantly.
   compression: "store",
   files: ["!out/"],
   icon: "public/logo-square.png",
