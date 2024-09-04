@@ -7,7 +7,7 @@
  */
 const options = {
   appId: "com.glabix-screen.app",
-  productName: "Глабикс Экран",
+  productName: "Glabix Screen",
   protocols: {
     name: "Glabix Screen",
     schemes: ["glabix-screen"],
