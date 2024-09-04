@@ -71,10 +71,12 @@
 .visible {
   opacity: 1 !important;
   visibility: visible !important;
+  pointer-events: auto;
 }
 .invisible {
   opacity: 0 !important;
   visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 [hidden] {

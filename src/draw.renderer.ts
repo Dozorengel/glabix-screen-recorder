@@ -13,6 +13,7 @@ class Draw {
   )
   laserStrokeWidth = 5
   panelDraw = document.querySelector("#panel-draw")
+  drawToggle = document.querySelector("#draw-btn")
 
   constructor() {
     this.setListeners()
@@ -31,14 +32,12 @@ class Draw {
   }
 
   handleDrawToggle() {
-    const drawToggle = document.querySelector("#draw-btn")
-    drawToggle.addEventListener("click", () => {
+    this.drawToggle.addEventListener("click", () => {
       if (this.stage) {
         this.drawEnd()
       } else {
         this.drawStart()
       }
-      drawToggle.classList.toggle("bg-gray-300")
     })
   }
 
@@ -82,6 +81,8 @@ class Draw {
 
   private drawStart() {
     if (this.stage) return
+
+    this.drawToggle.classList.add("active")
 
     this.stage = new Konva.Stage({
       container: "draw-container",
@@ -175,6 +176,7 @@ class Draw {
   }
 
   private drawEnd() {
+    this.drawToggle.classList.remove("active")
     if (this.stage) {
       this.stage.clear()
       this.stage.destroy()
@@ -225,13 +227,13 @@ setPanelDraggable()
 
 function setPanelDraggable() {
   const container = document.querySelector(".panel-wrapper")
-  const dragIcon = document.querySelector(".panel-drag-icon")
+  const dragHandler = document.querySelector(".panel-drag-handler")
   const moveable = new Moveable(document.body, {
     target: container as MoveableRefTargetType,
     container: document.body,
     className: "moveable-invisible-container",
     draggable: true,
-    dragTarget: dragIcon as MoveableRefType,
+    dragTarget: dragHandler as MoveableRefType,
   })
 
   moveable
