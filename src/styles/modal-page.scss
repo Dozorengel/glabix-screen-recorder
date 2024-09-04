@@ -21,6 +21,7 @@ body {
   top: 0;
   right: 0;
   display: flex;
+  -webkit-app-region: no-drag;
 }
 .windows-toolbar-btn {
   width: 33px;
