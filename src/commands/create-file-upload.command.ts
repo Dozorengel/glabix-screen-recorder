@@ -5,10 +5,15 @@ export function createFileUploadCommand(
   token: string,
   orgId: number,
   filename: string,
-  chunks: Blob[]
+  chunks: Blob[],
+  title: string
 ) {
   const url = `${import.meta.env.VITE_API_PATH}screen_recorder/organizations/${orgId}/uploads`
-  const params = { chunks_count: chunks.length, filename }
+  const params = {
+    chunks_count: chunks.length,
+    filename,
+    title,
+  }
   axios
     .post<{ uuid: string }>(
       url,

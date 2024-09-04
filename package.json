@@ -1,9 +1,9 @@
 {
-  "name": "glabix-video-recorder",
-  "productName": "glabix-video-recorder",
-  "version": "0.0.1",
-  "author": "Glabix co",
-  "description": "Glabix video recorder",
+  "name": "glabix-screen",
+  "productName": "Glabix Screen",
+  "version": "0.0.2",
+  "author": "Glabix",
+  "description": "A tool to record your screen",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "dotenvx run --env-file=.env -- electron-forge start",
@@ -15,13 +15,19 @@
     "make:win": "electron-forge make --platform win32 --arch x64",
     "make:mac-intel": "electron-forge make --platform darwin --arch x64",
     "make:mac-m1": "electron-forge make --platform darwin --arch arm64",
-    "make:mac-universal": "electron-forge make --platform darwin --arch universal"
+    "make:mac-universal": "electron-forge make --platform darwin --arch universal",
+    "dist": "npm run package && electron-builder --config electron-builder.config.js --mac --windows",
+    "dist:win": "npm run package && electron-builder --config electron-builder.config.js --windows",
+    "dist:mac-intel": "npm run package && electron-builder --config electron-builder.config.js --mac dmg:x64",
+    "dist:mac-m1": "npm run package && electron-builder --config electron-builder.config.js --mac dmg:arm64",
+    "release": "npm run package && electron-builder --config electron-builder.config.js --mac --windows -c.compression=maximum"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.8.0",
     "axios": "^1.7.4",
     "electron-log": "^5.1.7",
     "electron-squirrel-startup": "^1.0.1",
+    "electron-updater": "^6.2.1",
     "konva": "^9.3.14",
     "modern-normalize": "^3.0.0",
     "moveable": "^0.53.0"
@@ -36,9 +42,11 @@
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron-forge/plugin-vite": "^7.4.0",
     "@electron/fuses": "^1.8.0",
+    "@electron/notarize": "^2.4.0",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
     "@typescript-eslint/parser": "^8.1.0",
     "electron": "31.4.0",
+    "electron-builder": "^24.13.3",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.25.0",
