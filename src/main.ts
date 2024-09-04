@@ -48,6 +48,7 @@ let modalWindow: BrowserWindow
 let loginWindow: BrowserWindow
 let contextMenu: Menu
 let tray: Tray
+let isAppQuitting = false
 
 let chunksUploaders: ChunksUploader[] = []
 const tokenStorage = new TokenStorage()
@@ -216,8 +217,16 @@ function createModal(parentWindow) {
     mainWindow.focus()
   })
 
-  modalWindow.on("close", () => {
-    app.quit()
+  modalWindow.on("close", (event) => {
+    if (!isAppQuitting) {
+      event.preventDefault()
+      hideWindows()
+    }
+  })
+
+  modalWindow.on("minimize", (event) => {
+    event.preventDefault()
+    hideWindows()
   })
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -244,15 +253,46 @@ function createLoginWindow() {
       // contextIsolation: true,  // повышаем безопасность
     },
   })
-  loginWindow.on("close", () => {
-    app.quit()
-  })
+
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     loginWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/login.html`)
   } else {
     loginWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/login.html`)
     )
+  }
+}
+
+function showWindows() {
+  if (tokenStorage.dataIsActual()) {
+    if (mainWindow) mainWindow.show()
+    if (modalWindow) modalWindow.show()
+  } else {
+    if (loginWindow) loginWindow.show()
+  }
+}
+function hideWindows() {
+  if (tokenStorage.dataIsActual()) {
+    if (mainWindow) mainWindow.hide()
+    if (modalWindow) modalWindow.hide()
+  } else {
+    if (loginWindow) loginWindow.hide()
+  }
+}
+
+function toggleWindows() {
+  if (tokenStorage.dataIsActual()) {
+    if (modalWindow.isVisible() && mainWindow.isVisible()) {
+      hideWindows()
+    } else {
+      showWindows()
+    }
+  } else {
+    if (loginWindow.isVisible()) {
+      hideWindows()
+    } else {
+      showWindows()
+    }
   }
 }
 
@@ -272,77 +312,35 @@ function createTrayIcon(): Electron.NativeImage {
 
 function createMenu() {
   tray = new Tray(createTrayIcon())
-  buildTrayMenu()
-}
+  tray.setToolTip("Glabix Экран")
 
-function buildTrayMenu() {
-  const auth = tokenStorage.token
-  if (auth) {
-    contextMenu = Menu.buildFromTemplate([
-      {
-        label: "Начать",
-        click: () => {
-          if (tokenStorage.dataIsActual()) {
-            mainWindow.show()
-            modalWindow.show()
-          } else {
-            loginWindow.show()
-          }
-        },
+  tray.on("click", (e) => {
+    toggleWindows()
+  })
+
+  tray.on("right-click", (e) => {
+    tray.popUpContextMenu(contextMenu)
+  })
+
+  contextMenu = Menu.buildFromTemplate([
+    {
+      id: "menuLogOutItem",
+      label: "Разлогиниться",
+      visible: tokenStorage.dataIsActual(),
+      click: () => {
+        tokenStorage.reset()
+        mainWindow.hide()
+        modalWindow.hide()
+        loginWindow.show()
       },
-      {
-        label: "Скрыть",
-        click: () => {
-          mainWindow.hide()
-          modalWindow.hide()
-        },
+    },
+    {
+      label: "Выйти",
+      click: () => {
+        app.quit()
       },
-      {
-        label: "Разлогиниться",
-        click: () => {
-          tokenStorage.reset()
-          mainWindow.hide()
-          modalWindow.hide()
-          loginWindow.show()
-        },
-      },
-      {
-        label: "Выйти",
-        click: () => {
-          app.quit()
-        },
-      },
-    ])
-  } else {
-    contextMenu = Menu.buildFromTemplate([
-      {
-        label: "Начать",
-        click: () => {
-          if (tokenStorage.dataIsActual()) {
-            mainWindow.show()
-            modalWindow.show()
-          } else {
-            loginWindow.show()
-          }
-        },
-      },
-      {
-        label: "Скрыть",
-        click: () => {
-          mainWindow.hide()
-          modalWindow.hide()
-        },
-      },
-      {
-        label: "Выйти",
-        click: () => {
-          app.quit()
-        },
-      },
-    ])
-  }
-  tray.setToolTip("Glabix video app")
-  tray.setContextMenu(contextMenu)
+    },
+  ])
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -360,6 +358,10 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
+})
+
+app.on("before-quit", () => {
+  isAppQuitting = true
 })
 
 // In this file you can include the rest of your app's specific main process
@@ -404,7 +406,7 @@ ipcMain.on(LoginEvents.LOGIN_ATTEMPT, (event, credentials) => {
 })
 
 ipcMain.on(LoginEvents.LOGIN_SUCCESS, (event) => {
-  buildTrayMenu()
+  contextMenu.getMenuItemById("menuLogOutItem").visible = true
   loginWindow.hide()
   mainWindow.show()
   modalWindow.show()
@@ -473,7 +475,7 @@ ipcMain.on(FileUploadEvents.FILE_CHUNK_UPLOADED, (event) => {
 })
 
 ipcMain.on(LoginEvents.LOGOUT, (event) => {
-  buildTrayMenu()
+  contextMenu.getMenuItemById("menuLogOutItem").visible = false
 })
 
 ipcMain.on("log", (evt, data) => {
