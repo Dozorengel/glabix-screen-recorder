@@ -52,7 +52,8 @@ const appState = new AppState()
 const store = new SimpleStore()
 
 app.removeAsDefaultProtocolClient("glabix-video-recorder")
-app.disableHardwareAcceleration()
+app.commandLine.appendSwitch("force-compositing-mode")
+app.commandLine.appendSwitch("enable-transparent-visuals")
 
 const gotTheLock = app.requestSingleInstanceLock()
 
@@ -160,13 +161,13 @@ function createWindow() {
     },
   })
 
-  // and load the index.html of the app.
-  // mainWindow.setSimpleFullScreen(false)
   if (os.platform() == "darwin") {
     mainWindow.setWindowButtonVisibility(false)
   }
-  // mainWindow.loadFile("index.html")
+
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   mainWindow.setAlwaysOnTop(true, "normal", 999999)
+  mainWindow.setFullScreenable(false)
 
   // mainWindow.setIgnoreMouseEvents(true, { forward: true })
 

@@ -401,10 +401,14 @@ import { FileUploadEvents } from "./events/file-upload.events"
           ) as HTMLCanvasElement
           const canvasPosition = canvas.getBoundingClientRect()
           const ctx = canvas.getContext("2d")
-          const captureX = canvasPosition.left
-          const captureY = canvasPosition.top
-          const captureWidth = canvasPosition.width
-          const captureHeight = canvasPosition.height
+          const deviceRation =
+            navigator.platform.indexOf("Mac") != -1
+              ? 1
+              : window.devicePixelRatio
+          const captureX = deviceRation * canvasPosition.left
+          const captureY = deviceRation * canvasPosition.top
+          const captureWidth = deviceRation * canvasPosition.width
+          const captureHeight = deviceRation * canvasPosition.height
 
           // Обновление canvas с захваченной областью экрана
           function updateCanvas() {
