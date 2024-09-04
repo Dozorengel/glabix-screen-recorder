@@ -184,9 +184,11 @@ import { FileUploadEvents } from "./events/file-upload.events"
         _stream.getTracks().forEach((track) => track.stop())
       }
 
-      const screenOverlay = document.getElementById("__screen__")
-      if (screenOverlay) {
-        screenOverlay.remove()
+      const cropScreen = document.querySelector(
+        "#crop_video_screen"
+      ) as HTMLElement
+      if (cropScreen) {
+        cropScreen.classList.remove("is-recording")
       }
 
       const canvasVideo = document.getElementById("__canvas_video_stream__")
@@ -437,7 +439,6 @@ import { FileUploadEvents } from "./events/file-upload.events"
   window.electronAPI.ipcRenderer.on(
     SimpleStoreEvents.CHANGED,
     (event, state) => {
-      console.log("state", state["recordingState"])
       if (["recording", "paused"].includes(state["recordingState"])) {
         stopBtn.classList.add("panel-btn--stop")
       } else {
