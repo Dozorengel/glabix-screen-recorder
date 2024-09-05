@@ -99,7 +99,7 @@ function startStream(deviseId) {
         showVideo()
       })
       .catch((e) => {
-        showVideo()
+        showVideo(true)
       })
   } else {
     showVideo()
