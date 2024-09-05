@@ -142,11 +142,17 @@ if (!gotTheLock) {
         })
       }
     )
-
-    globalShortcut.register("Command+H", () => {
-      hideWindows()
-    })
   })
+}
+
+function registerShortCuts() {
+  globalShortcut.register("Command+H", () => {
+    hideWindows()
+  })
+}
+
+function unregisterShortCuts() {
+  globalShortcut.unregisterAll()
 }
 
 if (process.defaultApp) {
@@ -213,12 +219,13 @@ function createWindow() {
   mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   mainWindow.setAlwaysOnTop(true, "screen-saver")
 
-  mainWindow.on("restore", () => {
-    console.log("mainWindow.restore")
-    mainWindow.setAlwaysOnTop(true, "screen-saver")
-    modalWindow.setAlwaysOnTop(true, "screen-saver")
-    mainWindow.setBounds(screen.getPrimaryDisplay().bounds)
-  })
+  // mainWindow.on("restore", () => {
+  //   if (os.platform() == 'win32') {
+  //     mainWindow.setAlwaysOnTop(true, "screen-saver")
+  //     modalWindow.setAlwaysOnTop(true, "screen-saver")
+  //     mainWindow.setBounds(screen.getPrimaryDisplay().bounds)
+  //   }
+  // })
 
   // mainWindow.setFullScreenable(false)
   // mainWindow.setIgnoreMouseEvents(true, { forward: true })
@@ -267,6 +274,10 @@ function createModal(parentWindow) {
 
   modalWindow.on("restore", (event) => {
     mainWindow.show()
+    modalWindow.show()
+    mainWindow.setAlwaysOnTop(true, "screen-saver")
+    mainWindow.setBounds(screen.getPrimaryDisplay().bounds)
+    modalWindow.setAlwaysOnTop(true, "screen-saver")
   })
 
   modalWindow.on("close", (event) => {
@@ -316,6 +327,7 @@ function createLoginWindow() {
 }
 
 function showWindows() {
+  registerShortCuts()
   if (tokenStorage.dataIsActual()) {
     if (mainWindow) {
       mainWindow.show()
@@ -329,6 +341,7 @@ function showWindows() {
 }
 
 function hideWindows() {
+  unregisterShortCuts()
   if (tokenStorage.dataIsActual()) {
     if (mainWindow) mainWindow.hide()
     if (modalWindow) modalWindow.hide()
@@ -418,7 +431,7 @@ app.on("activate", () => {
 })
 
 app.on("before-quit", () => {
-  globalShortcut.unregisterAll()
+  unregisterShortCuts()
   isAppQuitting = true
 })
 
