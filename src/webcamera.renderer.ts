@@ -4,6 +4,9 @@ import Moveable, { MoveableRefTargetType } from "moveable"
 const videoContainer = document.getElementById(
   "webcamera-view"
 ) as HTMLDivElement
+const videoContainerError = videoContainer.querySelector(
+  ".webcamera-view-no-device"
+) as HTMLDivElement
 const video = document.getElementById("video") as HTMLVideoElement
 const changeCameraViewSizeBtn = document.querySelectorAll(
   ".js-camera-view-size"
@@ -58,29 +61,10 @@ function initMovable() {
       target.classList.add("moveable-dragging")
       // console.log("onDragStart", target)
     })
-    .on(
-      "drag",
-      ({
-        target,
-        transform,
-        left,
-        top,
-        right,
-        bottom,
-        beforeDelta,
-        beforeDist,
-        delta,
-        dist,
-        clientX,
-        clientY,
-      }) => {
-        console.log("onDrag left, top", left, top)
-        target!.style.left = `${left}px`
-        target!.style.top = `${top}px`
-        // console.log("onDrag translate", dist);
-        // target!.style.transform = transform;
-      }
-    )
+    .on("drag", ({ target, left, top }) => {
+      target!.style.left = `${left}px`
+      target!.style.top = `${top}px`
+    })
     .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
       target.classList.remove("moveable-dragging")
       console.log("onDragEnd", target, isDrag)
@@ -88,9 +72,13 @@ function initMovable() {
 }
 initMovable()
 
-function showVideo() {
+function showVideo(hasError?: boolean) {
   video.srcObject = currentStream
   videoContainer.removeAttribute("hidden")
+
+  if (hasError) {
+    videoContainerError.removeAttribute("hidden")
+  }
 }
 
 function startStream(deviseId) {
@@ -110,7 +98,9 @@ function startStream(deviseId) {
         currentStream = stream
         showVideo()
       })
-      .catch((e) => console.log(e))
+      .catch((e) => {
+        showVideo()
+      })
   } else {
     showVideo()
   }
@@ -122,6 +112,7 @@ function stopStream() {
     tracks.forEach((track) => track.stop())
     video.srcObject = null
     videoContainer.setAttribute("hidden", "")
+    videoContainerError.setAttribute("hidden", "")
     currentStream = null
   }
 
