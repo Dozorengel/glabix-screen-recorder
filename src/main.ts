@@ -187,6 +187,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     transparent: true,
     frame: false,
+    resizable: false,
+    minimizable: false,
     roundedCorners: false, // macOS, not working on Windows
     thickFrame: false,
     show: false,
@@ -202,15 +204,23 @@ function createWindow() {
       // contextIsolation: false, // Disable context isolation (not recommended for production)
     },
   })
+  mainWindow.setBounds(screen.getPrimaryDisplay().bounds)
 
   if (os.platform() == "darwin") {
     mainWindow.setWindowButtonVisibility(false)
   }
 
   mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-  mainWindow.setAlwaysOnTop(true, "normal", 999999)
-  mainWindow.setFullScreenable(false)
+  mainWindow.setAlwaysOnTop(true, "screen-saver")
 
+  mainWindow.on("restore", () => {
+    console.log("mainWindow.restore")
+    mainWindow.setAlwaysOnTop(true, "screen-saver")
+    modalWindow.setAlwaysOnTop(true, "screen-saver")
+    mainWindow.setBounds(screen.getPrimaryDisplay().bounds)
+  })
+
+  // mainWindow.setFullScreenable(false)
   // mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   // Open the DevTools.
@@ -230,10 +240,8 @@ function createWindow() {
 
 function createModal(parentWindow) {
   modalWindow = new BrowserWindow({
-    // frame: false,
-    // thickFrame: false,
     titleBarStyle: "hidden",
-    // fullscreenable: false,
+    fullscreenable: false,
     maximizable: false,
     resizable: false,
     width: 300,
@@ -248,9 +256,17 @@ function createModal(parentWindow) {
     },
   })
   // modalWindow.webContents.openDevTools()
-
+  modalWindow.setAlwaysOnTop(true, "screen-saver")
   modalWindow.on("blur", () => {
     mainWindow.focus()
+  })
+
+  modalWindow.on("minimize", (event) => {
+    mainWindow.hide()
+  })
+
+  modalWindow.on("restore", (event) => {
+    mainWindow.show()
   })
 
   modalWindow.on("close", (event) => {
@@ -258,11 +274,6 @@ function createModal(parentWindow) {
       event.preventDefault()
       hideWindows()
     }
-  })
-
-  modalWindow.on("minimize", (event) => {
-    event.preventDefault()
-    hideWindows()
   })
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -306,8 +317,12 @@ function createLoginWindow() {
 
 function showWindows() {
   if (tokenStorage.dataIsActual()) {
-    if (mainWindow) mainWindow.show()
-    if (modalWindow) modalWindow.show()
+    if (mainWindow) {
+      mainWindow.show()
+    }
+    if (modalWindow) {
+      modalWindow.show()
+    }
   } else {
     if (loginWindow) loginWindow.show()
   }
@@ -403,6 +418,7 @@ app.on("activate", () => {
 })
 
 app.on("before-quit", () => {
+  globalShortcut.unregisterAll()
   isAppQuitting = true
 })
 
