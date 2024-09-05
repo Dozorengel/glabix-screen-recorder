@@ -78,6 +78,8 @@ function showVideo(hasError?: boolean) {
 
   if (hasError) {
     videoContainerError.removeAttribute("hidden")
+  } else {
+    videoContainerError.setAttribute("hidden", "")
   }
 }
 
