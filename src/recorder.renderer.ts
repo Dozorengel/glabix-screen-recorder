@@ -13,6 +13,7 @@ import { FileUploadEvents } from "./events/file-upload.events"
   const timerDisplay = document.getElementById(
     "timerDisplay"
   ) as HTMLButtonElement
+  const controlPanel = document.querySelector(".panel-wrapper")
   const timer = new Timer(timerDisplay)
   const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement
   const pauseBtn = document.getElementById("pauseBtn") as HTMLButtonElement
@@ -219,6 +220,12 @@ import { FileUploadEvents } from "./events/file-upload.events"
     const data: ISimpleStoreData = {
       key: "recordingState",
       value: state,
+    }
+
+    if (state == "recording") {
+      controlPanel.classList.add("is-recording")
+    } else {
+      controlPanel.classList.remove("is-recording")
     }
 
     window.electronAPI.ipcRenderer.send(SimpleStoreEvents.UPDATE, data)
