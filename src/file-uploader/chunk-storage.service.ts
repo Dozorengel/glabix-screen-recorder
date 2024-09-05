@@ -2,10 +2,27 @@ import fs from "fs"
 import path from "path"
 import { ChunksStorage } from "./chunk-storage"
 import { Chunk } from "./chunk"
+import os from "os"
+import { app } from "electron"
 
 export class ChunkStorageService {
   private _storages: ChunksStorage[] = []
-  readonly mainPath = "chunks_storage"
+  readonly mainPath =
+    os.platform() == "darwin"
+      ? path.join(
+          os.homedir(),
+          "Library",
+          "Application Support",
+          app.getName(),
+          "chunks_storage"
+        )
+      : path.join(
+          os.homedir(),
+          "AppData",
+          "Roaming",
+          app.getName(),
+          "chunks_storage"
+        )
   currentProcessedStorage: ChunksStorage
   IsLoadedNow = false
 
@@ -17,10 +34,6 @@ export class ChunkStorageService {
   }
 
   hasUnloadedFiles(): boolean {
-    console.log(
-      19,
-      !!this._storages.flatMap((s) => s.chunks).find((c) => !c.processed)
-    )
     return !!this._storages.flatMap((s) => s.chunks).find((c) => !c.processed)
   }
 
@@ -72,6 +85,7 @@ export class ChunkStorageService {
     this._storages = []
     try {
       const dirs = this.getDirectoriesSync(this.mainPath)
+      console.log(dirs)
       // readChunks
       for (let i = 0; i < dirs.length; i++) {
         const dirPath = dirs[i]
@@ -84,6 +98,7 @@ export class ChunkStorageService {
   }
 
   private readChunksFromDirectorySync(dirName: string) {
+    console.log("readChunksFromDirectorySync")
     const chunks: Chunk[] = []
     try {
       const dirPath = path.join(this.mainPath, dirName)
@@ -134,7 +149,6 @@ export class ChunkStorageService {
     const directories = entries
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
-
     return directories
   }
 

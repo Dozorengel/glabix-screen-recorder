@@ -124,9 +124,7 @@ if (!gotTheLock) {
     //   "get-screen-resolution",
     //   () => screen.getPrimaryDisplay().workAreaSize
     // )
-    setTimeout(() => {
-      tokenStorage.readAuthData()
-    })
+    tokenStorage.readAuthData()
     createWindow()
     chunkStorage.initStorages()
     checkUnprocessedFiles()
