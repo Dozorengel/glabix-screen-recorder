@@ -23,6 +23,7 @@ import { FileUploadEvents } from "./events/file-upload.events"
   )
   let lastScreenAction: ScreenAction = "fullScreenVideo"
   let videoRecorder: MediaRecorder
+  let stream: MediaStream
   let cropMoveable: Moveable
   let cameraMoveable: Moveable
 
@@ -110,7 +111,7 @@ import { FileUploadEvents } from "./events/file-upload.events"
   }
 
   const createVideo = (_stream, _canvas, _video) => {
-    const stream = _canvas
+    stream = _canvas
       ? new MediaStream([
           ..._canvas.captureStream(30).getVideoTracks(),
           ..._stream.getAudioTracks(),
@@ -268,10 +269,23 @@ import { FileUploadEvents } from "./events/file-upload.events"
       cameraMoveable = undefined
     }
 
-    hideOnlyCameraError()
+    clearCameraOnlyVideoStream()
+  }
+
+  const clearCameraOnlyVideoStream = () => {
+    const video = document.querySelector(
+      "#webcam_only_video"
+    ) as HTMLVideoElement
+    video.srcObject = null
+
+    if (stream && stream.getTracks()) {
+      stream.getTracks().forEach((track) => track.stop())
+    }
   }
 
   const initView = (settings: StreamSettings) => {
+    clearCameraOnlyVideoStream()
+
     if (lastScreenAction == settings.action) {
       return
     }
