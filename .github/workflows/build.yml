@@ -1,10 +1,17 @@
 name: Build/release
 
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches:
+      - main
+      - review
 
 jobs:
   release:
     runs-on: ${{ matrix.os }}
+
+    environment:
+      name: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
 
     strategy:
       matrix:
@@ -23,8 +30,6 @@ jobs:
       - name: Build/release Electron app
         uses: Yan-Jobs/action-electron-builder@v1.7.0
         with:
-          node-version: 20
-
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
@@ -34,4 +39,4 @@ jobs:
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
 
           build_script_name: package
-          args: --config electron-builder.config.js --mac --windows -c.compression=maximum -p always
+          args: --config electron-builder.config.js --mac --windows -c.compression=maximum
