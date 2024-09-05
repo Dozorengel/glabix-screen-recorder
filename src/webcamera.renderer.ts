@@ -109,12 +109,13 @@ function startStream(deviseId) {
 }
 
 function stopStream() {
+  videoContainer.setAttribute("hidden", "")
+  videoContainerError.setAttribute("hidden", "")
+
   if (currentStream) {
     const tracks = currentStream.getTracks()
     tracks.forEach((track) => track.stop())
     video.srcObject = null
-    videoContainer.setAttribute("hidden", "")
-    videoContainerError.setAttribute("hidden", "")
     currentStream = null
   }
 
