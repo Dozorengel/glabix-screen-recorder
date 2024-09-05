@@ -361,6 +361,7 @@ import { FileUploadEvents } from "./events/file-upload.events"
       }
 
       if (data.action == "cameraOnly") {
+        hideOnlyCameraError()
         const video = document.querySelector(
           "#webcam_only_video"
         ) as HTMLVideoElement
