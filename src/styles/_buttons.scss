@@ -18,6 +18,7 @@
   text-decoration: none;
   width: 100%;
   -webkit-app-region: no-drag;
+  user-select: none;
 
   &:hover,
   &.hover {
