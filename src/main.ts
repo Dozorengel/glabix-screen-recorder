@@ -125,6 +125,7 @@ if (!gotTheLock) {
     // )
     try {
       tokenStorage.readAuthData()
+      createMenu()
     } catch (e) {
       setLog(e, true)
     }
@@ -218,7 +219,6 @@ function createWindow() {
     )
   }
   mainWindow.webContents.setFrameRate(60)
-  createMenu()
   createModal(mainWindow)
   createLoginWindow()
 }
