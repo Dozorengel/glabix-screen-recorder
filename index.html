@@ -16,10 +16,11 @@
     <div id="draw-container"></div>
 
     <div class="panel-wrapper hover">
-      <div class="panel-drag-icon hover-visible">
-        <i class="i i--lg i-grip-horizontal"></i>
+      <div class="panel-drag-handler"></div>
+      <div class="panel-drag-icon">
+        <i class="i i--lg i-grip-horizontal hover-visible"></i>
       </div>
-      <div id="panel-controls" class="panel transition-visibility">
+      <div class="panel transition-visibility">
         <button id="stopBtn" class="panel-btn mb-2 flex-center-10">
           <span class="i i-stop i--lg"></span>
         </button>
@@ -37,40 +38,51 @@
           <span class="i i-play i--lg"></span>
         </button>
         <div class="panel-divider"></div>
-        <button id="draw-toggle" class="panel-btn flex-center-10 clickable">
-          <span class="i i-pencil-mechanical i--lg"></span>
-        </button>
+        <div class="relative">
+          <button id="draw-btn" class="panel-btn flex-center-10 clickable">
+            <span class="i i-pencil-mechanical i--lg"></span>
+          </button>
+          <button
+            id="draw-settings-btn"
+            class="panel-btn absolute right-0.5 bottom-0.5 flex-center-3 p-0 clickable"
+          >
+            <span class="i i-gear"></span>
+          </button>
+        </div>
       </div>
 
-      <div id="panel-draw" class="panel transition-visibility invisible p-4">
+      <div
+        id="panel-draw"
+        class="panel panel-settings transition-visibility invisible p-4"
+      >
         <div class="flex gap-4 mb-4">
           <div class="flex flex-col gap-2">
             <button
-              class="bullet-xl hover:scale-125 text-accent-13 border-b-2 border-primary"
+              class="bullet-xl hover:scale-140 transition-transform text-accent-13 scale-140"
               data-color="accent-13"
             ></button>
             <button
-              class="bullet-xl hover:scale-125 text-warning"
+              class="bullet-xl hover:scale-140 transition-transform text-warning"
               data-color="warning"
             ></button>
             <button
-              class="bullet-xl hover:scale-125 text-accent-18"
+              class="bullet-xl hover:scale-140 transition-transform text-accent-18"
               data-color="accent-18"
             ></button>
             <button
-              class="bullet-xl hover:scale-125 text-accent-16"
+              class="bullet-xl hover:scale-140 transition-transform text-accent-16"
               data-color="accent-16"
             ></button>
             <button
-              class="bullet-xl hover:scale-125 text-accent-19"
+              class="bullet-xl hover:scale-140 transition-transform text-accent-19"
               data-color="accent-19"
             ></button>
             <button
-              class="bullet-xl hover:scale-125 text-light border border-gray-300"
+              class="bullet-xl hover:scale-140 transition-transform text-light border border-gray-300"
               data-color="light"
             ></button>
             <button
-              class="bullet-xl hover:scale-125 text-dark"
+              class="bullet-xl hover:scale-140 transition-transform text-dark"
               data-color="dark"
             ></button>
           </div>
@@ -85,7 +97,7 @@
         </div>
 
         <button
-          id="panel-draw-close-btn"
+          id="draw-settings-close-btn"
           class="flex text-xs mx-auto clickable"
         >
           Закрыть

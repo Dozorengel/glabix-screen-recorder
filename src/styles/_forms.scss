@@ -21,7 +21,7 @@ button {
     width: 40px;
     height: 24px;
     border-radius: 24px;
-    background: var(--accent-12);
+    background: var(--gray-400);
     display: block;
     position: relative;
   }
@@ -31,8 +31,11 @@ button {
   }
 
   &-input:disabled + &-label {
-    background: var(--gray-400);
+    background: var(--gray-300);
     pointer-events: none;
+  }
+  &-input:disabled + &-label:after {
+    background: rgba(255, 255, 255, 0.8);
   }
 
   &-label:after {

@@ -11,6 +11,7 @@ import {
   nativeImage,
   protocol,
   dialog,
+  nativeTheme,
 } from "electron"
 import path from "path"
 import os from "os"
@@ -33,6 +34,8 @@ import { SimpleStore } from "./storages/simple-store"
 import log from "electron-log/main"
 import { ChunkStorageService } from "./file-uploader/chunk-storage.service"
 import { Chunk } from "./file-uploader/chunk"
+import { autoUpdater } from "electron-updater"
+import { getTitle } from "./helpers/get-title"
 
 // Optional, initialize the logger for any renderer process
 log.initialize()
@@ -47,6 +50,7 @@ let modalWindow: BrowserWindow
 let loginWindow: BrowserWindow
 let contextMenu: Menu
 let tray: Tray
+let isAppQuitting = false
 
 const tokenStorage = new TokenStorage()
 const appState = new AppState()
@@ -54,7 +58,8 @@ const store = new SimpleStore()
 const chunkStorage = new ChunkStorageService()
 
 app.removeAsDefaultProtocolClient("glabix-video-recorder")
-app.disableHardwareAcceleration()
+app.commandLine.appendSwitch("force-compositing-mode")
+app.commandLine.appendSwitch("enable-transparent-visuals")
 
 const gotTheLock = app.requestSingleInstanceLock()
 
@@ -113,11 +118,15 @@ if (!gotTheLock) {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(() => {
+    autoUpdater.checkForUpdatesAndNotify()
+
     // ipcMain.handle(
     //   "get-screen-resolution",
     //   () => screen.getPrimaryDisplay().workAreaSize
     // )
-    tokenStorage.readAuthData()
+    setTimeout(() => {
+      tokenStorage.readAuthData()
+    })
     createWindow()
     chunkStorage.initStorages()
     checkUnprocessedFiles()
@@ -178,13 +187,13 @@ function createWindow() {
     },
   })
 
-  // and load the index.html of the app.
-  // mainWindow.setSimpleFullScreen(false)
   if (os.platform() == "darwin") {
     mainWindow.setWindowButtonVisibility(false)
   }
-  // mainWindow.loadFile("index.html")
+
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   mainWindow.setAlwaysOnTop(true, "normal", 999999)
+  mainWindow.setFullScreenable(false)
 
   // mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
@@ -228,8 +237,16 @@ function createModal(parentWindow) {
     mainWindow.focus()
   })
 
-  modalWindow.on("close", () => {
-    app.quit()
+  modalWindow.on("close", (event) => {
+    if (!isAppQuitting) {
+      event.preventDefault()
+      hideWindows()
+    }
+  })
+
+  modalWindow.on("minimize", (event) => {
+    event.preventDefault()
+    hideWindows()
   })
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -256,9 +273,7 @@ function createLoginWindow() {
       // contextIsolation: true,  // повышаем безопасность
     },
   })
-  loginWindow.on("close", () => {
-    app.quit()
-  })
+
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     loginWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/login.html`)
   } else {
@@ -268,83 +283,84 @@ function createLoginWindow() {
   }
 }
 
-function createMenu() {
-  const image = nativeImage
-    .createFromPath(path.join(__dirname, "favicon-24.png"))
-    .resize({ height: 16, width: 16 })
-  tray = new Tray(image)
-
-  buildTrayMenu()
+function showWindows() {
+  if (tokenStorage.dataIsActual()) {
+    if (mainWindow) mainWindow.show()
+    if (modalWindow) modalWindow.show()
+  } else {
+    if (loginWindow) loginWindow.show()
+  }
+}
+function hideWindows() {
+  if (tokenStorage.dataIsActual()) {
+    if (mainWindow) mainWindow.hide()
+    if (modalWindow) modalWindow.hide()
+  } else {
+    if (loginWindow) loginWindow.hide()
+  }
 }
 
-function buildTrayMenu() {
-  const auth = tokenStorage.token
-  if (auth) {
-    contextMenu = Menu.buildFromTemplate([
-      {
-        label: "Начать",
-        click: () => {
-          if (tokenStorage.dataIsActual()) {
-            mainWindow.show()
-            modalWindow.show()
-          } else {
-            loginWindow.show()
-          }
-        },
-      },
-      {
-        label: "Скрыть",
-        click: () => {
-          mainWindow.hide()
-          modalWindow.hide()
-        },
-      },
-      {
-        label: "Разлогиниться",
-        click: () => {
-          tokenStorage.reset()
-          mainWindow.hide()
-          modalWindow.hide()
-          loginWindow.show()
-        },
-      },
-      {
-        label: "Выйти",
-        click: () => {
-          app.quit()
-        },
-      },
-    ])
+function toggleWindows() {
+  if (tokenStorage.dataIsActual()) {
+    if (modalWindow.isVisible() && mainWindow.isVisible()) {
+      hideWindows()
+    } else {
+      showWindows()
+    }
   } else {
-    contextMenu = Menu.buildFromTemplate([
-      {
-        label: "Начать",
-        click: () => {
-          if (tokenStorage.dataIsActual()) {
-            mainWindow.show()
-            modalWindow.show()
-          } else {
-            loginWindow.show()
-          }
-        },
-      },
-      {
-        label: "Скрыть",
-        click: () => {
-          mainWindow.hide()
-          modalWindow.hide()
-        },
-      },
-      {
-        label: "Выйти",
-        click: () => {
-          app.quit()
-        },
-      },
-    ])
+    if (loginWindow.isVisible()) {
+      hideWindows()
+    } else {
+      showWindows()
+    }
   }
-  tray.setToolTip("Glabix video app")
-  tray.setContextMenu(contextMenu)
+}
+
+function createTrayIcon(): Electron.NativeImage {
+  let imagePath = "tray-win.png"
+
+  if (os.platform() == "darwin") {
+    imagePath = nativeTheme.shouldUseDarkColors
+      ? "tray-macos-light.png"
+      : "tray-macos-dark.png"
+  }
+
+  return nativeImage
+    .createFromPath(path.join(__dirname, imagePath))
+    .resize({ width: 20, height: 20 })
+}
+
+function createMenu() {
+  tray = new Tray(createTrayIcon())
+  tray.setToolTip("Glabix Экран")
+
+  tray.on("click", (e) => {
+    toggleWindows()
+  })
+
+  tray.on("right-click", (e) => {
+    tray.popUpContextMenu(contextMenu)
+  })
+
+  contextMenu = Menu.buildFromTemplate([
+    {
+      id: "menuLogOutItem",
+      label: "Разлогиниться",
+      visible: tokenStorage.dataIsActual(),
+      click: () => {
+        tokenStorage.reset()
+        mainWindow.hide()
+        modalWindow.hide()
+        loginWindow.show()
+      },
+    },
+    {
+      label: "Выйти",
+      click: () => {
+        app.quit()
+      },
+    },
+  ])
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -364,6 +380,10 @@ app.on("activate", () => {
   }
 })
 
+app.on("before-quit", () => {
+  isAppQuitting = true
+})
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
@@ -381,7 +401,15 @@ ipcMain.on("start-recording", (event, data) => {
   modalWindow.hide()
 })
 ipcMain.on("stop-recording", (event, data) => {
+  mainWindow.webContents.send("stop-recording")
   modalWindow.show()
+})
+ipcMain.on("windows:minimize", (event, data) => {
+  mainWindow.minimize()
+  modalWindow.minimize()
+})
+ipcMain.on("windows:close", (event, data) => {
+  modalWindow.close()
 })
 
 ipcMain.on(SimpleStoreEvents.UPDATE, (event, data: ISimpleStoreData) => {
@@ -405,7 +433,7 @@ ipcMain.on(LoginEvents.LOGIN_ATTEMPT, (event, credentials) => {
 })
 
 ipcMain.on(LoginEvents.LOGIN_SUCCESS, (event) => {
-  buildTrayMenu()
+  contextMenu.getMenuItemById("menuLogOutItem").visible = true
   loginWindow.hide()
   mainWindow.show()
   modalWindow.show()
@@ -429,11 +457,13 @@ ipcMain.on(FileUploadEvents.FILE_CREATED, (event, file) => {
   const chunksSlicer = new ChunkSlicer(blob, size)
   const processedChunks = [...chunksSlicer.allChunks]
   const fileName = "test-video-" + Date.now() + ".mp4"
+  const title = getTitle()
   createFileUploadCommand(
     tokenStorage.token.access_token,
     tokenStorage.organizationId,
     fileName,
-    processedChunks
+    processedChunks,
+    title
   )
 })
 
@@ -493,7 +523,7 @@ ipcMain.on(FileUploadEvents.FILE_CHUNK_UPLOADED, (event) => {
 })
 
 ipcMain.on(LoginEvents.LOGOUT, (event) => {
-  buildTrayMenu()
+  contextMenu.getMenuItemById("menuLogOutItem").visible = false
 })
 
 ipcMain.on("log", (evt, data) => {

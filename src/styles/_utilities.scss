@@ -1067,6 +1067,9 @@
 .right-0 {
   right: 0 !important;
 }
+.right-0\.5 {
+  right: 0.125rem !important;
+}
 .right-1 {
   right: 0.25rem !important;
 }
@@ -1100,6 +1103,9 @@
 // bottom
 .bottom-0 {
   bottom: 0 !important;
+}
+.bottom-0\.5 {
+  bottom: 0.125rem !important;
 }
 .bottom-2\.5 {
   bottom: 0.625rem !important;
@@ -1655,12 +1661,12 @@
   transform: rotate(180deg) !important;
 }
 
-.scale-125 {
-  transform: scale(1.25) !important;
+.scale-140 {
+  transform: scale(1.4) !important;
   transition: transform 0.15s;
 }
-.hover\:scale-125:hover {
-  transform: scale(1.25) !important;
+.hover\:scale-140:hover {
+  transform: scale(1.4) !important;
   transition: transform 0.15s;
 }
 

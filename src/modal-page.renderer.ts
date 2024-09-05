@@ -6,8 +6,6 @@ import {
   StreamSettings,
 } from "./helpers/types"
 ;(function () {
-  let videoRecorder: MediaRecorder
-  let audioRecorder: MediaRecorder
   let audioDevicesList: MediaDeviceInfo[] = []
   let activeAudioDevice: MediaDeviceInfo
   let videoDevicesList: MediaDeviceInfo[] = []
@@ -62,6 +60,32 @@ import {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    const windowsToolbar = document.querySelector(".windows-toolbar")
+    const windowsMinimizeBtn = document.querySelector("#windows_minimize")
+    const windowsCloseBtn = document.querySelector("#windows_close")
+    const isWindows = navigator.userAgent.indexOf("Windows") != -1
+    if (isWindows) {
+      windowsToolbar.removeAttribute("hidden")
+    }
+    windowsMinimizeBtn.addEventListener(
+      "click",
+      () => {
+        if (isWindows) {
+          window.electronAPI.ipcRenderer.send("windows:minimize", {})
+        }
+      },
+      false
+    )
+    windowsCloseBtn.addEventListener(
+      "click",
+      () => {
+        if (isWindows) {
+          window.electronAPI.ipcRenderer.send("windows:close", {})
+        }
+      },
+      false
+    )
+
     const actionButtons = document.querySelectorAll(
       ".js-btn-action-type"
     ) as NodeListOf<HTMLElement>
