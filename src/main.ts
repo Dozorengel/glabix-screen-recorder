@@ -124,6 +124,7 @@ if (!gotTheLock) {
     // )
     setTimeout(() => {
       tokenStorage.readAuthData()
+      createMenu()
     })
     createWindow()
     session.defaultSession.setDisplayMediaRequestHandler(
@@ -190,7 +191,6 @@ function createWindow() {
     )
   }
   mainWindow.webContents.setFrameRate(60)
-  createMenu()
   createModal(mainWindow)
   createLoginWindow()
 }
