@@ -21,6 +21,7 @@ export function createFileUploadCommand(
       { headers: { Authorization: `Bearer ${token}` } }
     )
     .then((res) => {
+      console.log("Создан файл", res.data.uuid, chunks.length)
       const uuid = res.data.uuid
       const params = { uuid, chunks }
       ipcMain.emit(FileUploadEvents.FILE_CREATED_ON_SERVER, params)
