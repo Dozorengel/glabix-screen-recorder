@@ -6,7 +6,6 @@ export class Chunk {
   readonly size: number
   readonly fileUuid: string
   readonly index: number
-  readonly buffer: Buffer
   readonly chunkPath: string
   readonly storage: ChunksStorage
   private _processed = false
@@ -15,14 +14,11 @@ export class Chunk {
     size: number,
     fileUuid: string,
     index: number,
-    buffer: Buffer,
     chunkPath: string
   ) {
-    console.log("chunk created")
     this.index = index
     this.fileUuid = fileUuid
     this.size = size
-    this.buffer = buffer
     this.chunkPath = chunkPath
   }
 

@@ -31,7 +31,6 @@ export class ChunksStorage {
   }
 
   removeChunk(chunk: Chunk): Promise<void> {
-    console.log("removeChunk")
     return new Promise((resolve, reject) => {
       fs.unlink(chunk.chunkPath, (err) => {
         if (err) {

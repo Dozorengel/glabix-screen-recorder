@@ -4,9 +4,10 @@ import { ChunksStorage } from "./chunk-storage"
 import { Chunk } from "./chunk"
 import os from "os"
 import { app } from "electron"
+import { setLog } from "../helpers/set-log"
 
 export class ChunkStorageService {
-  private _storages: ChunksStorage[] = []
+  _storages: ChunksStorage[] = []
   readonly mainPath =
     os.platform() == "darwin"
       ? path.join(
@@ -51,7 +52,7 @@ export class ChunkStorageService {
             const buffer = Buffer.from(data)
             this.writeChunk(i, fileUuid, buffer)
               .then((path) => {
-                const chunk = new Chunk(blob.size, fileUuid, i, buffer, path)
+                const chunk = new Chunk(blob.size, fileUuid, i, path)
                 resolve(chunk)
               })
               .catch((e) => reject(e))
@@ -85,20 +86,17 @@ export class ChunkStorageService {
     this._storages = []
     try {
       const dirs = this.getDirectoriesSync(this.mainPath)
-      console.log(dirs)
       // readChunks
       for (let i = 0; i < dirs.length; i++) {
         const dirPath = dirs[i]
         this.readChunksFromDirectorySync(dirPath)
       }
     } catch (err) {
-      console.error("Ошибка:", err)
+      setLog(err, true)
     }
-    console.log(this._storages)
   }
 
   private readChunksFromDirectorySync(dirName: string) {
-    console.log("readChunksFromDirectorySync")
     const chunks: Chunk[] = []
     try {
       const dirPath = path.join(this.mainPath, dirName)
@@ -115,23 +113,23 @@ export class ChunkStorageService {
             buffer.length,
             dirName,
             +chunkNumber,
-            buffer,
             filePath
           )
           chunks.push(chunk)
-          console.log(`chunk: ${filePath}:`, fileContent.length)
+          setLog(`chunk: ${filePath}: , ${fileContent.length}`, false)
         } else {
-          console.error('Имя файла не начинается с "chunk-"')
+          setLog(`unknown chunk name ${filePath}`, true)
         }
       }
       if (chunks.length) {
         this._storages.push(new ChunksStorage(dirName, chunks))
       } else {
-        console.log("this.removeDir(dirName)", dirName)
-        this.rmdirStorage(dirName).catch((e) => console.log(e))
+        this.rmdirStorage(dirName).catch((err) => {
+          setLog(err, true)
+        })
       }
     } catch (err) {
-      console.error("Ошибка:", err)
+      setLog(err, true)
     }
   }
 
@@ -162,16 +160,12 @@ export class ChunkStorageService {
   getNextChunk(): Chunk | null {
     if (!this.currentProcessedStorage) {
       if (!this._storages.length) {
-        console.log(139)
         return null
       }
       this.currentProcessedStorage = this._storages[0]
     }
-    console.log(this.currentProcessedStorage)
     const nextChunk = this.currentProcessedStorage.getNextChunk()
-    console.log("nextChunk")
     if (nextChunk) {
-      console.log("После следующего чанка")
       return nextChunk
     }
     return null
@@ -181,7 +175,6 @@ export class ChunkStorageService {
     return new Promise((resolve, reject) => {
       const storage = this._storages.find((s) => s.fileUuid === chunk.fileUuid)
       if (!storage) {
-        console.log("Missing chunk's storage")
         reject(Error("Missing chunk's storage"))
       }
       storage

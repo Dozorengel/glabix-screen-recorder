@@ -4,11 +4,12 @@ import { IAuthData, IJWTToken } from "../helpers/types"
 import { LoginEvents } from "../events/login.events"
 import os from "os"
 import path from "path"
+import { setLog } from "../helpers/set-log"
 
 export class TokenStorage {
   private _token: IJWTToken | null = null
   private _organizationId: number | null = null
-  readonly filename =
+  readonly authDataFileName =
     os.platform() == "darwin"
       ? path.join(
           os.homedir(),
@@ -35,7 +36,7 @@ export class TokenStorage {
   encryptAuthData(authData: IAuthData): void {
     if (safeStorage.isEncryptionAvailable()) {
       const encryptedData = safeStorage.encryptString(JSON.stringify(authData))
-      fs.writeFileSync(this.filename, encryptedData)
+      fs.writeFileSync(this.authDataFileName, encryptedData)
       this._token = authData.token
       this._organizationId = +authData.organization_id
     } else {
@@ -44,13 +45,16 @@ export class TokenStorage {
   }
 
   readAuthData(): void {
-    if (fs.existsSync(this.filename)) {
-      const encryptedDataBuffer = fs.readFileSync(this.filename)
+    setLog(`Read auth data`, false)
+    if (fs.existsSync(this.authDataFileName)) {
+      const encryptedDataBuffer = fs.readFileSync(this.authDataFileName)
       const encryptedDataString = safeStorage.decryptString(encryptedDataBuffer)
       const encryptedDataJSON = JSON.parse(encryptedDataString) as IAuthData
       this._token = encryptedDataJSON.token
       this._organizationId = +encryptedDataJSON.organization_id
+      setLog(`authDataFile is exist`, false)
     } else {
+      setLog(`authDataFile is empty`, false)
       this._token = null
       this._organizationId = null
     }
@@ -68,10 +72,11 @@ export class TokenStorage {
   }
 
   reset() {
+    setLog(`Reset auth data`, false)
     this._token = null
     this._organizationId = null
-    if (fs.existsSync(this.filename)) {
-      fs.unlinkSync(this.filename)
+    if (fs.existsSync(this.authDataFileName)) {
+      fs.unlinkSync(this.authDataFileName)
     }
     ipcMain.emit(LoginEvents.LOGOUT, {})
   }
