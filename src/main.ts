@@ -118,7 +118,7 @@ if (!gotTheLock) {
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(() => {
     autoUpdater.checkForUpdatesAndNotify()
-
+    setLog(JSON.stringify(import.meta.env), true)
     // ipcMain.handle(
     //   "get-screen-resolution",
     //   () => screen.getPrimaryDisplay().workAreaSize
