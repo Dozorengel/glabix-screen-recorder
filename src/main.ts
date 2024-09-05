@@ -12,6 +12,7 @@ import {
   protocol,
   dialog,
   nativeTheme,
+  globalShortcut,
 } from "electron"
 import path from "path"
 import os from "os"
@@ -141,6 +142,10 @@ if (!gotTheLock) {
         })
       }
     )
+
+    globalShortcut.register("Command+H", () => {
+      hideWindows()
+    })
   })
 }
 
@@ -229,6 +234,7 @@ function createModal(parentWindow) {
     // thickFrame: false,
     titleBarStyle: "hidden",
     // fullscreenable: false,
+    maximizable: false,
     resizable: false,
     width: 300,
     show: false,
@@ -274,6 +280,7 @@ function createLoginWindow() {
     height: 265,
     show: false,
     resizable: false,
+    maximizable: false,
     frame: false,
     roundedCorners: true,
     webPreferences: {
