@@ -267,6 +267,8 @@ import { FileUploadEvents } from "./events/file-upload.events"
       cameraMoveable.destroy()
       cameraMoveable = undefined
     }
+
+    hideOnlyCameraError()
   }
 
   const initView = (settings: StreamSettings) => {
@@ -338,6 +340,15 @@ import { FileUploadEvents } from "./events/file-upload.events"
     }
   }
 
+  const showOnlyCameraError = () => {
+    const error = document.querySelector(".webcamera-only-no-device")
+    error.removeAttribute("hidden")
+  }
+  const hideOnlyCameraError = () => {
+    const error = document.querySelector(".webcamera-only-no-device")
+    error.setAttribute("hidden", "")
+  }
+
   window.electronAPI.ipcRenderer.on(
     "record-settings-change",
     (event, data: StreamSettings) => {
@@ -353,9 +364,13 @@ import { FileUploadEvents } from "./events/file-upload.events"
         const video = document.querySelector(
           "#webcam_only_video"
         ) as HTMLVideoElement
-        initStream(data).then((stream) => {
-          createVideo(stream, undefined, video)
-        })
+        initStream(data)
+          .then((stream) => {
+            createVideo(stream, undefined, video)
+          })
+          .catch((e) => {
+            showOnlyCameraError()
+          })
       }
 
       if (data.action == "cropVideo") {
