@@ -1,7 +1,7 @@
 {
   "name": "glabix-screen",
   "productName": "Glabix Screen",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Glabix",
   "description": "A tool to record your screen",
   "main": ".vite/build/main.js",
