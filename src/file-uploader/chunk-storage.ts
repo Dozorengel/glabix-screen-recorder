@@ -42,4 +42,8 @@ export class ChunksStorage {
       })
     })
   }
+
+  hasUnloadChunks() {
+    return this.chunks.find((c) => c.processed)
+  }
 }

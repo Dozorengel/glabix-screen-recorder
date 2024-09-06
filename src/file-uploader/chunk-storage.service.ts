@@ -158,11 +158,21 @@ export class ChunkStorageService {
   }
 
   getNextChunk(): Chunk | null {
-    if (!this.currentProcessedStorage) {
+    if (
+      !this.currentProcessedStorage ||
+      !this.currentProcessedStorage.chunks.length
+    ) {
       if (!this._storages.length) {
         return null
       }
-      this.currentProcessedStorage = this._storages[0]
+      const foundStorage = this._storages.find((s) =>
+        s.chunks.find((c) => !c.processed)
+      )
+      if (foundStorage) {
+        this.currentProcessedStorage = foundStorage
+      } else {
+        return null
+      }
     }
     const nextChunk = this.currentProcessedStorage.getNextChunk()
     if (nextChunk) {
@@ -180,7 +190,15 @@ export class ChunkStorageService {
       storage
         .removeChunk(chunk)
         .then(() => {
-          resolve()
+          if (storage.chunks.length === 0) {
+            this.rmdirStorage(chunk.fileUuid)
+              .then((s) => {
+                resolve()
+              })
+              .catch((e) => reject(e))
+          } else {
+            resolve()
+          }
         })
         .catch((e) => reject(e))
     })

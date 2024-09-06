@@ -13,6 +13,7 @@ import {
   dialog,
   nativeTheme,
   globalShortcut,
+  shell,
 } from "electron"
 import path from "path"
 import os from "os"
@@ -181,8 +182,7 @@ function checkUnprocessedFiles() {
     } else {
       setLog(`No next chunk`, false)
     }
-  }
-  {
+  } else {
     setLog(`No unprocessed files!`, false)
   }
 }
@@ -512,6 +512,14 @@ ipcMain.on(FileUploadEvents.FILE_CREATED_ON_SERVER, (event) => {
   chunkStorage.addStorage(chunks, uuid).then(() => {
     checkUnprocessedFiles()
   })
+  const shared =
+    import.meta.env.VITE_AUTH_APP_URL +
+    "recorder/org/" +
+    tokenStorage.organizationId +
+    "/" +
+    "library/" +
+    uuid
+  shell.openExternal(shared)
 })
 
 ipcMain.on(FileUploadEvents.LOAD_FILE_CHUNK, (event) => {
