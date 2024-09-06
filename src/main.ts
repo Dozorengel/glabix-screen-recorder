@@ -252,6 +252,7 @@ function createModal(parentWindow) {
     maximizable: false,
     resizable: false,
     width: 300,
+    height: 500,
     show: false,
     alwaysOnTop: true,
     parent: parentWindow,
@@ -263,6 +264,7 @@ function createModal(parentWindow) {
     },
   })
   // modalWindow.webContents.openDevTools()
+  // modalWindow.setAutoResize(true, "screen-saver")
   modalWindow.setAlwaysOnTop(true, "screen-saver")
   modalWindow.on("blur", () => {
     mainWindow.focus()
