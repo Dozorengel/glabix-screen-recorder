@@ -5,15 +5,13 @@ on:
     branches:
       - main
       - review
-    tags:
-      - v*
 
 jobs:
   release:
     runs-on: macos-latest
 
     environment:
-      name: ${{ github.ref_name == 'review' && 'staging' || 'production' }}
+      name: ${{ (github.ref_name == 'main' || startsWith(github.ref, 'refs/tags/v')) && 'production' || 'staging' }}
 
     steps:
       - name: Check out Git repository
@@ -35,10 +33,6 @@ jobs:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
-
-          # If the commit is tagged with a version (e.g. "v1.0.0"),
-          # release the app after building
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-
+          release: true
           build_script_name: package
           args: --config electron-builder.config.js --mac --windows -c.compression=maximum

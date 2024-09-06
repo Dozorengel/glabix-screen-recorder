@@ -35,10 +35,6 @@ const options = {
   nsisWeb: {
     shortcutName: "Глабикс Экран",
   },
-  publish: {
-    provider: "github",
-    releaseType: "release",
-  },
 }
 
 module.exports = options
