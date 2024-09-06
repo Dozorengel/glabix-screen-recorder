@@ -219,14 +219,6 @@ function createWindow() {
   mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   mainWindow.setAlwaysOnTop(true, "screen-saver")
 
-  // mainWindow.on("restore", () => {
-  //   if (os.platform() == 'win32') {
-  //     mainWindow.setAlwaysOnTop(true, "screen-saver")
-  //     modalWindow.setAlwaysOnTop(true, "screen-saver")
-  //     mainWindow.setBounds(screen.getPrimaryDisplay().bounds)
-  //   }
-  // })
-
   // mainWindow.setFullScreenable(false)
   // mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
@@ -256,6 +248,7 @@ function createModal(parentWindow) {
     show: false,
     alwaysOnTop: true,
     parent: parentWindow,
+    minimizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       zoomFactor: 1.0,
@@ -268,18 +261,6 @@ function createModal(parentWindow) {
   modalWindow.setAlwaysOnTop(true, "screen-saver")
   modalWindow.on("blur", () => {
     mainWindow.focus()
-  })
-
-  modalWindow.on("minimize", (event) => {
-    mainWindow.hide()
-  })
-
-  modalWindow.on("restore", (event) => {
-    mainWindow.show()
-    modalWindow.show()
-    mainWindow.setAlwaysOnTop(true, "screen-saver")
-    mainWindow.setBounds(screen.getPrimaryDisplay().bounds)
-    modalWindow.setAlwaysOnTop(true, "screen-saver")
   })
 
   modalWindow.on("close", (event) => {
@@ -458,8 +439,7 @@ ipcMain.on("stop-recording", (event, data) => {
   modalWindow.show()
 })
 ipcMain.on("windows:minimize", (event, data) => {
-  mainWindow.minimize()
-  modalWindow.minimize()
+  modalWindow.close()
 })
 ipcMain.on("windows:close", (event, data) => {
   modalWindow.close()
