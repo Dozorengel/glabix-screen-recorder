@@ -29,6 +29,7 @@ jobs:
           VITE_API_PATH: ${{ vars.VITE_API_PATH }}
           VITE_AUTH_APP_URL: ${{ vars.VITE_AUTH_APP_URL }}
           VITE_LOGIN_IS_REQUIRED: ${{ vars.VITE_LOGIN_IS_REQUIRED }}
+          EP_PRE_RELEASE: ${{ vars.EP_PRE_RELEASE }}
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
