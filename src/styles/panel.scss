@@ -3,10 +3,14 @@
   top: 350px;
   left: 30px;
   z-index: 15;
+  opacity: 0;
+  pointer-events: none;
 }
+
 .panel-wrapper.is-recording {
   opacity: 0.7;
   transition: opacity 0.15s;
+  pointer-events: auto;
   &:hover {
     opacity: 1;
   }

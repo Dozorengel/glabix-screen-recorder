@@ -415,6 +415,12 @@ function createMenu() {
   tray.setToolTip("Glabix Экран")
 
   tray.on("click", (e) => {
+    const state = store.get()
+
+    if (["recording", "paused"].includes(state["recordingState"])) {
+      return
+    }
+
     toggleWindows()
   })
 

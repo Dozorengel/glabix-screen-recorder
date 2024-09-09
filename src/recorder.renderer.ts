@@ -476,9 +476,11 @@ import { FileUploadEvents } from "./events/file-upload.events"
     SimpleStoreEvents.CHANGED,
     (event, state) => {
       if (["recording", "paused"].includes(state["recordingState"])) {
+        document.body.classList.add("body--is-recording")
         stopBtn.classList.add("panel-btn--stop")
       } else {
         stopBtn.classList.remove("panel-btn--stop")
+        document.body.classList.remove("body--is-recording")
       }
 
       if (["paused"].includes(state["recordingState"])) {
