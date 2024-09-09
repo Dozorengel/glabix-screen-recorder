@@ -25,6 +25,8 @@ import { ChunkSlicer } from "./file-uploader/chunk-slicer"
 import { TokenStorage } from "./storages/token-storage"
 import {
   IAuthData,
+  IDropdownPageData,
+  IDropdownPageSelectData,
   ISimpleStoreData,
   IUser,
   SimpleStoreEvents,
@@ -46,6 +48,7 @@ if (require("electron-squirrel-startup")) {
   app.quit()
 }
 
+let dropdownWindow: BrowserWindow
 let mainWindow: BrowserWindow
 let modalWindow: BrowserWindow
 let loginWindow: BrowserWindow
@@ -193,10 +196,10 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     transparent: true,
     frame: false,
+    thickFrame: false,
     resizable: false,
     minimizable: false,
     roundedCorners: false, // macOS, not working on Windows
-    thickFrame: false,
     show: false,
     alwaysOnTop: true,
     x,
@@ -244,7 +247,7 @@ function createModal(parentWindow) {
     maximizable: false,
     resizable: false,
     width: 300,
-    height: 500,
+    height: 370,
     show: false,
     alwaysOnTop: true,
     parent: parentWindow,
@@ -257,8 +260,11 @@ function createModal(parentWindow) {
     },
   })
   // modalWindow.webContents.openDevTools()
-  // modalWindow.setAutoResize(true, "screen-saver")
   modalWindow.setAlwaysOnTop(true, "screen-saver")
+  modalWindow.on("hide", () => {
+    dropdownWindow.hide()
+  })
+  modalWindow.on("show", () => {})
   modalWindow.on("blur", () => {
     mainWindow.focus()
   })
@@ -275,6 +281,47 @@ function createModal(parentWindow) {
   } else {
     modalWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/modal.html`)
+    )
+  }
+
+  createDropdownWindow(modalWindow)
+}
+
+function createDropdownWindow(parentWindow) {
+  dropdownWindow = new BrowserWindow({
+    titleBarStyle: "hiddenInset",
+    titleBarOverlay: true,
+    frame: false,
+    fullscreen: false,
+    thickFrame: false,
+    fullscreenable: false,
+    maximizable: false,
+    // resizable: false,
+    width: 300,
+    height: 300,
+    autoHideMenuBar: true,
+    show: false,
+    alwaysOnTop: true,
+    parent: parentWindow,
+    minimizable: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      zoomFactor: 1.0,
+      nodeIntegration: true, // Enable Node.js integration
+      // contextIsolation: false, // Disable context isolation (not recommended for production)
+    },
+  })
+  // dropdownWindow.webContents.openDevTools()
+  dropdownWindow.setAlwaysOnTop(true, "screen-saver")
+  if (os.platform() == "darwin") {
+    dropdownWindow.setWindowButtonVisibility(false)
+  }
+
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    dropdownWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/dropdown.html`)
+  } else {
+    dropdownWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/dropdown.html`)
     )
   }
 }
@@ -428,6 +475,49 @@ ipcMain.on("set-ignore-mouse-events", (event, ignore, options) => {
 
 ipcMain.on("record-settings-change", (event, data) => {
   mainWindow.webContents.send("record-settings-change", data)
+})
+
+ipcMain.on("dropdown:close", (event, data) => {
+  dropdownWindow.hide()
+})
+ipcMain.on("dropdown:select", (event, data: IDropdownPageSelectData) => {
+  modalWindow.webContents.send("dropdown:select", data)
+  dropdownWindow.hide()
+})
+
+ipcMain.on("dropdown:open", (event, data: IDropdownPageData) => {
+  const dropdownWindowBounds = dropdownWindow.getBounds()
+  const modalWindowBounds = modalWindow.getBounds()
+  const screenBounds = screen.getPrimaryDisplay().bounds
+  const gap = 20
+  const itemHeight = 48
+  const height = data.list.items.length * itemHeight
+  const positionRight =
+    modalWindowBounds.x +
+    modalWindowBounds.width +
+    dropdownWindowBounds.width +
+    gap
+  const positionY = modalWindowBounds.y + data.offsetY
+  const diffX = screenBounds.width - positionRight
+
+  if (diffX < 0) {
+    dropdownWindow.setBounds({
+      x: modalWindowBounds.x - dropdownWindowBounds.width - gap,
+      y: positionY,
+    })
+  } else {
+    dropdownWindow.setBounds({
+      x: modalWindowBounds.x + modalWindowBounds.width + gap,
+      y: positionY,
+    })
+  }
+
+  if (height) {
+    dropdownWindow.setBounds({ height })
+  }
+
+  dropdownWindow.show()
+  dropdownWindow.webContents.send("dropdown:open", data)
 })
 
 ipcMain.on("start-recording", (event, data) => {

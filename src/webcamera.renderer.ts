@@ -59,7 +59,6 @@ function initMovable() {
   moveable
     .on("dragStart", ({ target, clientX, clientY }) => {
       target.classList.add("moveable-dragging")
-      // console.log("onDragStart", target)
     })
     .on("drag", ({ target, left, top }) => {
       target!.style.left = `${left}px`
@@ -67,7 +66,6 @@ function initMovable() {
     })
     .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
       target.classList.remove("moveable-dragging")
-      console.log("onDragEnd", target, isDrag)
     })
 }
 initMovable()

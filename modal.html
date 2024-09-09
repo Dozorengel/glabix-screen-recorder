@@ -31,69 +31,47 @@
       <img src="recorder-logo.svg" />
     </div>
     <div class="mb-5">
-      <div class="mb-3">
-        <button
-          type="button"
-          class="btn hover justify-start js-btn-action-type"
-          data-action="fullScreenVideo"
-        >
-          <div class="flex-center-5 min-w-5 mr-3">
-            <i class="i i--lg relative i-display">
-              <i class="icon-dot i-br"></i>
-            </i>
-          </div>
-          <div>Запись всего экрана</div>
-        </button>
-      </div>
-      <div class="mb-3">
-        <button
-          type="button"
-          class="btn justify-start js-btn-action-type"
-          data-action="cropVideo"
-        >
-          <div class="flex-center-5 min-w-5 mr-3">
-            <i class="i i--lg i-expand-wide relative">
-              <i class="icon-dot i-br"></i>
-            </i>
-          </div>
-          <div>Произвольная область</div>
-        </button>
-      </div>
-      <div class="mb-3">
-        <button
-          type="button"
-          class="btn justify-start js-btn-action-type"
-          data-action="cameraOnly"
-        >
-          <div class="flex-center-5 min-w-5 mr-3">
-            <i class="i i--lg i-video"></i>
-          </div>
-          <div>Только камера</div>
-        </button>
-      </div>
+      <div id="screen_settings_container"></div>
     </div>
-    <div id="media_device_container"></div>
+    <div id="video_device_container"></div>
+    <div id="audio_device_container"></div>
     <div>
       <button type="button" id="startBtn" class="btn btn--primary">
         Начать запись
       </button>
     </div>
 
+    <template id="screen_settings_tpl">
+      <button
+        type="button"
+        class="btn js-btn-action-type justify-start text-overflow"
+      >
+        <div class="flex-center-5 min-w-5 mr-3 pointer-events-none">
+          <i class="i relative i--lg"></i>
+        </div>
+        <span
+          class="text-overflow text-left pointer-events-none flex-grow-1"
+        ></span>
+      </button>
+    </template>
+
     <template id="media_device_tpl">
       <div class="mb-3">
-        <div class="btn text-overflow items-center">
-          <div class="flex-center-5 min-w-5 mr-3">
+        <button class="btn justify-start text-overflow items-center">
+          <div class="flex-center-5 pointer-events-none min-w-5 mr-3">
             <i class="i i--lg"></i>
           </div>
-          <span class="text-overflow"></span>
-          <label class="form-toggle ml-1">
+          <span
+            class="text-overflow text-left flex-grow-1 pointer-events-none"
+          ></span>
+          <label class="form-toggle ml-1" hidden>
             <input
               class="form-toggle-input media-device-checkbox"
               type="checkbox"
             />
             <span class="form-toggle-label"></span>
           </label>
-        </div>
+        </button>
       </div>
     </template>
     <script type="module" src="/src/modal-page.renderer.ts"></script>

@@ -3,8 +3,8 @@ export type RecorderState = "recording" | "paused" | "stopped"
 export interface StreamSettings {
   action: ScreenAction
   audioDeviceId?: string
-  video?: boolean
   cameraDeviceId?: string
+  video?: boolean
 }
 
 export interface IAppState {
@@ -39,4 +39,32 @@ export enum SimpleStoreEvents {
 export interface ISimpleStoreData {
   key: string
   value: any
+}
+
+export interface IDropdownPageData {
+  action: ScreenAction
+  offsetY: number
+  list: IDropdownList
+}
+export interface IDropdownPageSelectData {
+  action?: ScreenAction
+  audioDeviceId?: string
+  cameraDeviceId?: string
+  item: IDropdownItem
+}
+export type DropdownListType = "videoDevices" | "audioDevices" | "screenActions"
+export interface IDropdownItem {
+  id: string
+  label: string
+  isSelected: boolean
+  extraData?: any
+}
+export interface IDropdownList {
+  type: DropdownListType
+  items: IDropdownItem[]
+}
+
+export interface IScreenActionItem {
+  action: ScreenAction
+  label: string
 }

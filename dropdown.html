@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+    />
+    <title></title>
+  </head>
+
+  <body>
+    <div id="dropdown_list" class="dropdown-list"></div>
+
+    <template id="dropdown_item_tpl">
+      <div class="dropdown-item">
+        <button type="button" class="btn justify-start text-overflow">
+          <div class="flex-center-5 min-w-5 mr-3 pointer-events-none">
+            <i class="i relative i--lg"></i>
+          </div>
+          <span
+            class="text-overflow text-left pointer-events-none flex-grow-1"
+          ></span>
+          <div
+            class="js-is-selected pointer-events-none ml-3 flex-center-5 min-w-5"
+            hidden
+          >
+            <div class="i i--lg i-check-circle-solid text-primary"></div>
+          </div>
+        </button>
+      </div>
+    </template>
+    <script type="module" src="/src/dropdown-page.renderer.ts"></script>
+  </body>
+</html>

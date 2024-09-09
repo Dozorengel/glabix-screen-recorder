@@ -40,10 +40,3 @@ body {
   background-color: #d5322f;
   color: var(--light);
 }
-
-.text-overflow {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}

@@ -125,7 +125,6 @@ import { FileUploadEvents } from "./events/file-upload.events"
 
       if (_stream.getVideoTracks()[0]) {
         const stream_settings = _stream.getVideoTracks()[0].getSettings()
-        console.log("stream_settings", stream_settings)
       }
     }
 
