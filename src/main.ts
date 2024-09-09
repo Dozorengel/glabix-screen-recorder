@@ -425,7 +425,7 @@ function createMenu() {
   contextMenu = Menu.buildFromTemplate([
     {
       id: "menuLogOutItem",
-      label: "Разлогиниться",
+      label: "Выйти",
       visible: tokenStorage.dataIsActual(),
       click: () => {
         tokenStorage.reset()
@@ -435,7 +435,7 @@ function createMenu() {
       },
     },
     {
-      label: "Выйти",
+      label: "Закрыть",
       click: () => {
         app.quit()
       },
