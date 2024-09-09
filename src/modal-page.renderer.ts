@@ -11,7 +11,6 @@ import {
   SimpleStoreEvents,
   StreamSettings,
 } from "./helpers/types"
-
 ;(function () {
   let openedDropdownType: DropdownListType | undefined = undefined
   const audioDeviceContainer = document.querySelector("#audio_device_container")
@@ -249,7 +248,7 @@ import {
       (event, data: IDropdownPageSelectData) => {
         streamSettings = { ...streamSettings, ...data }
 
-        if (data.action && data.action != streamSettings.action) {
+        if (data.action && data.action != activeScreenAction) {
           activeScreenAction = data.action
           activeScreenActionItem = data.item
           renderScreenSettings(data.item)
@@ -279,8 +278,6 @@ import {
         sendSettings()
       }
     )
-
-    // const actionButton = document.querySelector(".js-btn-action-type") as HTMLElement
 
     document.addEventListener(
       "click",
@@ -412,12 +409,6 @@ import {
     SimpleStoreEvents.CHANGED,
     (event, data) => {
       console.log("modal SimpleStoreEvents.CHANGED", data)
-    }
-  )
-  window.electronAPI.ipcRenderer.on(
-    "dropdown:open",
-    (event, data: IDropdownPageData) => {
-      console.log("dropdown is open")
     }
   )
 })()
