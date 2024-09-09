@@ -5,15 +5,13 @@ on:
     branches:
       - main
       - review
-    tags:
-      - "*"
 
 jobs:
   release:
     runs-on: macos-latest
 
     environment:
-      name: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      name: ${{ (github.ref_name == 'main' || startsWith(github.ref, 'refs/tags/v')) && 'production' || 'staging' }}
 
     steps:
       - name: Check out Git repository
@@ -27,14 +25,15 @@ jobs:
 
       - name: Build/release Electron app
         uses: Yan-Jobs/action-electron-builder@v1.7.0
+        env:
+          VITE_API_PATH: ${{ vars.VITE_API_PATH }}
+          VITE_AUTH_APP_URL: ${{ vars.VITE_AUTH_APP_URL }}
+          VITE_LOGIN_IS_REQUIRED: ${{ vars.VITE_LOGIN_IS_REQUIRED }}
+          EP_PRE_RELEASE: ${{ vars.EP_PRE_RELEASE }}
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
-
-          # If the commit is tagged with a version (e.g. "v1.0.0"),
-          # release the app after building
-          release: ${{ startsWith(github.ref, 'refs/tags/') }}
-
+          release: true
           build_script_name: package
           args: --config electron-builder.config.js --mac --windows -c.compression=maximum
