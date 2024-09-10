@@ -298,14 +298,11 @@ function createModal(parentWindow) {
 
 function createDropdownWindow(parentWindow) {
   dropdownWindow = new BrowserWindow({
-    titleBarStyle: "hiddenInset",
-    titleBarOverlay: true,
-    frame: false,
+    titleBarStyle: "hidden",
     fullscreen: false,
-    thickFrame: false,
     fullscreenable: false,
     maximizable: false,
-    // resizable: false,
+    resizable: false,
     width: 300,
     height: 300,
     autoHideMenuBar: true,
