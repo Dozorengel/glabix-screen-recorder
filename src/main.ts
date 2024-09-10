@@ -270,9 +270,12 @@ function createModal(parentWindow) {
   // modalWindow.webContents.openDevTools()
   modalWindow.setAlwaysOnTop(true, "screen-saver")
   modalWindow.on("hide", () => {
+    mainWindow.webContents.send("app:hide")
     dropdownWindow.hide()
   })
-  modalWindow.on("show", () => {})
+  modalWindow.on("show", () => {
+    mainWindow.webContents.send("app:show")
+  })
   modalWindow.on("blur", () => {
     mainWindow.focus()
   })

@@ -17,39 +17,7 @@ const changeCameraViewSizeBtn = document.querySelectorAll(
 
 let currentStream: MediaStream
 let moveable: Moveable
-
-window.electronAPI.ipcRenderer.on(
-  "record-settings-change",
-  (event, data: StreamSettings) => {
-    if (data.action == "cameraOnly") {
-      stopStream()
-      return
-    }
-    if (data.cameraDeviceId) {
-      startStream(data.cameraDeviceId)
-    } else {
-      stopStream()
-    }
-  }
-)
-
-changeCameraViewSizeBtn.forEach((button) => {
-  button.addEventListener(
-    "click",
-    (event) => {
-      const target = event.target as HTMLElement
-      const size = target.dataset.size
-      const container = document.querySelector(".webcamera-view-container")
-      container.classList.remove("sm", "lg", "xl")
-      container.classList.add(size)
-
-      if (moveable) {
-        moveable.updateRect()
-      }
-    },
-    false
-  )
-})
+let lastStreamSettings: StreamSettings
 
 function initMovable() {
   moveable = new Moveable(document.body, {
@@ -90,6 +58,10 @@ function showVideo(hasError?: boolean, errorType?: "no-permission") {
 }
 
 function startStream(deviseId) {
+  if (!deviseId) {
+    return
+  }
+
   if (!moveable) {
     initMovable()
   }
@@ -135,3 +107,50 @@ function stopStream() {
     moveable = undefined
   }
 }
+
+function checkStream(data: StreamSettings) {
+  if (data.action == "cameraOnly") {
+    stopStream()
+    return
+  }
+
+  if (data.cameraDeviceId) {
+    startStream(data.cameraDeviceId)
+  } else {
+    stopStream()
+  }
+}
+
+window.electronAPI.ipcRenderer.on(
+  "record-settings-change",
+  (event, data: StreamSettings) => {
+    lastStreamSettings = data
+    checkStream(data)
+  }
+)
+
+window.electronAPI.ipcRenderer.on("app:hide", () => {
+  stopStream()
+})
+
+window.electronAPI.ipcRenderer.on("app:show", () => {
+  checkStream(lastStreamSettings)
+})
+
+changeCameraViewSizeBtn.forEach((button) => {
+  button.addEventListener(
+    "click",
+    (event) => {
+      const target = event.target as HTMLElement
+      const size = target.dataset.size
+      const container = document.querySelector(".webcamera-view-container")
+      container.classList.remove("sm", "lg", "xl")
+      container.classList.add(size)
+
+      if (moveable) {
+        moveable.updateRect()
+      }
+    },
+    false
+  )
+})
