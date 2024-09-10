@@ -26,6 +26,7 @@ import { FileUploadEvents } from "./events/file-upload.events"
   let stream: MediaStream
   let cropMoveable: Moveable
   let cameraMoveable: Moveable
+  let lastStreamSettings: StreamSettings
 
   changeCameraOnlySizeBtn.forEach((button) => {
     button.addEventListener(
@@ -172,14 +173,14 @@ import { FileUploadEvents } from "./events/file-upload.events"
       reader.readAsArrayBuffer(blob)
 
       // Create a link to download the recorded video
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.style.display = "none"
-      a.href = url
-      a.download = "recorded-video.webm"
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
+      // const url = URL.createObjectURL(blob)
+      // const a = document.createElement("a")
+      // a.style.display = "none"
+      // a.href = url
+      // a.download = "recorded-video.webm"
+      // document.body.appendChild(a)
+      // a.click()
+      // window.URL.revokeObjectURL(url)
 
       stream.getTracks().forEach((track) => track.stop())
 
@@ -380,46 +381,51 @@ import { FileUploadEvents } from "./events/file-upload.events"
     errorCamera.setAttribute("hidden", "")
   }
 
+  function initRecord(data: StreamSettings) {
+    initView(data)
+
+    if (data.action == "fullScreenVideo") {
+      initStream(data).then((stream) => {
+        createVideo(stream, undefined, undefined)
+      })
+    }
+
+    if (data.action == "cameraOnly") {
+      hideOnlyCameraError()
+      const video = document.querySelector(
+        "#webcam_only_video"
+      ) as HTMLVideoElement
+
+      if (!data.cameraDeviceId) {
+        showOnlyCameraError("no-camera")
+      }
+
+      initStream(data)
+        .then((stream) => {
+          createVideo(stream, undefined, video)
+        })
+        .catch((e) => {
+          if (e.toString().toLowerCase().includes("permission denied")) {
+            showOnlyCameraError("no-permission")
+          } else {
+            showOnlyCameraError()
+          }
+        })
+    }
+
+    if (data.action == "cropVideo") {
+      const canvas = document.querySelector("#crop_video_screen canvas")
+      initStream(data).then((stream) => {
+        createVideo(stream, canvas, undefined)
+      })
+    }
+  }
+
   window.electronAPI.ipcRenderer.on(
     "record-settings-change",
     (event, data: StreamSettings) => {
-      initView(data)
-
-      if (data.action == "fullScreenVideo") {
-        initStream(data).then((stream) => {
-          createVideo(stream, undefined, undefined)
-        })
-      }
-
-      if (data.action == "cameraOnly") {
-        hideOnlyCameraError()
-        const video = document.querySelector(
-          "#webcam_only_video"
-        ) as HTMLVideoElement
-
-        if (!data.cameraDeviceId) {
-          showOnlyCameraError("no-camera")
-        }
-
-        initStream(data)
-          .then((stream) => {
-            createVideo(stream, undefined, video)
-          })
-          .catch((e) => {
-            if (e.toString().toLowerCase().includes("permission denied")) {
-              showOnlyCameraError("no-permission")
-            } else {
-              showOnlyCameraError()
-            }
-          })
-      }
-
-      if (data.action == "cropVideo") {
-        const canvas = document.querySelector("#crop_video_screen canvas")
-        initStream(data).then((stream) => {
-          createVideo(stream, canvas, undefined)
-        })
-      }
+      lastStreamSettings = data
+      initRecord(data)
     }
   )
 
@@ -520,6 +526,8 @@ import { FileUploadEvents } from "./events/file-upload.events"
 
       if (["stopped"].includes(state["recordingState"])) {
         window.electronAPI.ipcRenderer.send("stop-recording", {})
+        lastScreenAction = undefined
+        initRecord(lastStreamSettings)
       }
     }
   )
