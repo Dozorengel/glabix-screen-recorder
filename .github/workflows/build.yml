@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - review
+  workflow_dispatch:
 
 jobs:
   release:
