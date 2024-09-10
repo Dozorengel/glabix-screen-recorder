@@ -334,9 +334,12 @@ function createDropdownWindow(parentWindow) {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/dropdown.html`)
     )
   }
+
   modalWindow.on("move", () => {
     const gap = 20
-    const screenBounds = screen.getPrimaryDisplay().bounds
+    const screenBounds = screen.getDisplayNearestPoint(
+      modalWindow.getBounds()
+    ).bounds
     const [modalX, modalY] = modalWindow.getPosition()
     const modalBounds = modalWindow.getBounds()
     const dropdownBounds = dropdownWindow.getBounds()
@@ -352,6 +355,7 @@ function createDropdownWindow(parentWindow) {
     const y = modalY + dropdownWindowOffsetY
 
     dropdownWindow.setPosition(x, y)
+    mainWindow.setBounds(screenBounds)
   })
 }
 
