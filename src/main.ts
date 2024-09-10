@@ -50,6 +50,7 @@ if (require("electron-squirrel-startup")) {
 }
 
 let dropdownWindow: BrowserWindow
+let dropdownWindowOffsetY = 0
 let mainWindow: BrowserWindow
 let modalWindow: BrowserWindow
 let loginWindow: BrowserWindow
@@ -312,6 +313,7 @@ function createDropdownWindow(parentWindow) {
     alwaysOnTop: true,
     parent: parentWindow,
     minimizable: false,
+    movable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       zoomFactor: 1.0,
@@ -333,6 +335,25 @@ function createDropdownWindow(parentWindow) {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/dropdown.html`)
     )
   }
+  modalWindow.on("move", () => {
+    const gap = 20
+    const screenBounds = screen.getPrimaryDisplay().bounds
+    const [modalX, modalY] = modalWindow.getPosition()
+    const modalBounds = modalWindow.getBounds()
+    const dropdownBounds = dropdownWindow.getBounds()
+
+    const positionRight =
+      modalBounds.x + modalBounds.width + dropdownBounds.width + gap
+    const diffX = screenBounds.width - positionRight
+
+    const x =
+      diffX < 0
+        ? modalX - dropdownBounds.width - gap
+        : modalX + modalBounds.width + gap
+    const y = modalY + dropdownWindowOffsetY
+
+    dropdownWindow.setPosition(x, y)
+  })
 }
 
 function createLoginWindow() {
@@ -515,6 +536,7 @@ ipcMain.on("dropdown:open", (event, data: IDropdownPageData) => {
     gap
   const positionY = modalWindowBounds.y + data.offsetY
   const diffX = screenBounds.width - positionRight
+  dropdownWindowOffsetY = data.offsetY
 
   if (diffX < 0) {
     dropdownWindow.setBounds({

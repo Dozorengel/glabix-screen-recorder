@@ -20,6 +20,7 @@ export default defineConfig((env) => {
           main_window: resolve(__dirname, "index.html"),
           modal_window: resolve(__dirname, "modal.html"),
           login_window: resolve(__dirname, "login.html"),
+          dropdown_window: resolve(__dirname, "dropdown.html"),
         },
       },
     },
