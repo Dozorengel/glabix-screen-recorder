@@ -68,8 +68,8 @@ import {
 
   async function setupMediaPermissions() {
     const devices = await navigator.mediaDevices.enumerateDevices()
-    const cameraPermission = await getMediaPermission("camera")
     const microPermission = await getMediaPermission("microphone")
+    const cameraPermission = await getMediaPermission("camera")
 
     audioDevicesList = devices.filter((d) => d.kind == "audioinput")
     audioDevicesList = [noAudioDevice, ...audioDevicesList]

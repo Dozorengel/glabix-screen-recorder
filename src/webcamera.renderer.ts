@@ -7,6 +7,9 @@ const videoContainer = document.getElementById(
 const videoContainerError = videoContainer.querySelector(
   ".webcamera-view-no-device"
 ) as HTMLDivElement
+const videoContainerPermissionError = videoContainer.querySelector(
+  ".webcamera-view-no-permission"
+) as HTMLDivElement
 const video = document.getElementById("video") as HTMLVideoElement
 const changeCameraViewSizeBtn = document.querySelectorAll(
   ".js-camera-view-size"
@@ -70,14 +73,19 @@ function initMovable() {
 }
 initMovable()
 
-function showVideo(hasError?: boolean) {
+function showVideo(hasError?: boolean, errorType?: "no-permission") {
   video.srcObject = currentStream
   videoContainer.removeAttribute("hidden")
 
   if (hasError) {
-    videoContainerError.removeAttribute("hidden")
+    if (errorType == "no-permission") {
+      videoContainerPermissionError.removeAttribute("hidden")
+    } else {
+      videoContainerError.removeAttribute("hidden")
+    }
   } else {
     videoContainerError.setAttribute("hidden", "")
+    videoContainerPermissionError.setAttribute("hidden", "")
   }
 }
 
@@ -99,7 +107,11 @@ function startStream(deviseId) {
         showVideo()
       })
       .catch((e) => {
-        showVideo(true)
+        if (e.toString().toLowerCase().includes("permission denied")) {
+          showVideo(true, "no-permission")
+        } else {
+          showVideo(true)
+        }
       })
   } else {
     showVideo()
@@ -109,6 +121,7 @@ function startStream(deviseId) {
 function stopStream() {
   videoContainer.setAttribute("hidden", "")
   videoContainerError.setAttribute("hidden", "")
+  videoContainerPermissionError.setAttribute("hidden", "")
 
   if (currentStream) {
     const tracks = currentStream.getTracks()

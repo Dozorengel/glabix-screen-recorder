@@ -146,6 +146,12 @@ if (!gotTheLock) {
         })
       }
     )
+
+    session.defaultSession.setPermissionRequestHandler(
+      (webContents, permission, callback) => {
+        callback(true)
+      }
+    )
   })
 }
 
@@ -209,6 +215,7 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       zoomFactor: 1.0,
+      devTools: !app.isPackaged,
       nodeIntegration: true, // Enable Node.js integration
       // contextIsolation: false, // Disable context isolation (not recommended for production)
     },
@@ -255,6 +262,7 @@ function createModal(parentWindow) {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       zoomFactor: 1.0,
+      devTools: !app.isPackaged,
       nodeIntegration: true, // Enable Node.js integration
       // contextIsolation: false, // Disable context isolation (not recommended for production)
     },
@@ -307,6 +315,7 @@ function createDropdownWindow(parentWindow) {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       zoomFactor: 1.0,
+      devTools: !app.isPackaged,
       nodeIntegration: true, // Enable Node.js integration
       // contextIsolation: false, // Disable context isolation (not recommended for production)
     },
@@ -339,6 +348,7 @@ function createLoginWindow() {
       preload: path.join(__dirname, "preload.js"), // для безопасного взаимодействия с рендерером
       nodeIntegration: true, // повышаем безопасность
       zoomFactor: 1.0,
+      devTools: !app.isPackaged,
       // contextIsolation: true,  // повышаем безопасность
     },
   })

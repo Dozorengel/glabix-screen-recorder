@@ -118,8 +118,17 @@
         <i class="i i-dot i--lg"></i>
         <div class="fw-500">Запись только камеры</div>
       </div>
-      <div class="webcamera-only-no-device" hidden>
+      <div class="webcamera-only-error webcamera-only-no-device" hidden>
         <div>Камера не доступна или используется другой программой</div>
+      </div>
+      <div class="webcamera-only-error webcamera-only-no-permission" hidden>
+        <div>
+          Доступ к камере запрещен. Включите доступ к камере в настройках
+          системы.
+        </div>
+      </div>
+      <div class="webcamera-only-error webcamera-only-no-camera" hidden>
+        <div>Выберите камеру</div>
       </div>
       <video id="webcam_only_video" autoplay></video>
       <div class="webcamera-only-menu-container">
@@ -159,8 +168,14 @@
 
     <div id="webcamera-view" class="webcamera-view-container sm" hidden>
       <video id="video" autoplay></video>
-      <div class="webcamera-view-no-device" hidden>
+      <div class="webcamera-view-error webcamera-view-no-device" hidden>
         <div>Камера не доступна или используется другой программой</div>
+      </div>
+      <div class="webcamera-view-error webcamera-view-no-permission" hidden>
+        <div>
+          Доступ к камере запрещен. Включите доступ к камере в настройках
+          системы.
+        </div>
       </div>
       <div class="webcamera-view-menu-container">
         <div class="webcamera-view-menu webcamera-view-menu-more">

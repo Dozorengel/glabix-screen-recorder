@@ -87,12 +87,14 @@ import { FileUploadEvents } from "./events/file-upload.events"
     if (settings.action == "fullScreenVideo") {
       videoStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
+        audio: false,
       })
     }
 
     if (settings.action == "cropVideo") {
       videoStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
+        audio: false,
       })
     }
 
@@ -353,13 +355,29 @@ import { FileUploadEvents } from "./events/file-upload.events"
     }
   }
 
-  const showOnlyCameraError = () => {
+  const showOnlyCameraError = (errorType?: "no-permission" | "no-camera") => {
     const error = document.querySelector(".webcamera-only-no-device")
-    error.removeAttribute("hidden")
+    const errorPermission = document.querySelector(
+      ".webcamera-only-no-permission"
+    )
+    const errorCamera = document.querySelector(".webcamera-only-no-camera")
+    if (errorType == "no-permission") {
+      errorPermission.removeAttribute("hidden")
+    } else if (errorType == "no-camera") {
+      errorCamera.removeAttribute("hidden")
+    } else {
+      error.removeAttribute("hidden")
+    }
   }
   const hideOnlyCameraError = () => {
     const error = document.querySelector(".webcamera-only-no-device")
+    const errorPermission = document.querySelector(
+      ".webcamera-only-no-permission"
+    )
+    const errorCamera = document.querySelector(".webcamera-only-no-camera")
     error.setAttribute("hidden", "")
+    errorPermission.setAttribute("hidden", "")
+    errorCamera.setAttribute("hidden", "")
   }
 
   window.electronAPI.ipcRenderer.on(
@@ -378,12 +396,21 @@ import { FileUploadEvents } from "./events/file-upload.events"
         const video = document.querySelector(
           "#webcam_only_video"
         ) as HTMLVideoElement
+
+        if (!data.cameraDeviceId) {
+          showOnlyCameraError("no-camera")
+        }
+
         initStream(data)
           .then((stream) => {
             createVideo(stream, undefined, video)
           })
           .catch((e) => {
-            showOnlyCameraError()
+            if (e.toString().toLowerCase().includes("permission denied")) {
+              showOnlyCameraError("no-permission")
+            } else {
+              showOnlyCameraError()
+            }
           })
       }
 
