@@ -1,4 +1,8 @@
-import { StreamSettings } from "./helpers/types"
+import {
+  RecorderState,
+  SimpleStoreEvents,
+  StreamSettings,
+} from "./helpers/types"
 import Moveable, { MoveableRefTargetType } from "moveable"
 
 const videoContainer = document.getElementById(
@@ -18,6 +22,7 @@ const changeCameraViewSizeBtn = document.querySelectorAll(
 let currentStream: MediaStream
 let moveable: Moveable
 let lastStreamSettings: StreamSettings
+let isRecording
 
 function initMovable() {
   moveable = new Moveable(document.body, {
@@ -125,16 +130,29 @@ window.electronAPI.ipcRenderer.on(
   "record-settings-change",
   (event, data: StreamSettings) => {
     lastStreamSettings = data
-    checkStream(data)
+    if (!isRecording) {
+      checkStream(data)
+    }
   }
 )
 
+window.electronAPI.ipcRenderer.on("start-recording", () => {
+  isRecording = true
+})
+window.electronAPI.ipcRenderer.on("stop-recording", () => {
+  isRecording = false
+})
+
 window.electronAPI.ipcRenderer.on("app:hide", () => {
-  stopStream()
+  if (!isRecording) {
+    stopStream()
+  }
 })
 
 window.electronAPI.ipcRenderer.on("app:show", () => {
-  checkStream(lastStreamSettings)
+  if (!isRecording) {
+    checkStream(lastStreamSettings)
+  }
 })
 
 changeCameraViewSizeBtn.forEach((button) => {

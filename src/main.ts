@@ -343,6 +343,7 @@ function createDropdownWindow(parentWindow) {
     const [modalX, modalY] = modalWindow.getPosition()
     const modalBounds = modalWindow.getBounds()
     const dropdownBounds = dropdownWindow.getBounds()
+    const dropdownWindowWidth = 300
 
     const positionRight =
       modalBounds.x + modalBounds.width + dropdownBounds.width + gap
@@ -350,7 +351,7 @@ function createDropdownWindow(parentWindow) {
 
     const x =
       diffX < 0
-        ? modalX - dropdownBounds.width - gap
+        ? modalX - dropdownWindowWidth - gap
         : modalX + modalBounds.width + gap
     const y = modalY + dropdownWindowOffsetY
 
