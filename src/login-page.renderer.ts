@@ -3,11 +3,18 @@ import "./styles/login-page.scss"
 ;(function () {})()
 
 document.addEventListener("DOMContentLoaded", () => {
-  const link = import.meta.env.VITE_AUTH_APP_URL + "recorder/auth"
+  const authLink = import.meta.env.VITE_AUTH_APP_URL + "recorder/auth"
+  const registrationLink =
+    import.meta.env.VITE_AUTH_APP_URL + "recorder/registration"
   const authBtn = document.getElementById("auth-btn")
+  const registrationBtn = document.getElementById("registration-btn")
   authBtn.addEventListener("click", (event) => {
     event.preventDefault()
-    window.electronAPI.openLinkInBrowser(link)
+    window.electronAPI.openLinkInBrowser(authLink)
+  })
+  registrationBtn.addEventListener("click", (event) => {
+    event.preventDefault()
+    window.electronAPI.openLinkInBrowser(registrationLink)
   })
 })
 
