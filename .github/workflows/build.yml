@@ -31,6 +31,11 @@ jobs:
           VITE_AUTH_APP_URL: ${{ vars.VITE_AUTH_APP_URL }}
           VITE_LOGIN_IS_REQUIRED: ${{ vars.VITE_LOGIN_IS_REQUIRED }}
           EP_PRE_RELEASE: ${{ vars.EP_PRE_RELEASE }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
