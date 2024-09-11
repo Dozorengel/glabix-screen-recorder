@@ -624,8 +624,8 @@ ipcMain.on(FileUploadEvents.FILE_CREATED, (event, file) => {
   const size = 10 * 1024 * 1024
   const chunksSlicer = new ChunkSlicer(blob, size)
   const processedChunks = [...chunksSlicer.allChunks]
-  const fileName = "test-video-" + Date.now() + ".mp4"
   const title = getTitle()
+  const fileName = title + ".mp4"
   createFileUploadCommand(
     tokenStorage.token.access_token,
     tokenStorage.organizationId,
