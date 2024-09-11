@@ -11,7 +11,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: "favicon-24.png",
-    osxSign: {},
+    // osxSign: {},
   },
   rebuildConfig: {},
   makers: [

@@ -31,6 +31,7 @@ const options = {
       NSCameraUsageDescription: "Предоставьте доступ к камере",
     },
     notarize: true,
+    entitlements: "build/entitlements.mac.plist",
   },
   nsisWeb: {
     shortcutName: "Глабикс Экран",
