@@ -464,7 +464,7 @@ import { FileUploadEvents } from "./events/file-upload.events"
             window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
             setTimeout(() => {
               startRecording()
-            }, 20)
+            }, 50)
           } else {
             countdown.innerHTML = `${timeleft}`
             window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
@@ -548,6 +548,8 @@ import { FileUploadEvents } from "./events/file-upload.events"
         lastScreenAction = undefined
         initRecord(lastStreamSettings)
       }
+
+      window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
     }
   )
 })()
