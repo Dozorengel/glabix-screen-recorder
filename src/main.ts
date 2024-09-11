@@ -597,7 +597,9 @@ ipcMain.on("main-window-focus", (event, data) => {
   mainWindow.focus()
 })
 ipcMain.on("invalidate-shadow", (event, data) => {
-  mainWindow.invalidateShadow()
+  if (os.platform() == "darwin") {
+    mainWindow.invalidateShadow()
+  }
 })
 
 ipcMain.on(LoginEvents.LOGIN_ATTEMPT, (event, credentials) => {
