@@ -35,6 +35,7 @@ function initMovable() {
   moveable
     .on("dragStart", ({ target, clientX, clientY }) => {
       target.classList.add("moveable-dragging")
+      window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
     })
     .on("drag", ({ target, left, top }) => {
       target!.style.left = `${left}px`
@@ -42,6 +43,7 @@ function initMovable() {
     })
     .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
       target.classList.remove("moveable-dragging")
+      window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
     })
 }
 initMovable()

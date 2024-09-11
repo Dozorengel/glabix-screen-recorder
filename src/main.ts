@@ -243,6 +243,9 @@ function createWindow() {
     )
   }
   mainWindow.webContents.setFrameRate(60)
+  mainWindow.on("close", () => {
+    app.quit()
+  })
   createModal(mainWindow)
   createLoginWindow()
 }
@@ -254,7 +257,7 @@ function createModal(parentWindow) {
     maximizable: false,
     resizable: false,
     width: 300,
-    height: 370,
+    height: 395,
     show: false,
     alwaysOnTop: true,
     parent: parentWindow,
@@ -274,6 +277,7 @@ function createModal(parentWindow) {
     dropdownWindow.hide()
   })
   modalWindow.on("show", () => {
+    modalWindow.webContents.send("app:version", app.getVersion())
     mainWindow.webContents.send("app:show")
   })
   modalWindow.on("blur", () => {
@@ -290,9 +294,13 @@ function createModal(parentWindow) {
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     modalWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/modal.html`)
   } else {
-    modalWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/modal.html`)
-    )
+    modalWindow
+      .loadFile(
+        path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/modal.html`)
+      )
+      .then(() => {
+        modalWindow.webContents.send("app:version", app.getVersion())
+      })
   }
 
   createDropdownWindow(modalWindow)
@@ -355,6 +363,7 @@ function createDropdownWindow(parentWindow) {
         : modalX + modalBounds.width + gap
     const y = modalY + dropdownWindowOffsetY
 
+    dropdownWindow.setBounds({ width: dropdownWindowWidth })
     dropdownWindow.setPosition(x, y)
     mainWindow.setBounds(screenBounds)
   })
@@ -466,7 +475,7 @@ function createMenu() {
   contextMenu = Menu.buildFromTemplate([
     {
       id: "menuLogOutItem",
-      label: "Выйти",
+      label: "Выйти из аккаунта",
       visible: tokenStorage.dataIsActual(),
       click: () => {
         tokenStorage.reset()
@@ -476,7 +485,7 @@ function createMenu() {
       },
     },
     {
-      label: "Закрыть",
+      label: "Закрыть приложение",
       click: () => {
         app.quit()
       },
@@ -586,6 +595,9 @@ ipcMain.on(SimpleStoreEvents.UPDATE, (event, data: ISimpleStoreData) => {
 
 ipcMain.on("main-window-focus", (event, data) => {
   mainWindow.focus()
+})
+ipcMain.on("invalidate-shadow", (event, data) => {
+  mainWindow.invalidateShadow()
 })
 
 ipcMain.on(LoginEvents.LOGIN_ATTEMPT, (event, credentials) => {

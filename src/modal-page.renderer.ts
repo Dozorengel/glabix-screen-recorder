@@ -242,7 +242,10 @@ import {
       },
       false
     )
-
+    window.electronAPI.ipcRenderer.on("app:version", (event, version) => {
+      const versionEl = document.querySelector("#app_version")
+      versionEl.innerHTML = `, v${version}`
+    })
     window.electronAPI.ipcRenderer.on(
       "dropdown:select",
       (event, data: IDropdownPageSelectData) => {

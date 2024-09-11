@@ -239,6 +239,7 @@ function setPanelDraggable() {
   moveable
     .on("dragStart", ({ target, clientX, clientY }) => {
       target.classList.add("moveable-dragging")
+      window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
     })
     .on(
       "drag",
@@ -262,5 +263,6 @@ function setPanelDraggable() {
     )
     .on("dragEnd", ({ target, isDrag, clientX, clientY }) => {
       target.classList.remove("moveable-dragging")
+      window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
     })
 }

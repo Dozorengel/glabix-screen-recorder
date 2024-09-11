@@ -120,7 +120,10 @@ import { FileUploadEvents } from "./events/file-upload.events"
           ..._stream.getAudioTracks(),
         ])
       : _stream
-    videoRecorder = new MediaRecorder(stream)
+    videoRecorder = new MediaRecorder(stream, {
+      mimeType: "video/webm; codecs=vp9",
+      videoBitsPerSecond: 2500000, // 2.5 Mbps
+    })
     let chunks = []
 
     if (_video) {
@@ -312,10 +315,17 @@ import { FileUploadEvents } from "./events/file-upload.events"
         draggable: true,
       })
 
-      cameraMoveable.on("drag", ({ target, left, top }) => {
-        target!.style.left = `${left}px`
-        target!.style.top = `${top}px`
-      })
+      cameraMoveable
+        .on("dragStart", () => {
+          window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
+        })
+        .on("drag", ({ target, left, top }) => {
+          target!.style.left = `${left}px`
+          target!.style.top = `${top}px`
+        })
+        .on("dragEnd", () => {
+          window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
+        })
     }
 
     if (settings.action == "cropVideo") {
@@ -334,10 +344,17 @@ import { FileUploadEvents } from "./events/file-upload.events"
         resizable: true,
       })
 
-      cropMoveable.on("drag", ({ target, left, top }) => {
-        target!.style.left = `${left}px`
-        target!.style.top = `${top}px`
-      })
+      cropMoveable
+        .on("dragStart", () => {
+          window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
+        })
+        .on("drag", ({ target, left, top }) => {
+          target!.style.left = `${left}px`
+          target!.style.top = `${top}px`
+        })
+        .on("dragEnd", () => {
+          window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
+        })
 
       /* resizable */
       cropMoveable.on("resize", (data) => {
@@ -444,11 +461,13 @@ import { FileUploadEvents } from "./events/file-upload.events"
             clearInterval(startTimer)
             countdownContainer.setAttribute("hidden", "")
             countdown.innerHTML = ""
+            window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
             setTimeout(() => {
               startRecording()
-            }, 10)
+            }, 20)
           } else {
             countdown.innerHTML = `${timeleft}`
+            window.electronAPI.ipcRenderer.send("invalidate-shadow", {})
           }
           timeleft -= 1
         }, 1000)
