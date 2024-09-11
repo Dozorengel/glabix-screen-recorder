@@ -60,6 +60,9 @@
     "typescript": "~5.5.4",
     "vite": "^5.0.12"
   },
+  "resolutions": {
+    "@electron/notarize": "2.4.0"
+  },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
   }
