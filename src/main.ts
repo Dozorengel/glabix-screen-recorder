@@ -61,7 +61,7 @@ let isAppQuitting = false
 const tokenStorage = new TokenStorage()
 const appState = new AppState()
 const store = new SimpleStore()
-const chunkStorage = new ChunkStorageService()
+let chunkStorage: ChunkStorageService
 
 app.removeAsDefaultProtocolClient("glabix-video-recorder")
 app.commandLine.appendSwitch("force-compositing-mode")
@@ -122,6 +122,7 @@ if (!gotTheLock) {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(() => {
+    chunkStorage = new ChunkStorageService()
     autoUpdater.checkForUpdatesAndNotify()
     setLog(JSON.stringify(import.meta.env), true)
     // ipcMain.handle(
