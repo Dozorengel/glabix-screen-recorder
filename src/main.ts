@@ -44,11 +44,6 @@ import { setLog } from "./helpers/set-log"
 // Optional, initialize the logger for any renderer process
 log.initialize()
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require("electron-squirrel-startup")) {
-  app.quit()
-}
-
 let dropdownWindow: BrowserWindow
 let dropdownWindowOffsetY = 0
 let mainWindow: BrowserWindow
