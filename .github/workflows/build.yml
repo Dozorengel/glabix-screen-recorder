@@ -26,9 +26,11 @@ jobs:
 
       - name: Decode signing certificate into a file
         env:
-          CERTIFICATE_BASE64: ${{ secrets.CSC_LINK }}
+          SIGNING_CERT64: ${{ secrets.CSC_LINK }}
+          NOTARIZE_CERT: ${{ secrets.APPLE_API_KEY }}
         run: |
-          echo $CERTIFICATE_BASE64 | base64 --decode > signing-cert.p12
+          echo $SIGNING_CERT64 | base64 --decode > signing-cert.p12
+          echo $NOTARIZE_CERT > notarize-cert.p8
 
       - name: Build/release Electron app
         uses: Yan-Jobs/action-electron-builder@v1.7.0
@@ -39,7 +41,7 @@ jobs:
           EP_PRE_RELEASE: ${{ vars.EP_PRE_RELEASE }}
           CSC_LINK: signing-cert.p12
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY: notarize-cert.p8
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         with:
