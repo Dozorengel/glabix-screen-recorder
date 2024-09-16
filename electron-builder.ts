@@ -1,11 +1,6 @@
-"use strict"
+import { Configuration } from "app-builder-lib"
 
-// Let's get that intellisense working
-/**
- * @type {import('electron-builder').Configuration}
- * @see https://www.electron.build/configuration/configuration
- */
-const options = {
+const options: Configuration = {
   appId: "com.glabix-screen.app",
   productName: "Glabix Screen",
   protocols: {

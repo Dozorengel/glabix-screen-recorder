@@ -42,4 +42,4 @@ jobs:
           github_token: ${{ secrets.github_token }}
           release: true
           build_script_name: package
-          args: --config electron-builder.mjs --mac --windows -c.compression=maximum
+          args: --config electron-builder.ts --mac --windows -c.compression=maximum

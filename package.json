@@ -16,7 +16,7 @@
     "make:mac-intel": "electron-forge make --platform darwin --arch x64",
     "make:mac-m1": "electron-forge make --platform darwin --arch arm64",
     "make:mac-universal": "electron-forge make --platform darwin --arch universal",
-    "build": "electron-builder --config electron-builder.mjs",
+    "build": "electron-builder --config electron-builder.ts",
     "dist": "npm run package && npm run build -- --mac --windows",
     "dist:win": "npm run package && npm run build -- --windows",
     "dist:mac": "npm run package && npm run build -- --mac",
