@@ -1,9 +1,9 @@
 {
   "name": "glabix-screen",
-  "productName": "Glabix Screen",
-  "version": "0.0.22-dev.0",
-  "author": "Glabix",
-  "description": "A tool to record your screen",
+  "productName": "Glabix.Screen",
+  "version": "0.0.22",
+  "author": "Глабикс",
+  "description": "Программа для записи экрана и создания видеосообщений",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "dotenvx run --env-file=.env -- electron-forge start",

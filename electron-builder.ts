@@ -2,9 +2,9 @@ import { Configuration } from "app-builder-lib"
 
 const options: Configuration = {
   appId: "com.glabix-screen.app",
-  productName: "Glabix Screen",
+  productName: "Глабикс.Экран",
   protocols: {
-    name: "Glabix Screen",
+    name: "Глабикс.Экран",
     schemes: ["glabix-screen"],
   },
   // "store" | “normal" | "maximum" - For testing builds, use 'store' to reduce build time significantly.
@@ -13,11 +13,12 @@ const options: Configuration = {
   icon: "public/logo-square.png",
   win: {
     target: [{ target: "nsis-web", arch: ["x64"] }],
+    executableName: "Глабикс.Экран",
   },
   mac: {
     target: [{ target: "dmg", arch: ["arm64", "x64"] }],
     category: "public.app-category.productivity",
-    executableName: "Глабикс Экран",
+    executableName: "Глабикс.Экран",
     hardenedRuntime: true,
     gatekeeperAssess: true,
     extendInfo: {
@@ -27,9 +28,10 @@ const options: Configuration = {
     },
     notarize: true,
     entitlements: "build/entitlements.mac.plist",
+    entitlementsInherit: "build/entitlements.mac.plist",
   },
   nsisWeb: {
-    shortcutName: "Глабикс Экран",
+    shortcutName: "Глабикс.Экран",
   },
 }
 
