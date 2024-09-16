@@ -24,6 +24,12 @@ jobs:
           node-version: 20
           cache: "npm"
 
+      - name: Decode signing certificate into a file
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.CSC_LINK }}
+        run: |
+          echo $CERTIFICATE_BASE64 | base64 --decode > signing-cert.p12
+
       - name: Build/release Electron app
         uses: Yan-Jobs/action-electron-builder@v1.7.0
         env:
@@ -31,7 +37,7 @@ jobs:
           VITE_AUTH_APP_URL: ${{ vars.VITE_AUTH_APP_URL }}
           VITE_LOGIN_IS_REQUIRED: ${{ vars.VITE_LOGIN_IS_REQUIRED }}
           EP_PRE_RELEASE: ${{ vars.EP_PRE_RELEASE }}
-          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_LINK: signing-cert.p12
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
