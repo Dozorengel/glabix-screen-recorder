@@ -38,4 +38,4 @@ const options = {
   },
 }
 
-module.exports = options
+export default options
