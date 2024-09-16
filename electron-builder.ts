@@ -2,7 +2,7 @@ import { Configuration } from "app-builder-lib"
 
 const options: Configuration = {
   appId: "com.glabix-screen.app",
-  productName: "Глабикс.Экран",
+  productName: "Glabix.Screen",
   protocols: {
     name: "Глабикс.Экран",
     schemes: ["glabix-screen"],
