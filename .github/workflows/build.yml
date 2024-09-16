@@ -24,13 +24,10 @@ jobs:
           node-version: 20
           cache: "npm"
 
-      # - name: Decode signing certificate into a file
-      #   env:
-      #     SIGNING_CERT64: ${{ secrets.CSC_LINK }}
-      #   run: |
-      #     echo $SIGNING_CERT64 | base64 --decode > signing-cert.p12
-      #     mkdir -p ~/private_keys/
-      #     echo '${{ secrets.APPLE_API_KEY }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+      - name: Create notarization certificate file
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.APPLE_API_KEY }}' > ~/private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
 
       - name: Build/release Electron app
         uses: Yan-Jobs/action-electron-builder@v1.7.0
@@ -42,8 +39,8 @@ jobs:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           # APPLE_API_KEY: notarize-cert.p8
-          # APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-          # APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
