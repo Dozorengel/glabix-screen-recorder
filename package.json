@@ -1,7 +1,7 @@
 {
   "name": "glabix-screen",
   "productName": "Glabix.Screen",
-  "version": "0.0.23-dev.0",
+  "version": "0.0.24-dev.0",
   "author": "Глабикс",
   "description": "Программа для записи экрана и создания видеосообщений",
   "main": ".vite/build/main.js",
